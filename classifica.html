@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rovigoal - Classifica</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        table {
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .posizione {
+            width: 60px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .squadra {
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        .primo {
+            background-color: #FFD700;
+        }
+        
+        .secondo {
+            background-color: #C0C0C0;
+        }
+        
+        .terzo {
+            background-color: #CD7F32;
+        }
+        
+        .btn-back {
+            display: block;
+            margin: 30px auto;
+            padding: 12px 30px;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .btn-back:hover {
+            opacity: 0.9;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏆 CLASSIFICA ROVIGOAL</h1>
+        <p>Aggiornata in tempo reale</p>
+    </div>
+    
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totSquadre">0</div>
+                <div class="stat-label">Squadre</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totPartite">0</div>
+                <div class="stat-label">Partite</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totGol">0</div>
+                <div class="stat-label">Gol Totali</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="mediaGol">0.0</div>
+                <div class="stat-label">Media Gol/Partita</div>
+            </div>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th class="posizione">#</th>
+                    <th class="squadra">SQUADRA</th>
+                    <th>P</th>
+                    <th>PG</th>
+                    <th>V</th>
+                    <th>N</th>
+                    <th>P</th>
+                    <th>GF</th>
+                    <th>GS</th>
+                    <th>DR</th>
+                    <th>ULT. 5</th>
+                </tr>
+            </thead>
+            <tbody id="tabellaClassifica">
+                <!-- La classifica verrà inserita qui -->
+            </tbody>
+        </table>
+        
+        <button class="btn-back" onclick="tornaIndietro()">← TORNA ALLA HOME</button>
+    </div>
+    
+    <script>
+        // Carica dati dal database
+        function caricaClassifica() {
+            const squadre = JSON.parse(localStorage.getItem('rovigoal_squadre')) || [];
+            const partite = JSON.parse(localStorage.getItem('rovigoal_partite')) || [];
+            
+            // Ordina squadre per punti (discendente)
+            squadre.sort((a, b) => {
+                if(b.punti !== a.punti) return b.punti - a.punti;
+                // In caso di pari punti, differenza reti
+                const drA = a.golFatti - a.golSubiti;
+                const drB = b.golFatti - b.golSubiti;
+                if(drB !== drA) return drB - drA;
+                // In caso di pari DR, gol fatti
+                return b.golFatti - a.golFatti;
+            });
+            
+            // Aggiorna statistiche
+            document.getElementById('totSquadre').textContent = squadre.length;
+            document.getElementById('totPartite').textContent = partite.length;
+            
+            let totGol = 0;
+            partite.forEach(partita => {
+                totGol += partita.golCasa + partita.golOspite;
+            });
+            document.getElementById('totGol').textContent = totGol;
+            
+            const mediaGol = partite.length > 0 ? (totGol / partite.length).toFixed(2) : "0.00";
+            document.getElementById('mediaGol').textContent = mediaGol;
+            
+            // Genera tabella classifica
+            const tabella = document.getElementById('tabellaClassifica');
+            tabella.innerHTML = '';
+            
+            if(squadre.length === 0) {
+                tabella.innerHTML = `
+                    <tr>
+                        <td colspan="11" style="text-align: center; padding: 40px;">
+                            Nessuna squadra registrata. Vai in Area Admin per aggiungere squadre.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            squadre.forEach((squadra, index) => {
+                const posizione = index + 1;
+                const dr = squadra.golFatti - squadra.golSubiti;
+                
+                // Determina classe per le prime tre posizioni
+                let classePosizione = '';
+                if(posizione === 1) classePosizione = 'primo';
+                else if(posizione === 2) classePosizione = 'secondo';
+                else if(posizione === 3) classePosizione = 'terzo';
+                
+                // Genera risultati ultime partite (placeholder)
+                const ultimePartite = '---';
+                
+                const riga = `
+                    <tr class="${classePosizione}">
+                        <td class="posizione">${posizione}</td>
+                        <td class="squadra">${squadra.nome}</td>
+                        <td><strong>${squadra.punti}</strong></td>
+                        <td>${squadra.partiteGiocate}</td>
+                        <td>${squadra.vittorie}</td>
+                        <td>${squadra.pareggi}</td>
+                        <td>${squadra.sconfitte}</td>
+                        <td>${squadra.golFatti}</td>
+                        <td>${squadra.golSubiti}</td>
+                        <td>${dr > 0 ? '+' : ''}${dr}</td>
+                        <td>${ultimePartite}</td>
+                    </tr>
+                `;
+                
+                tabella.innerHTML += riga;
+            });
+        }
+        
+        function tornaIndietro() {
+            window.location.href = 'main.html';
+        }
+        
+        // Controllo accesso
+        if(localStorage.getItem('rovigoal_entrato') !== 'true') {
+            window.location.href = 'index.html';
+        }
+        
+        // Carica la classifica all'avvio
+        caricaClassifica();
+        
+        // Aggiorna automaticamente ogni 30 secondi
+        setInterval(caricaClassifica, 30000);
+    </script>
+</body>
+</html>

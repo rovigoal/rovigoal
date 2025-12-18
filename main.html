@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rovigoal - Area Principale</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .logo-header {
+            font-size: 2em;
+            position: absolute;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .pulsante {
+            background: white;
+            padding: 50px 20px;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 1.4em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pulsante:hover {
+            transform: translateY(-15px) scale(1.03);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .pulsante::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: 0.5s;
+        }
+        
+        .pulsante:hover::before {
+            left: 100%;
+        }
+        
+        .pulsante:nth-child(1) {
+            background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%);
+            color: white;
+        }
+        
+        .pulsante:nth-child(2) {
+            background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+            color: white;
+        }
+        
+        .pulsante:nth-child(3) {
+            background: linear-gradient(135deg, #834d9b 0%, #d04ed6 100%);
+            color: white;
+        }
+        
+        .pulsante:nth-child(4) {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .pulsante:nth-child(5) {
+            background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+            color: white;
+        }
+        
+        .icona {
+            font-size: 2.5em;
+            display: block;
+            margin-bottom: 15px;
+        }
+        
+        .logout {
+            display: block;
+            margin: 50px auto 0;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .logout:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        
+        .user-info {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        @media (max-width: 768px) {
+            .menu {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .logo-header, .user-info {
+                position: static;
+                transform: none;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-header">⚽</div>
+        <h1>ROVIGOAL</h1>
+        <p>Gestione Calcio Rovigiano</p>
+        <div class="user-info" id="userInfo">Utente: Ospite</div>
+    </div>
+    
+    <div class="menu">
+        <div class="pulsante" onclick="apriPagina('classifica')">
+            <span class="icona">🏆</span>
+            CLASSIFICA
+        </div>
+        <div class="pulsante" onclick="apriPagina('giocatori')">
+            <span class="icona">👥</span>
+            GIOCATORI
+        </div>
+        <div class="pulsante" onclick="apriPagina('admin')">
+            <span class="icona">🔧</span>
+            ADMIN
+        </div>
+        <div class="pulsante" onclick="apriPagina('partite')">
+            <span class="icona">📅</span>
+            PARTITE
+        </div>
+        <div class="pulsante" onclick="apriPagina('statistiche')">
+            <span class="icona">📊</span>
+            STATISTICHE
+        </div>
+    </div>
+    
+    <button class="logout" onclick="logout()">ESCI DALL'AREA</button>
+    
+    <script>
+        function apriPagina(pagina) {
+            alert("Hai selezionato: " + pagina.toUpperCase() + "\n\nDimmi cosa vuoi che faccia questa sezione!");
+            localStorage.setItem('rovigoal_pagina_selezionata', pagina);
+        }
+        
+        function logout() {
+            if(confirm("Sei sicuro di voler uscire?")) {
+                localStorage.removeItem('rovigoal_entrato');
+                window.location.href = 'index.html';
+            }
+        }
+        
+        // Controllo accesso
+        if(localStorage.getItem('rovigoal_entrato') !== 'true') {
+            window.location.href = 'index.html';
+        }
+        
+        // Mostra informazioni utente
+        const userInfo = document.getElementById('userInfo');
+        const ora = new Date().getHours();
+        let saluto = '';
+        
+        if(ora < 12) saluto = 'Buongiorno';
+        else if(ora < 18) saluto = 'Buon pomeriggio';
+        else saluto = 'Buonasera';
+        
+        userInfo.textContent = `${saluto} | Rovigoal`;
+    </script>
+</body>
+</html>

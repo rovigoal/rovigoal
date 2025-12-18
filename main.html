@@ -106,12 +106,71 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
+        
+        .info-footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .stats-summary {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            min-width: 150px;
+        }
+        
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+        
+        .stat-label {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .menu {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .pulsante {
+                padding: 40px 20px;
+            }
+            
+            .stats-summary {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>ROVIGOAL</h1>
         <p>Gestione Torneo Calcio</p>
+        
+        <div class="stats-summary" id="statsSummary">
+            <!-- Le statistiche verranno caricate qui -->
+        </div>
     </div>
     
     <div class="menu">
@@ -135,22 +194,85 @@
     
     <button class="logout" onclick="logout()">ESCI</button>
     
+    <div class="info-footer">
+        <p>Il tuo torneo di calcio a Rovigo e dintorni</p>
+        <p>Data ultimo aggiornamento: <span id="ultimoAggiornamento"></span></p>
+    </div>
+    
     <script>
+        // Carica statistiche all'avvio
+        function caricaStatistiche() {
+            const squadre = JSON.parse(localStorage.getItem('rovigoal_squadre')) || [];
+            const giocatori = JSON.parse(localStorage.getItem('rovigoal_giocatori')) || [];
+            const partite = JSON.parse(localStorage.getItem('rovigoal_partite')) || [];
+            
+            const container = document.getElementById('statsSummary');
+            
+            let html = '';
+            
+            if(squadre.length > 0 || giocatori.length > 0 || partite.length > 0) {
+                html = `
+                    <div class="stat-box">
+                        <div class="stat-number">${squadre.length}</div>
+                        <div class="stat-label">Squadre</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">${giocatori.length}</div>
+                        <div class="stat-label">Giocatori</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">${partite.length}</div>
+                        <div class="stat-label">Partite</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">${calcolaTotaleGol(partite)}</div>
+                        <div class="stat-label">Gol Totali</div>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="stat-box">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">Squadre registrate</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">Partite giocate</div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+            
+            // Aggiorna data ultimo aggiornamento
+            const now = new Date();
+            document.getElementById('ultimoAggiornamento').textContent = 
+                now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT');
+        }
+        
+        function calcolaTotaleGol(partite) {
+            return partite.reduce((total, partita) => {
+                return total + (partita.golCasa || 0) + (partita.golOspite || 0);
+            }, 0);
+        }
+        
+        // Funzioni per aprire le pagine
         function apriClassifica() {
             window.location.href = 'classifica.html';
         }
         
         function apriSquadra() {
-            alert("Pagina SQUADRA in costruzione!");
+            window.location.href = 'squadra.html';
         }
         
         function apriStatistiche() {
-            alert("Pagina STATISTICHE in costruzione!");
+            window.location.href = 'statistiche.html';
         }
         
         function apriAdmin() {
             const password = prompt("Inserisci la password ADMIN:");
             if(password === "1246912.!!") {
+                localStorage.setItem('admin_accesso', 'true');
                 window.location.href = 'admin.html';
             } else {
                 alert("Password errata! Accesso negato.");
@@ -159,14 +281,23 @@
         
         function logout() {
             if(confirm("Sei sicuro di voler uscire?")) {
+                // Rimuovi tutti i dati di accesso
                 localStorage.removeItem('rovigoal_entrato');
+                localStorage.removeItem('admin_accesso');
                 window.location.href = 'index.html';
             }
         }
         
+        // Controllo accesso
         if(localStorage.getItem('rovigoal_entrato') !== 'true') {
             window.location.href = 'index.html';
         }
+        
+        // Carica le statistiche all'avvio
+        caricaStatistiche();
+        
+        // Aggiorna le statistiche ogni 30 secondi
+        setInterval(caricaStatistiche, 30000);
     </script>
 </body>
 </html>

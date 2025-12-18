@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rovigoal - Statistiche</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #32CD32 0%, #228B22 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .tab:hover {
+            transform: translateY(-2px);
+        }
+        
+        .tab.active {
+            background: #1e3c72;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        th {
+            background: #f5f5f5;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+            color: #333;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .cannoniere .posizione {
+            width: 50px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .cannoniere .giocatore {
+            font-weight: bold;
+        }
+        
+        .cannoniere .gol {
+            text-align: center;
+            font-weight: bold;
+            color: #228B22;
+        }
+        
+        .cannoniere .squadra {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .btn-back {
+            display: block;
+            margin: 30px auto;
+            padding: 12px 30px;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .btn-back:hover {
+            opacity: 0.9;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .medaglie {
+            display: inline-block;
+            margin-left: 10px;
+        }
+        
+        .medaglia-oro { color: #FFD700; }
+        .medaglia-argento { color: #C0C0C0; }
+        .medaglia-bronzo { color: #CD7F32; }
+        
+        .badge {
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+        
+        .badge-giallo { background: #FFFACD; color: #8B6914; }
+        .badge-rosso { background: #FFB6C1; color: #8B0000; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 STATISTICHE ROVIGOAL</h1>
+        <p>Statistiche dettagliate giocatori e squadre</p>
+    </div>
+    
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" onclick="apriTab('cannoniere')">⚽ CANNONIERI</button>
+            <button class="tab" onclick="apriTab('ammoniti')">🟨 AMMONITI</button>
+            <button class="tab" onclick="apriTab('espulsi')">🟥 ESPULSI</button>
+            <button class="tab" onclick="apriTab('portieri')">🥅 PORTIERI</button>
+        </div>
+        
+        <div id="cannoniere" class="tab-content active">
+            <h2>Classifica Cannonieri</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="60">#</th>
+                        <th>Giocatore</th>
+                        <th>Squadra</th>
+                        <th>Ruolo</th>
+                        <th width="100">Gol</th>
+                        <th>Media</th>
+                    </tr>
+                </thead>
+                <tbody id="tabellaCannoniere">
+                    <!-- Dati cannonieri -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div id="ammoniti" class="tab-content">
+            <h2>Giocatori più Ammoniti</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="60">#</th>
+                        <th>Giocatore</th>
+                        <th>Squadra</th>
+                        <th>Ruolo</th>
+                        <th width="100">Ammonizioni</th>
+                    </tr>
+                </thead>
+                <tbody id="tabellaAmmoniti">
+                    <!-- Dati ammoniti -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div id="espulsi" class="tab-content">
+            <h2>Giocatori Espulsi</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="60">#</th>
+                        <th>Giocatore</th>
+                        <th>Squadra</th>
+                        <th>Ruolo</th>
+                        <th width="100">Espulsioni</th>
+                    </tr>
+                </thead>
+                <tbody id="tabellaEspulsi">
+                    <!-- Dati espulsi -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div id="portieri" class="tab-content">
+            <h2>Statistiche Portieri</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="60">#</th>
+                        <th>Portiere</th>
+                        <th>Squadra</th>
+                        <th>Gol Subiti</th>
+                        <th>Partite</th>
+                        <th>Media</th>
+                    </tr>
+                </thead>
+                <tbody id="tabellaPortieri">
+                    <!-- Dati portieri -->
+                </tbody>
+            </table>
+        </div>
+        
+        <button class="btn-back" onclick="tornaIndietro()">← TORNA ALLA HOME</button>
+    </div>
+    
+    <script>
+        // Funzione per cambiare tab
+        function apriTab(tabName) {
+            // Nascondi tutti i tab
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Rimuovi active da tutti i tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Mostra il tab selezionato
+            document.getElementById(tabName).classList.add('active');
+            
+            // Attiva il button del tab
+            event.target.classList.add('active');
+            
+            // Ricarica i dati per il tab selezionato
+            caricaStatistiche(tabName);
+        }
+        
+        // Carica statistiche
+        function caricaStatistiche(tipo) {
+            const giocatori = JSON.parse(localStorage.getItem('rovigoal_giocatori')) || [];
+            
+            let giocatoriFiltrati = [];
+            
+            switch(tipo) {
+                case 'cannoniere':
+                    // Ordina per gol (discendente)
+                    giocatoriFiltrati = [...giocatori].filter(g => (g.gol || 0) > 0);
+                    giocatoriFiltrati.sort((a, b) => (b.gol || 0) - (a.gol || 0));
+                    caricaTabellaCannoniere(giocatoriFiltrati);
+                    break;
+                    
+                case 'ammoniti':
+                    // Ordina per ammonizioni (discendente)
+                    giocatoriFiltrati = [...giocatori].filter(g => (g.ammonizioni || 0) > 0);
+                    giocatoriFiltrati.sort((a, b) => (b.ammonizioni || 0) - (a.ammonizioni || 0));
+                    caricaTabellaAmmoniti(giocatoriFiltrati);
+                    break;
+                    
+                case 'espulsi':
+                    // Ordina per espulsioni (discendente)
+                    giocatoriFiltrati = [...giocatori].filter(g => (g.espulsioni || 0) > 0);
+                    giocatoriFiltrati.sort((a, b) => (b.espulsioni || 0) - (a.espulsioni || 0));
+                    caricaTabellaEspulsi(giocatoriFiltrati);
+                    break;
+                    
+                case 'portieri':
+                    // Filtra solo portieri
+                    giocatoriFiltrati = [...giocatori].filter(g => 
+                        g.ruolo && g.ruolo.toLowerCase().includes('portiere')
+                    );
+                    caricaTabellaPortieri(giocatoriFiltrati);
+                    break;
+            }
+        }
+        
+        // Funzioni per caricare le tabelle
+        function caricaTabellaCannoniere(giocatori) {
+            const tbody = document.getElementById('tabellaCannoniere');
+            
+            if(giocatori.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            Nessun gol registrato ancora
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            giocatori.forEach((giocatore, index) => {
+                let medaglia = '';
+                if(index === 0) medaglia = '<span class="medaglie medaglia-oro">🥇</span>';
+                else if(index === 1) medaglia = '<span class="medaglie medaglia-argento">🥈</span>';
+                else if(index === 2) medaglia = '<span class="medaglie medaglia-bronzo">🥉</span>';
+                
+                html += `
+                    <tr>
+                        <td class="posizione">${index + 1}${medaglia}</td>
+                        <td class="giocatore">${giocatore.nome}</td>
+                        <td class="squadra">${giocatore.squadra || 'N/A'}</td>
+                        <td>${giocatore.ruolo || 'Giocatore'}</td>
+                        <td class="gol">${giocatore.gol || 0}</td>
+                        <td>${calcolaMediaGol(giocatore)}</td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        function caricaTabellaAmmoniti(giocatori) {
+            const tbody = document.getElementById('tabellaAmmoniti');
+            
+            if(giocatori.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            Nessuna ammonizione registrata
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            giocatori.forEach((giocatore, index) => {
+                html += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${giocatore.nome}</td>
+                        <td>${giocatore.squadra || 'N/A'}</td>
+                        <td>${giocatore.ruolo || 'Giocatore'}</td>
+                        <td>
+                            ${giocatore.ammonizioni || 0}
+                            <span class="badge badge-giallo">🟨</span>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        function caricaTabellaEspulsi(giocatori) {
+            const tbody = document.getElementById('tabellaEspulsi');
+            
+            if(giocatori.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            Nessuna espulsione registrata
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            giocatori.forEach((giocatore, index) => {
+                html += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${giocatore.nome}</td>
+                        <td>${giocatore.squadra || 'N/A'}</td>
+                        <td>${giocatore.ruolo || 'Giocatore'}</td>
+                        <td>
+                            ${giocatore.espulsioni || 0}
+                            <span class="badge badge-rosso">🟥</span>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        function caricaTabellaPortieri(giocatori) {
+            const tbody = document.getElementById('tabellaPortieri');
+            
+            if(giocatori.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            Nessun portiere registrato
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            giocatori.forEach((giocatore, index) => {
+                // Per i portieri, possiamo aggiungere gol subiti se li registriamo
+                const golSubiti = giocatore.gol_subiti || 0;
+                const partite = giocatore.partite_portiere || 0;
+                const media = partite > 0 ? (golSubiti / partite).toFixed(2) : '0.00';
+                
+                html += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${giocatore.nome}</td>
+                        <td>${giocatore.squadra || 'N/A'}</td>
+                        <td>${golSubiti}</td>
+                        <td>${partite}</td>
+                        <td>${media} per partita</td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        function calcolaMediaGol(giocatore) {
+            // In futuro potremmo avere il numero di partite del giocatore
+            return giocatore.gol > 0 ? `${giocatore.gol} gol` : '0 gol';
+        }
+        
+        function tornaIndietro() {
+            window.location.href = 'main.html';
+        }
+        
+        // Controllo accesso
+        if(localStorage.getItem('rovigoal_entrato') !== 'true') {
+            window.location.href = 'index.html';
+        }
+        
+        // Carica le statistiche all'avvio (cannoniere di default)
+        caricaStatistiche('cannoniere');
+    </script>
+</body>
+</html>

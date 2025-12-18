@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rovigoal - Squadre</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .squadre-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .squadra-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .squadra-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .squadra-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 15px;
+        }
+        
+        .squadra-nome {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .squadra-info {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .giocatori-list {
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .giocatore-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .giocatore-item:last-child {
+            border-bottom: none;
+        }
+        
+        .giocatore-info {
+            flex: 1;
+        }
+        
+        .giocatore-nome {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .giocatore-dettagli {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .giocatore-stats {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .stat-badge {
+            background: #f0f0f0;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        .gol { background: #90EE90; color: #006400; }
+        .amm { background: #FFFACD; color: #8B6914; }
+        .esp { background: #FFB6C1; color: #8B0000; }
+        
+        .btn-back {
+            display: block;
+            margin: 30px auto;
+            padding: 12px 30px;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .btn-back:hover {
+            opacity: 0.9;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .stats-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .squadra-stats {
+            display: flex;
+            gap: 10px;
+            font-size: 0.9em;
+        }
+        
+        .stat {
+            background: rgba(255,255,255,0.2);
+            padding: 3px 8px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>👥 SQUADRE ROVIGOAL</h1>
+        <p>Tutte le squadre e i giocatori registrati</p>
+    </div>
+    
+    <div class="container">
+        <div id="squadreList" class="squadre-container">
+            <!-- Le squadre verranno caricate qui -->
+        </div>
+        
+        <button class="btn-back" onclick="tornaIndietro()">← TORNA ALLA HOME</button>
+    </div>
+    
+    <script>
+        // Carica squadre e giocatori
+        function caricaSquadre() {
+            const squadre = JSON.parse(localStorage.getItem('rovigoal_squadre')) || [];
+            const giocatori = JSON.parse(localStorage.getItem('rovigoal_giocatori')) || [];
+            
+            const container = document.getElementById('squadreList');
+            
+            if(squadre.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Nessuna squadra registrata</h3>
+                        <p>Vai nell'area Admin per aggiungere squadre e giocatori</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            // Per ogni squadra
+            squadre.forEach(squadra => {
+                // Filtra giocatori della squadra
+                const giocatoriSquadra = giocatori.filter(g => g.squadra === squadra.nome);
+                
+                // Ordina giocatori per numero di maglia
+                giocatoriSquadra.sort((a, b) => (a.numero || 99) - (b.numero || 99));
+                
+                let giocatoriHTML = '';
+                
+                if(giocatoriSquadra.length === 0) {
+                    giocatoriHTML = `
+                        <div class="empty-state">
+                            <p>Nessun giocatore registrato per questa squadra</p>
+                        </div>
+                    `;
+                } else {
+                    giocatoriSquadra.forEach(giocatore => {
+                        giocatoriHTML += `
+                            <div class="giocatore-item">
+                                <div class="giocatore-info">
+                                    <div class="giocatore-nome">
+                                        ${giocatore.nome} 
+                                        ${giocatore.numero ? `<small>#${giocatore.numero}</small>` : ''}
+                                    </div>
+                                    <div class="giocatore-dettagli">
+                                        ${giocatore.ruolo || 'Giocatore'}
+                                    </div>
+                                </div>
+                                <div class="giocatore-stats">
+                                    ${giocatore.gol > 0 ? `<span class="stat-badge gol">⚽ ${giocatore.gol}</span>` : ''}
+                                    ${giocatore.ammonizioni > 0 ? `<span class="stat-badge amm">🟨 ${giocatore.ammonizioni}</span>` : ''}
+                                    ${giocatore.espulsioni > 0 ? `<span class="stat-badge esp">🟥 ${giocatore.espulsioni}</span>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                // Calcola statistiche squadra
+                const totGol = giocatoriSquadra.reduce((sum, g) => sum + (g.gol || 0), 0);
+                const totAmm = giocatoriSquadra.reduce((sum, g) => sum + (g.ammonizioni || 0), 0);
+                const totEsp = giocatoriSquadra.reduce((sum, g) => sum + (g.espulsioni || 0), 0);
+                
+                const squadraCard = `
+                    <div class="squadra-card">
+                        <div class="squadra-header">
+                            <div class="stats-header">
+                                <div class="squadra-nome">${squadra.nome}</div>
+                                <div class="squadra-stats">
+                                    ${totGol > 0 ? `<div class="stat">⚽ ${totGol}</div>` : ''}
+                                    ${totAmm > 0 ? `<div class="stat">🟨 ${totAmm}</div>` : ''}
+                                    ${totEsp > 0 ? `<div class="stat">🟥 ${totEsp}</div>` : ''}
+                                </div>
+                            </div>
+                            <div class="squadra-info">
+                                Allenatore: ${squadra.allenatore || 'Non specificato'} | 
+                                Colori: ${squadra.colori || 'Non specificati'}
+                            </div>
+                        </div>
+                        <div class="giocatori-list">
+                            ${giocatoriHTML}
+                        </div>
+                    </div>
+                `;
+                
+                container.innerHTML += squadraCard;
+            });
+        }
+        
+        function tornaIndietro() {
+            window.location.href = 'main.html';
+        }
+        
+        // Controllo accesso
+        if(localStorage.getItem('rovigoal_entrato') !== 'true') {
+            window.location.href = 'index.html';
+        }
+        
+        // Carica i dati all'avvio
+        caricaSquadre();
+    </script>
+</body>
+</html>

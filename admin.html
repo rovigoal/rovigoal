@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rovigoal - Area Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #FF4500 0%, #DC143C 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .sezione {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #FF4500;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #FF4500 0%, #DC143C 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-back {
+            background: #1e3c72;
+            margin-top: 20px;
+        }
+        
+        .btn-green {
+            background: linear-gradient(135deg, #32CD32 0%, #228B22 100%);
+            margin-bottom: 10px;
+        }
+        
+        .btn-blue {
+            background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
+        }
+        
+        .lista {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        
+        .item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .item:last-child {
+            border-bottom: none;
+        }
+        
+        .badge {
+            background: #FF4500;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔧 AREA ADMIN ROVIGOAL</h1>
+        <p>Gestione completa del torneo</p>
+    </div>
+    
+    <div class="container">
+        <!-- SEZIONE AGGIUNGI SQUADRA -->
+        <div class="sezione">
+            <h2>➕ AGGIUNGI SQUADRA</h2>
+            <div class="form-group">
+                <label>Nome Squadra:</label>
+                <input type="text" id="nomeSquadra" placeholder="Es: Rovigo FC">
+            </div>
+            <div class="form-group">
+                <label>Allenatore:</label>
+                <input type="text" id="allenatore" placeholder="Nome allenatore">
+            </div>
+            <div class="form-group">
+                <label>Colori:</label>
+                <input type="text" id="colori" placeholder="Es: Rosso-Blu">
+            </div>
+            <button class="btn btn-green" onclick="aggiungiSquadra()">AGGIUNGI SQUADRA</button>
+        </div>
+        
+        <!-- SEZIONE AGGIUNGI GIOCATORE -->
+        <div class="sezione">
+            <h2>👥 AGGIUNGI GIOCATORE</h2>
+            <div class="form-group">
+                <label>Squadra:</label>
+                <select id="squadraGiocatore">
+                    <option value="">Seleziona squadra</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Nome Giocatore:</label>
+                <input type="text" id="nomeGiocatore" placeholder="Nome e cognome">
+            </div>
+            <div class="form-group">
+                <label>Numero Maglia:</label>
+                <input type="number" id="numeroMaglia" placeholder="Es: 10">
+            </div>
+            <div class="form-group">
+                <label>Ruolo:</label>
+                <select id="ruolo">
+                    <option value="Portiere">Portiere</option>
+                    <option value="Difensore">Difensore</option>
+                    <option value="Centrocampista">Centrocampista</option>
+                    <option value="Attaccante">Attaccante</option>
+                </select>
+            </div>
+            <button class="btn btn-blue" onclick="aggiungiGiocatore()">AGGIUNGI GIOCATORE</button>
+        </div>
+        
+        <!-- SEZIONE INSERISCI RISULTATI -->
+        <div class="sezione">
+            <h2>⚽ INSERISCI RISULTATO</h2>
+            <div class="form-group">
+                <label>Squadra Casa:</label>
+                <select id="squadraCasa">
+                    <option value="">Seleziona squadra</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Squadra Ospite:</label>
+                <select id="squadraOspite">
+                    <option value="">Seleziona squadra</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Gol Casa:</label>
+                <input type="number" id="golCasa" min="0" value="0">
+            </div>
+            <div class="form-group">
+                <label>Gol Ospite:</label>
+                <input type="number" id="golOspite" min="0" value="0">
+            </div>
+            <div class="form-group">
+                <label>Ammonizioni:</label>
+                <input type="number" id="ammonizioni" min="0" value="0" placeholder="Totale ammonizioni">
+            </div>
+            <div class="form-group">
+                <label>Espulsioni:</label>
+                <input type="number" id="espulsioni" min="0" value="0" placeholder="Totale espulsioni">
+            </div>
+            <button class="btn" onclick="inserisciRisultato()">SALVA RISULTATO</button>
+        </div>
+        
+        <!-- SEZIONE ELENCHI -->
+        <div class="sezione">
+            <h2>📋 ELENCHI</h2>
+            <button class="btn btn-green" onclick="mostraSquadre()">VISUALIZZA SQUADRE</button>
+            <button class="btn btn-blue" onclick="mostraGiocatori()">VISUALIZZA GIOCATORI</button>
+            
+            <div class="lista" id="listaDati">
+                <!-- Qui appariranno i dati -->
+            </div>
+        </div>
+    </div>
+    
+    <button class="btn btn-back" onclick="tornaIndietro()">← TORNA ALLA HOME</button>
+    
+    <script>
+        // Database in memoria (su un sito reale useremmo un database vero)
+        let database = {
+            squadre: JSON.parse(localStorage.getItem('rovigoal_squadre')) || [],
+            giocatori: JSON.parse(localStorage.getItem('rovigoal_giocatori')) || [],
+            partite: JSON.parse(localStorage.getItem('rovigoal_partite')) || []
+        };
+        
+        // Carica squadre nei select
+        function caricaSquadre() {
+            const selectSquadraGiocatore = document.getElementById('squadraGiocatore');
+            const selectSquadraCasa = document.getElementById('squadraCasa');
+            const selectSquadraOspite = document.getElementById('squadraOspite');
+            
+            // Pulisci le opzioni esistenti (mantenendo la prima)
+            [selectSquadraGiocatore, selectSquadraCasa, selectSquadraOspite].forEach(select => {
+                while(select.options.length > 1) {
+                    select.remove(1);
+                }
+            });
+            
+            // Aggiungi le squadre
+            database.squadre.forEach(squadra => {
+                const option = `<option value="${squadra.nome}">${squadra.nome}</option>`;
+                selectSquadraGiocatore.innerHTML += option;
+                selectSquadraCasa.innerHTML += option;
+                selectSquadraOspite.innerHTML += option;
+            });
+        }
+        
+        // Funzioni per aggiungere dati
+        function aggiungiSquadra() {
+            const nome = document.getElementById('nomeSquadra').value;
+            const allenatore = document.getElementById('allenatore').value;
+            const colori = document.getElementById('colori').value;
+            
+            if(!nome) {
+                alert("Inserisci il nome della squadra!");
+                return;
+            }
+            
+            const nuovaSquadra = {
+                id: Date.now(),
+                nome: nome,
+                allenatore: allenatore,
+                colori: colori,
+                punti: 0,
+                partiteGiocate: 0,
+                vittorie: 0,
+                pareggi: 0,
+                sconfitte: 0,
+                golFatti: 0,
+                golSubiti: 0
+            };
+            
+            database.squadre.push(nuovaSquadra);
+            salvaDatabase();
+            caricaSquadre();
+            
+            document.getElementById('nomeSquadra').value = '';
+            document.getElementById('allenatore').value = '';
+            document.getElementById('colori').value = '';
+            
+            alert(`Squadra "${nome}" aggiunta con successo!`);
+        }
+        
+        function aggiungiGiocatore() {
+            const squadra = document.getElementById('squadraGiocatore').value;
+            const nome = document.getElementById('nomeGiocatore').value;
+            const numero = document.getElementById('numeroMaglia').value;
+            const ruolo = document.getElementById('ruolo').value;
+            
+            if(!squadra || !nome) {
+                alert("Compila tutti i campi obbligatori!");
+                return;
+            }
+            
+            const nuovoGiocatore = {
+                id: Date.now(),
+                nome: nome,
+                numero: numero,
+                ruolo: ruolo,
+                squadra: squadra,
+                gol: 0,
+                ammonizioni: 0,
+                espulsioni: 0
+            };
+            
+            database.giocatori.push(nuovoGiocatore);
+            salvaDatabase();
+            
+            document.getElementById('nomeGiocatore').value = '';
+            document.getElementById('numeroMaglia').value = '';
+            
+            alert(`Giocatore "${nome}" aggiunto alla squadra ${squadra}!`);
+        }
+        
+        function inserisciRisultato() {
+            const squadraCasa = document.getElementById('squadraCasa').value;
+            const squadraOspite = document.getElementById('squadraOspite').value;
+            const golCasa = parseInt(document.getElementById('golCasa').value);
+            const golOspite = parseInt(document.getElementById('golOspite').value);
+            const ammonizioni = parseInt(document.getElementById('ammonizioni').value);
+            const espulsioni = parseInt(document.getElementById('espulsioni').value);
+            
+            if(!squadraCasa || !squadraOspite || squadraCasa === squadraOspite) {
+                alert("Seleziona due squadre diverse!");
+                return;
+            }
+            
+            // Calcola punti
+            let puntiCasa, puntiOspite;
+            if(golCasa > golOspite) {
+                puntiCasa = 3;
+                puntiOspite = 0;
+            } else if(golCasa < golOspite) {
+                puntiCasa = 0;
+                puntiOspite = 3;
+            } else {
+                puntiCasa = 1;
+                puntiOspite = 1;
+            }
+            
+            // Aggiorna statistiche squadre
+            database.squadre.forEach(squadra => {
+                if(squadra.nome === squadraCasa) {
+                    squadra.punti += puntiCasa;
+                    squadra.partiteGiocate++;
+                    squadra.golFatti += golCasa;
+                    squadra.golSubiti += golOspite;
+                    if(puntiCasa === 3) squadra.vittorie++;
+                    else if(puntiCasa === 1) squadra.pareggi++;
+                    else squadra.sconfitte++;
+                }
+                if(squadra.nome === squadraOspite) {
+                    squadra.punti += puntiOspite;
+                    squadra.partiteGiocate++;
+                    squadra.golFatti += golOspite;
+                    squadra.golSubiti += golCasa;
+                    if(puntiOspite === 3) squadra.vittorie++;
+                    else if(puntiOspite === 1) squadra.pareggi++;
+                    else squadra.sconfitte++;
+                }
+            });
+            
+            // Salva partita
+            const nuovaPartita = {
+                id: Date.now(),
+                data: new Date().toLocaleDateString(),
+                squadraCasa: squadraCasa,
+                squadraOspite: squadraOspite,
+                golCasa: golCasa,
+                golOspite: golOspite,
+                ammonizioni: ammonizioni,
+                espulsioni: espulsioni
+            };
+            
+            database.partite.push(nuovaPartita);
+            salvaDatabase();
+            
+            // Reset form
+            document.getElementById('golCasa').value = 0;
+            document.getElementById('golOspite').value = 0;
+            document.getElementById('ammonizioni').value = 0;
+            document.getElementById('espulsioni').value = 0;
+            
+            alert(`Risultato salvato: ${squadraCasa} ${golCasa}-${golOspite} ${squadraOspite}`);
+        }
+        
+        // Funzioni per visualizzare dati
+        function mostraSquadre() {
+            const lista = document.getElementById('listaDati');
+            if(database.squadre.length === 0) {
+                lista.innerHTML = '<p class="item">Nessuna squadra registrata</p>';
+                return;
+            }
+            
+            let html = '<h3>Squadre Registrate:</h3>';
+            database.squadre.forEach(squadra => {
+                html += `
+                    <div class="item">
+                        <div>
+                            <strong>${squadra.nome}</strong><br>
+                            <small>Allenatore: ${squadra.allenatore}</small>
+                        </div>
+                        <div>
+                            <span class="badge">${squadra.punti} PTS</span>
+                        </div>
+                    </div>
+                `;
+            });
+            lista.innerHTML = html;
+        }
+        
+        function mostraGiocatori() {
+            const lista = document.getElementById('listaDati');
+            if(database.giocatori.length === 0) {
+                lista.innerHTML = '<p class="item">Nessun giocatore registrato</p>';
+                return;
+            }
+            
+            let html = '<h3>Giocatori Registrati:</h3>';
+            database.giocatori.forEach(giocatore => {
+                html += `
+                    <div class="item">
+                        <div>
+                            <strong>${giocatore.nome}</strong> (${giocatore.numero})<br>
+                            <small>${giocatore.squadra} - ${giocatore.ruolo}</small>
+                        </div>
+                    </div>
+                `;
+            });
+            lista.innerHTML = html;
+        }
+        
+        // Salva nel localStorage
+        function salvaDatabase() {
+            localStorage.setItem('rovigoal_squadre', JSON.stringify(database.squadre));
+            localStorage.setItem('rovigoal_giocatori', JSON.stringify(database.giocatori));
+            localStorage.setItem('rovigoal_partite', JSON.stringify(database.partite));
+        }
+        
+        function tornaIndietro() {
+            window.location.href = 'main.html';
+        }
+        
+        // Controllo password (già fatto nella pagina precedente, ma aggiungiamo controllo)
+        if(!localStorage.getItem('admin_accesso') || localStorage.getItem('admin_accesso') !== 'true') {
+            const password = prompt("Inserisci la password ADMIN:");
+            if(password !== "1246912.!!") {
+                alert("Accesso negato!");
+                window.location.href = 'main.html';
+            } else {
+                localStorage.setItem('admin_accesso', 'true');
+            }
+        }
+        
+        // Inizializzazione
+        caricaSquadre();
+    </script>
+</body>
+</html>

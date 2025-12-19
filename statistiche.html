@@ -156,6 +156,27 @@
         
         .badge-giallo { background: #FFFACD; color: #8B6914; }
         .badge-rosso { background: #FFB6C1; color: #8B0000; }
+        .badge-voto { 
+            background: #8A2BE2; 
+            color: white;
+            margin: 2px;
+            display: inline-block;
+        }
+        
+        .voto-cell {
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .voto-alto { color: #228B22; }
+        .voto-medio { color: #FF8C00; }
+        .voto-basso { color: #DC143C; }
+        
+        .voti-recenti {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
     </style>
 </head>
 <body>
@@ -170,6 +191,7 @@
             <button class="tab" onclick="apriTab('ammoniti')">🟨 AMMONITI</button>
             <button class="tab" onclick="apriTab('espulsi')">🟥 ESPULSI</button>
             <button class="tab" onclick="apriTab('portieri')">🥅 PORTIERI</button>
+            <button class="tab" onclick="apriTab('voti')">⭐ VOTI GIOCATORI</button>
         </div>
         
         <div id="cannoniere" class="tab-content active">
@@ -246,6 +268,26 @@
             </table>
         </div>
         
+        <div id="voti" class="tab-content">
+            <h2>Classifica per Voto</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="60">#</th>
+                        <th>Giocatore</th>
+                        <th>Squadra</th>
+                        <th>Ruolo</th>
+                        <th width="100">Voto Medio</th>
+                        <th>Partite Giocate</th>
+                        <th>Ultimi Voti</th>
+                    </tr>
+                </thead>
+                <tbody id="tabellaVoti">
+                    <!-- Dati voti -->
+                </tbody>
+            </table>
+        </div>
+        
         <button class="btn-back" onclick="tornaIndietro()">← TORNA ALLA HOME</button>
     </div>
     
@@ -268,7 +310,7 @@
             // Attiva il button del tab
             event.target.classList.add('active');
             
-            // Ricarica i dati per il tab selezionato
+            // Carica i dati per il tab selezionato
             caricaStatistiche(tabName);
         }
         
@@ -306,6 +348,16 @@
                         g.ruolo && g.ruolo.toLowerCase().includes('portiere')
                     );
                     caricaTabellaPortieri(giocatoriFiltrati);
+                    break;
+                    
+                case 'voti':
+                    // Filtra giocatori con voti
+                    giocatoriFiltrati = [...giocatori].filter(g => 
+                        g.voti && g.voti.length > 0 && g.mediaVoto > 0
+                    );
+                    // Ordina per voto medio (discendente)
+                    giocatoriFiltrati.sort((a, b) => b.mediaVoto - a.mediaVoto);
+                    caricaTabellaVoti(giocatoriFiltrati);
                     break;
             }
         }
@@ -449,6 +501,59 @@
             tbody.innerHTML = html;
         }
         
+        function caricaTabellaVoti(giocatori) {
+            const tbody = document.getElementById('tabellaVoti');
+            
+            if(giocatori.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            Nessun voto registrato ancora
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            giocatori.forEach((giocatore, index) => {
+                let medaglia = '';
+                if(index === 0) medaglia = '<span class="medaglie medaglia-oro">🥇</span>';
+                else if(index === 1) medaglia = '<span class="medaglie medaglia-argento">🥈</span>';
+                else if(index === 2) medaglia = '<span class="medaglie medaglia-bronzo">🥉</span>';
+                
+                // Prendi gli ultimi 3 voti
+                const ultimiVoti = giocatore.voti ? giocatore.voti.slice(-3).reverse() : [];
+                const votiHtml = ultimiVoti.map(v => `<span class="badge badge-voto">${v}</span>`).join(' ');
+                
+                // Determina classe colore in base al voto
+                let classeVoto = '';
+                if(giocatore.mediaVoto >= 7) classeVoto = 'voto-alto';
+                else if(giocatore.mediaVoto >= 5) classeVoto = 'voto-medio';
+                else classeVoto = 'voto-basso';
+                
+                html += `
+                    <tr>
+                        <td class="posizione">${index + 1}${medaglia}</td>
+                        <td class="giocatore">${giocatore.nome}</td>
+                        <td class="squadra">${giocatore.squadra || 'N/A'}</td>
+                        <td>${giocatore.ruolo || 'Giocatore'}</td>
+                        <td class="voto-cell ${classeVoto}">
+                            <strong>${giocatore.mediaVoto.toFixed(2)}</strong>
+                        </td>
+                        <td>${giocatore.voti ? giocatore.voti.length : 0}</td>
+                        <td>
+                            <div class="voti-recenti">
+                                ${votiHtml || '-'}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
         function calcolaMediaGol(giocatore) {
             // In futuro potremmo avere il numero di partite del giocatore
             return giocatore.gol > 0 ? `${giocatore.gol} gol` : '0 gol';
@@ -467,80 +572,4 @@
         caricaStatistiche('cannoniere');
     </script>
 </body>
-<!-- Aggiungi questo button nei tabs esistenti: -->
-<button class="tab" onclick="apriTab('voti')">⭐ VOTI GIOCATORI</button>
-
-<!-- Aggiungi questa nuova sezione dopo la sezione portieri: -->
-<div id="voti" class="tab-content">
-    <h2>Classifica per Voto</h2>
-    <table>
-        <thead>
-            <tr>
-                <th width="60">#</th>
-                <th>Giocatore</th>
-                <th>Squadra</th>
-                <th>Ruolo</th>
-                <th width="100">Voto Medio</th>
-                <th>Partite Giocate</th>
-                <th>Ultimi Voti</th>
-            </tr>
-        </thead>
-        <tbody id="tabellaVoti">
-            <!-- Dati voti -->
-        </tbody>
-    </table>
-</div>
-    function caricaTabellaVoti(giocatori) {
-    const tbody = document.getElementById('tabellaVoti');
-    
-    // Filtra giocatori con almeno un voto
-    const giocatoriConVoto = giocatori.filter(g => 
-        g.voti && g.voti.length > 0 && g.mediaVoto > 0
-    );
-    
-    // Ordina per voto medio (discendente)
-    giocatoriConVoto.sort((a, b) => b.mediaVoto - a.mediaVoto);
-    
-    if(giocatoriConVoto.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="7" class="empty-state">
-                    Nessun voto registrato ancora
-                </td>
-            </tr>
-        `;
-        return;
-    }
-    
-    let html = '';
-    giocatoriConVoto.forEach((giocatore, index) => {
-        let medaglia = '';
-        if(index === 0) medaglia = '<span class="medaglie medaglia-oro">🥇</span>';
-        else if(index === 1) medaglia = '<span class="medaglie medaglia-argento">🥈</span>';
-        else if(index === 2) medaglia = '<span class="medaglie medaglia-bronzo">🥉</span>';
-        
-        // Prendi gli ultimi 3 voti
-        const ultimiVoti = giocatore.voti.slice(-3).reverse();
-        const votiHtml = ultimiVoti.map(v => `<span class="badge badge-voto">${v}</span>`).join(' ');
-        
-        html += `
-            <tr>
-                <td class="posizione">${index + 1}${medaglia}</td>
-                <td class="giocatore">${giocatore.nome}</td>
-                <td class="squadra">${giocatore.squadra || 'N/A'}</td>
-                <td>${giocatore.ruolo || 'Giocatore'}</td>
-                <td class="gol"><strong>${giocatore.mediaVoto.toFixed(2)}</strong></td>
-                <td>${giocatore.voti.length}</td>
-                <td>${votiHtml}</td>
-            </tr>
-        `;
-    });
-    
-    tbody.innerHTML = html;
-}
-
-// Aggiungi nel case dello switch nella funzione caricaStatistiche:
-case 'voti':
-    caricaTabellaVoti(giocatori);
-    break;
 </html>

@@ -26,6 +26,25 @@
             text-align: center;
         }
         
+        .btn-home {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 1000;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        
+        .btn-home:hover {
+            background: #2a5298;
+        }
+        
         .menu-admin {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -302,6 +321,8 @@
     </style>
 </head>
 <body>
+    <button class="btn-home" onclick="tornaHome()">🏠 HOME</button>
+    
     <div class="header">
         <h1>🔧 AREA ADMIN ROVIGOAL</h1>
         <p>Gestione completa del torneo</p>
@@ -454,7 +475,11 @@
             document.getElementById('partite').classList.remove('attiva');
         });
         
-        // Mostra/nascondi sezioni
+        // Funzioni di navigazione
+        function tornaHome() {
+            window.location.href = 'main.html';
+        }
+        
         function mostraSezione(sezione) {
             document.getElementById('menuPrincipale').style.display = 'none';
             document.getElementById('gestione').classList.remove('attiva');
@@ -463,8 +488,6 @@
             
             if(sezione === 'gestione') {
                 caricaSquadreNeiSelect();
-            } else if(sezione === 'partite') {
-                resetPartita();
             }
         }
         
@@ -569,7 +592,7 @@
                 gol: 0,
                 ammonizioni: 0,
                 espulsioni: 0,
-                punteggioTotale: 0  // Somma di tutti i voti
+                punteggioTotale: 0
             };
             
             database.giocatori.push(nuovoGiocatore);
@@ -995,7 +1018,6 @@
                         giocatore.espulsioni = (giocatore.espulsioni || 0) + (evento.valore || 1);
                         break;
                     case 'voto':
-                        // Aggiungi voto al punteggio totale
                         giocatore.punteggioTotale = (giocatore.punteggioTotale || 0) + evento.valore;
                         break;
                 }
@@ -1105,14 +1127,10 @@
                     const squadraId = parseInt(document.getElementById('squadraDaEliminare').value);
                     if(squadraId) {
                         if(confirm("ATTENZIONE: Eliminando una squadra verranno eliminati anche tutti i suoi giocatori. Continuare?")) {
-                            // Trova nome squadra
                             const squadra = database.squadre.find(s => s.id === squadraId);
                             if(!squadra) return;
                             
-                            // Elimina squadra
                             database.squadre = database.squadre.filter(s => s.id !== squadraId);
-                            
-                            // Elimina giocatori della squadra
                             database.giocatori = database.giocatori.filter(g => g.squadra !== squadra.nome);
                             
                             salvaDatabase();

@@ -799,10 +799,9 @@
                                 ${partita.squadraCasa} ${partita.golCasa}-${partita.golOspite} ${partita.squadraOspite}
                             </div>
                         </div>
-                        <div class="partita-azioni">
-                            <button class="btn-modifica" onclick="apriModificaPartita(${realIndex})">✏️ Modifica</button>
-                            <button class="btn-elimina" onclick="eliminaPartita(${realIndex})">🗑️ Elimina</button>
-                        </div>
+                        <div style="text-align: right; margin-top: 10px;">
+    <button class="btn-elimina" onclick="eliminaPartita(${realIndex})">🗑️ Elimina Partita</button>
+</div>
                         <div style="margin-top: 10px; font-size: 0.9em;">
                             <p>⚽ Gol giocatori: ${gol} | 🟨 Ammonizioni: ${ammonizioni} | 🟥 Espulsioni: ${espulsioni}</p>
                             <p>🏆 <strong>Miglior Giocatore:</strong> ${migliorGiocatoreNome} (Voto: ${partita.votoMigliorGiocatore}/10)</p>
@@ -1064,3 +1063,4 @@
     </script>
 </body>
 </html>
+

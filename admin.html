@@ -60,29 +60,19 @@
         .btn-yellow { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #333; }
         
         .giocatori-partita { border: 2px solid #ddd; padding: 15px; border-radius: 8px; margin-top: 15px; background: #f9f9f9; }
-        .giocatore-eventi { margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #eee; }
+        .giocatore-item { margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #eee; }
         .giocatore-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .contatori { display: flex; gap: 15px; }
-        .contatore { display: flex; align-items: center; gap: 5px; }
-        .btn-contatore { background: #ddd; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; }
-        .valore-contatore { min-width: 30px; text-align: center; font-weight: bold; }
-        .gol-segnati { background: #32CD32; color: white; }
-        .ammonizioni { background: #FFD700; color: #333; }
-        .espulsioni { background: #DC143C; color: white; }
+        
+        .eventi-giocatore { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-evento { padding: 5px 10px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; }
+        .btn-gol { background: #32CD32; color: white; }
+        .btn-amm { background: #FFD700; color: #333; }
+        .btn-esp { background: #DC143C; color: white; }
         
         .eventi-salvati { margin-top: 20px; padding: 15px; background: #e8f4ff; border-radius: 8px; border: 1px solid #b3d9ff; }
         .evento-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #cce0ff; }
         .evento-item:last-child { border-bottom: none; }
         .btn-rimuovi { background: #ff6666; color: white; border: none; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-size: 12px; }
-        
-        .voto-container { margin-top: 10px; padding: 10px; background: white; border-radius: 5px; border: 1px solid #ddd; }
-        .voto-stelle { display: flex; gap: 5px; margin-top: 5px; }
-        .stella { font-size: 24px; cursor: pointer; color: #ddd; transition: color 0.2s; }
-        .stella.selezionata { color: #FFD700; }
-        
-        .hidden { display: none; }
-        .avviso { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 10px; border-radius: 5px; margin-top: 10px; }
-        .avviso.errore { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
         
         .selezione-migliori { 
             margin-top: 20px; padding: 20px; 
@@ -92,6 +82,15 @@
         }
         .migliori-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; }
         @media (max-width: 768px) { .migliori-row { grid-template-columns: 1fr; } }
+        
+        .voto-container { margin-top: 10px; padding: 10px; background: white; border-radius: 5px; border: 1px solid #ddd; }
+        .voto-stelle { display: flex; gap: 5px; margin-top: 5px; }
+        .stella { font-size: 24px; cursor: pointer; color: #ddd; transition: color 0.2s; }
+        .stella.selezionata { color: #FFD700; }
+        
+        .hidden { display: none; }
+        .avviso { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 10px; border-radius: 5px; margin-top: 10px; }
+        .avviso.errore { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
         
         .gestione-partite { margin-top: 30px; }
         .partita-item { 
@@ -110,14 +109,6 @@
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .close-modal { background: none; border: none; font-size: 24px; cursor: pointer; color: #666; }
         
-        .selezione-migliori .avviso {
-            background: #e7f5ff;
-            border-left: 4px solid #1c7ed6;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
-        
         .selezione-obbligatoria {
             border: 2px solid #ff6b6b;
             animation: pulse 2s infinite;
@@ -135,6 +126,25 @@
             padding: 15px;
             border-radius: 8px;
             margin-top: 10px;
+        }
+        
+        .riepilogo-gol {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0fff0;
+            border-radius: 5px;
+            border: 1px solid #32CD32;
+        }
+        
+        .counter-display {
+            display: inline-block;
+            margin: 0 5px;
+            padding: 2px 8px;
+            background: #333;
+            color: white;
+            border-radius: 3px;
+            min-width: 20px;
+            text-align: center;
         }
     </style>
 </head>
@@ -195,8 +205,8 @@
         
         <div class="form-group">
             <h3>🏟️ SELEZIONA PARTITA</h3>
-            <select id="squadraCasa" onchange="caricaGiocatoriSquadra('casa')"><option value="">Squadra Casa</option></select>
-            <select id="squadraOspite" onchange="caricaGiocatoriSquadra('ospite')"><option value="">Squadra Ospite</option></select>
+            <select id="squadraCasa" onchange="caricaGiocatoriPartita()"><option value="">Squadra Casa</option></select>
+            <select id="squadraOspite" onchange="caricaGiocatoriPartita()"><option value="">Squadra Ospite</option></select>
         </div>
         
         <div class="form-group">
@@ -208,19 +218,28 @@
             </div>
         </div>
         
-        <div id="giocatoriCasaContainer" class="hidden"><h3>👥 GIOCATORI CASA</h3><div id="giocatoriCasa" class="giocatori-partita"></div></div>
-        <div id="giocatoriOspiteContainer" class="hidden"><h3>👥 GIOCATORI OSPITE</h3><div id="giocatoriOspite" class="giocatori-partita"></div></div>
+        <!-- LISTA GIOCATORI CASA -->
+        <div id="giocatoriCasaContainer" class="hidden">
+            <h3>👥 GIOCATORI CASA</h3>
+            <div id="giocatoriCasa" class="giocatori-partita"></div>
+        </div>
+        
+        <!-- LISTA GIOCATORI OSPITE -->
+        <div id="giocatoriOspiteContainer" class="hidden">
+            <h3>👥 GIOCATORI OSPITE</h3>
+            <div id="giocatoriOspite" class="giocatori-partita"></div>
+        </div>
         
         <!-- SELEZIONE MIGLIORI -->
         <div id="selezioneMiglioriContainer" class="selezione-migliori hidden">
             <h3>🏆 SELEZIONA I MIGLIORI</h3>
             <div class="avviso">
-                <strong>⚠️ IMPORTANTE:</strong> Puoi selezionare SOLO UN miglior giocatore e SOLO UN miglior portiere
+                <strong>⚠️ IMPORTANTE:</strong> Seleziona SOLO UN miglior giocatore e SOLO UN miglior portiere (se presente)
             </div>
             <div class="migliori-row">
                 <div>
                     <label>Miglior Giocatore (obbligatorio):</label>
-                    <select id="migliorGiocatore" required>
+                    <select id="migliorGiocatore">
                         <option value="">-- Seleziona miglior giocatore --</option>
                     </select>
                     <div class="voto-container">
@@ -230,8 +249,8 @@
                     </div>
                 </div>
                 <div>
-                    <label>Miglior Portiere (obbligatorio):</label>
-                    <select id="migliorPortiere" required>
+                    <label>Miglior Portiere (se presente):</label>
+                    <select id="migliorPortiere">
                         <option value="">-- Seleziona miglior portiere --</option>
                     </select>
                     <div class="voto-container">
@@ -243,12 +262,14 @@
             </div>
         </div>
         
+        <!-- EVENTI SALVATI -->
         <div id="eventiSalvatiContainer" class="hidden">
             <h3>📝 EVENTI REGISTRATI</h3>
             <div id="eventiSalvati" class="eventi-salvati">Nessun evento registrato</div>
             <div class="avviso" id="avvisoGol">⚠️ Controlla che il totale gol dei giocatori corrisponda al risultato</div>
         </div>
         
+        <!-- BOTTONI AZIONE -->
         <div style="margin-top: 20px;">
             <button class="btn btn-yellow" onclick="resetPartita()">🔄 RESET PARTITA</button>
             <button class="btn btn-green" onclick="salvaPartita()">💾 SALVA PARTITA</button>
@@ -284,33 +305,41 @@
         };
         
         // PARTITA IN CORSO
-        let partitaInCorso = { eventi: [] };
-        let miglioriSelezionati = { migliorGiocatore: null, votoMigliorGiocatore: 0, migliorPortiere: null, votoMigliorPortiere: 0 };
-        let partitaDaModificare = null;
+        let partitaInCorso = {
+            eventi: [], // Array di oggetti: {giocatoreId, tipo: 'gol'/'amm'/'esp', squadra}
+            migliori: { giocatore: null, votoGiocatore: 0, portiere: null, votoPortiere: 0 }
+        };
         
         // INIZIALIZZAZIONE
         document.addEventListener('DOMContentLoaded', function() {
             caricaSquadreNeiSelect();
-            document.getElementById('menuPrincipale').style.display = 'grid';
-            document.getElementById('gestione').classList.remove('attiva');
-            document.getElementById('partite').classList.remove('attiva');
-            document.getElementById('gestionePartite').classList.remove('attiva');
-            
-            // Inizializza stelle voti
             inizializzaVoti();
         });
         
         function inizializzaVoti() {
+            // Stelle per miglior giocatore
             const stelleGiocatore = document.getElementById('voto-miglior-giocatore');
-            const stellePortiere = document.getElementById('voto-miglior-portiere');
-            
             stelleGiocatore.innerHTML = [1,2,3,4,5,6,7,8,9,10].map(v => 
-                `<span class="stella" onclick="assegnaVotoMigliorGiocatore(${v})">★</span>`
+                `<span class="stella" onclick="assegnaVoto('giocatore', ${v})">★</span>`
             ).join('');
             
+            // Stelle per miglior portiere
+            const stellePortiere = document.getElementById('voto-miglior-portiere');
             stellePortiere.innerHTML = [1,2,3,4,5,6,7,8,9,10].map(v => 
-                `<span class="stella" onclick="assegnaVotoMigliorPortiere(${v})">★</span>`
+                `<span class="stella" onclick="assegnaVoto('portiere', ${v})">★</span>`
             ).join('');
+        }
+        
+        function assegnaVoto(tipo, voto) {
+            const stelle = document.querySelectorAll(`#voto-miglior-${tipo} .stella`);
+            stelle.forEach((stella, index) => stella.classList.toggle('selezionata', index < voto));
+            document.getElementById(`voto-miglior-${tipo}-attuale`).textContent = voto;
+            
+            if (tipo === 'giocatore') {
+                partitaInCorso.migliori.votoGiocatore = voto;
+            } else {
+                partitaInCorso.migliori.votoPortiere = voto;
+            }
         }
         
         function tornaHome() { window.location.href = 'main.html'; }
@@ -343,7 +372,7 @@
                 if(!select) return;
                 
                 const valoreSalvato = select.value;
-                while(select.options.length > 1) select.remove(1);
+                select.innerHTML = '<option value="">Seleziona Squadra</option>';
                 
                 database.squadre.forEach(squadra => {
                     const option = document.createElement('option');
@@ -393,7 +422,7 @@
             database.giocatori.push({
                 id: Date.now(), nome: nome, numero: numero || null, ruolo: ruolo, squadra: squadra,
                 gol: 0, ammonizioni: 0, espulsioni: 0, punteggioTotale: 0,
-                premiMigliorGiocatore: 0, premiMigliorPortiere: 0, partiteGiocate: 0
+                premiMigliorGiocatore: 0, premiMigliorPortiere: 0
             });
             
             salvaDatabase();
@@ -402,230 +431,189 @@
             alert(`Giocatore "${nome}" aggiunto alla squadra ${squadra}!`);
         }
         
-        function caricaGiocatoriSquadra(tipo) {
-            const squadraSelect = document.getElementById(tipo === 'casa' ? 'squadraCasa' : 'squadraOspite');
-            const containerId = tipo + 'Container';
-            const giocatoriDivId = tipo === 'casa' ? 'giocatoriCasa' : 'giocatoriOspite';
-            const squadra = squadraSelect.value;
+        function caricaGiocatoriPartita() {
+            const squadraCasa = document.getElementById('squadraCasa').value;
+            const squadraOspite = document.getElementById('squadraOspite').value;
             
-            if(!squadra) {
-                document.getElementById(containerId).classList.add('hidden');
+            if (!squadraCasa || !squadraOspite) {
+                document.getElementById('giocatoriCasaContainer').classList.add('hidden');
+                document.getElementById('giocatoriOspiteContainer').classList.add('hidden');
+                document.getElementById('selezioneMiglioriContainer').classList.add('hidden');
                 return;
             }
             
-            const giocatoriSquadra = database.giocatori.filter(g => g.squadra === squadra);
-            let html = '';
+            // Carica giocatori casa
+            caricaListaGiocatori('Casa', squadraCasa, 'giocatoriCasa');
+            document.getElementById('giocatoriCasaContainer').classList.remove('hidden');
             
-            if(giocatoriSquadra.length === 0) {
-                html = '<p class="avviso">Nessun giocatore registrato per questa squadra</p>';
-            } else {
-                giocatoriSquadra.forEach(giocatore => {
-                    html += `
-                        <div class="giocatore-eventi">
-                            <div class="giocatore-header">
-                                <div><strong>${giocatore.nome}</strong><small>(${giocatore.ruolo} #${giocatore.numero || 'N/A'})</small></div>
-                                <div class="contatori">
-                                    <div class="contatore">
-                                        <button class="btn-contatore gol-segnati" onclick="modificaContatore('${tipo}', ${giocatore.id}, 'gol', -1)">-</button>
-                                        <span class="valore-contatore" id="gol-${giocatore.id}">0</span>
-                                        <button class="btn-contatore gol-segnati" onclick="modificaContatore('${tipo}', ${giocatore.id}, 'gol', 1)">+</button>
-                                        <span>⚽</span>
-                                    </div>
-                                    <div class="contatore">
-                                        <button class="btn-contatore ammonizioni" onclick="modificaContatore('${tipo}', ${giocatore.id}, 'amm', -1)">-</button>
-                                        <span class="valore-contatore" id="amm-${giocatore.id}">0</span>
-                                        <button class="btn-contatore ammonizioni" onclick="modificaContatore('${tipo}', ${giocatore.id}, 'amm', 1)">+</button>
-                                        <span>🟨</span>
-                                    </div>
-                                    <div class="contatore">
-                                        <button class="btn-contatore espulsioni" onclick="modificaContatore('${tipo}', ${giocatore.id}, 'esp', -1)">-</button>
-                                        <span class="valore-contatore" id="esp-${giocatore.id}">0</span>
-                                        <button class="btn-contatore espulsioni" onclick="modificaContatore('${tipo}', ${giocatore.id}, 'esp', 1)">+</button>
-                                        <span>🟥</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
+            // Carica giocatori ospite
+            caricaListaGiocatori('Ospite', squadraOspite, 'giocatoriOspite');
+            document.getElementById('giocatoriOspiteContainer').classList.remove('hidden');
             
-            document.getElementById(giocatoriDivId).innerHTML = html;
-            document.getElementById(containerId).classList.remove('hidden');
+            // Carica selezione migliori
+            caricaSelezioneMigliori(squadraCasa, squadraOspite);
+            document.getElementById('selezioneMiglioriContainer').classList.remove('hidden');
             
-            // Carica selezioni migliori se entrambe le squadre sono selezionate
-            const squadraCasa = document.getElementById('squadraCasa').value;
-            const squadraOspite = document.getElementById('squadraOspite').value;
-            if(squadraCasa && squadraOspite) {
-                document.getElementById('selezioneMiglioriContainer').classList.remove('hidden');
-                document.getElementById('eventiSalvatiContainer').classList.remove('hidden');
-                caricaOpzioniMigliori();
-                aggiornaEventiSalvati();
-            }
+            // Mostra eventi salvati
+            document.getElementById('eventiSalvatiContainer').classList.remove('hidden');
         }
         
-        function caricaOpzioniMigliori() {
-            const squadraCasa = document.getElementById('squadraCasa').value;
-            const squadraOspite = document.getElementById('squadraOspite').value;
+        function caricaListaGiocatori(tipo, nomeSquadra, containerId) {
+            const giocatoriSquadra = database.giocatori.filter(g => g.squadra === nomeSquadra);
+            const container = document.getElementById(containerId);
+            
+            if(giocatoriSquadra.length === 0) {
+                container.innerHTML = '<p class="avviso">Nessun giocatore registrato per questa squadra</p>';
+                return;
+            }
+            
+            let html = '';
+            giocatoriSquadra.forEach(giocatore => {
+                // Conta eventi per questo giocatore
+                const golCount = partitaInCorso.eventi.filter(e => 
+                    e.giocatoreId === giocatore.id && e.tipo === 'gol' && e.squadra === tipo.toLowerCase()
+                ).length;
+                
+                const ammCount = partitaInCorso.eventi.filter(e => 
+                    e.giocatoreId === giocatore.id && e.tipo === 'amm' && e.squadra === tipo.toLowerCase()
+                ).length;
+                
+                const espCount = partitaInCorso.eventi.filter(e => 
+                    e.giocatoreId === giocatore.id && e.tipo === 'esp' && e.squadra === tipo.toLowerCase()
+                ).length;
+                
+                html += `
+                    <div class="giocatore-item">
+                        <div class="giocatore-header">
+                            <div>
+                                <strong>${giocatore.nome}</strong>
+                                <small>(${giocatore.ruolo} #${giocatore.numero || 'N/A'})</small>
+                            </div>
+                            <div>
+                                <span class="counter-display">⚽ ${golCount}</span>
+                                <span class="counter-display">🟨 ${ammCount}</span>
+                                <span class="counter-display">🟥 ${espCount}</span>
+                            </div>
+                        </div>
+                        <div class="eventi-giocatore">
+                            <button class="btn-evento btn-gol" onclick="aggiungiEvento(${giocatore.id}, 'gol', '${tipo.toLowerCase()}')">+ Gol</button>
+                            <button class="btn-evento btn-amm" onclick="aggiungiEvento(${giocatore.id}, 'amm', '${tipo.toLowerCase()}')">+ Ammonizione</button>
+                            <button class="btn-evento btn-esp" onclick="aggiungiEvento(${giocatore.id}, 'esp', '${tipo.toLowerCase()}')">+ Espulsione</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function caricaSelezioneMigliori(squadraCasa, squadraOspite) {
             const giocatoriPartita = database.giocatori.filter(g => 
                 g.squadra === squadraCasa || g.squadra === squadraOspite
             );
             
-            // CARICA MIGLIOR GIOCATORE (solo giocatori di campo)
+            // Popola miglior giocatore (solo giocatori di campo)
             const selectGiocatore = document.getElementById('migliorGiocatore');
-            while(selectGiocatore.options.length > 1) selectGiocatore.remove(1);
+            selectGiocatore.innerHTML = '<option value="">-- Seleziona miglior giocatore --</option>';
             
             const giocatoriCampo = giocatoriPartita.filter(g => g.ruolo === 'Giocatore');
             giocatoriCampo.forEach(g => {
                 const option = document.createElement('option');
                 option.value = g.id;
-                option.textContent = `${g.nome} (${g.squadra}) - #${g.numero || 'N/A'}`;
+                option.textContent = `${g.nome} (${g.squadra})`;
                 selectGiocatore.appendChild(option);
             });
             
-            if (giocatoriCampo.length === 0) {
-                selectGiocatore.innerHTML = '<option value="">Nessun giocatore disponibile</option>';
-                selectGiocatore.disabled = true;
-            } else {
-                selectGiocatore.disabled = false;
-            }
-            
-            // CARICA MIGLIOR PORTIERE (solo portieri)
+            // Popola miglior portiere (solo portieri)
             const selectPortiere = document.getElementById('migliorPortiere');
-            while(selectPortiere.options.length > 1) selectPortiere.remove(1);
+            selectPortiere.innerHTML = '<option value="">-- Seleziona miglior portiere --</option>';
             
-            const portieriPartita = giocatoriPartita.filter(g => g.ruolo === 'Portiere');
-            portieriPartita.forEach(p => {
+            const portieri = giocatoriPartita.filter(g => g.ruolo === 'Portiere');
+            portieri.forEach(p => {
                 const option = document.createElement('option');
                 option.value = p.id;
-                option.textContent = `${p.nome} (${p.squadra}) - #${p.numero || 'N/A'}`;
+                option.textContent = `${p.nome} (${p.squadra})`;
                 selectPortiere.appendChild(option);
             });
             
-            if (portieriPartita.length === 0) {
-                selectPortiere.innerHTML = '<option value="">Nessun portiere in campo</option>';
-                selectPortiere.disabled = true;
-            } else {
-                selectPortiere.disabled = false;
-            }
-            
-            // Reset selezione
-            miglioriSelezionati = { migliorGiocatore: null, votoMigliorGiocatore: 0, migliorPortiere: null, votoMigliorPortiere: 0 };
+            // Reset voti
+            partitaInCorso.migliori = { giocatore: null, votoGiocatore: 0, portiere: null, votoPortiere: 0 };
             document.getElementById('voto-miglior-giocatore-attuale').textContent = 'N/A';
             document.getElementById('voto-miglior-portiere-attuale').textContent = 'N/A';
             document.querySelectorAll('.stella.selezionata').forEach(s => s.classList.remove('selezionata'));
         }
         
-        function assegnaVotoMigliorGiocatore(voto) {
-            const stelle = document.querySelectorAll('#voto-miglior-giocatore .stella');
-            stelle.forEach((stella, index) => stella.classList.toggle('selezionata', index < voto));
-            document.getElementById('voto-miglior-giocatore-attuale').textContent = voto;
-            miglioriSelezionati.votoMigliorGiocatore = voto;
-            
-            // Controllo se non c'è giocatore selezionato
-            const giocatoreSelect = document.getElementById('migliorGiocatore');
-            if (!giocatoreSelect.value) {
-                giocatoreSelect.classList.add('selezione-obbligatoria');
-                alert("Seleziona prima un giocatore!");
-            } else {
-                giocatoreSelect.classList.remove('selezione-obbligatoria');
-            }
-        }
-        
-        function assegnaVotoMigliorPortiere(voto) {
-            const stelle = document.querySelectorAll('#voto-miglior-portiere .stella');
-            stelle.forEach((stella, index) => stella.classList.toggle('selezionata', index < voto));
-            document.getElementById('voto-miglior-portiere-attuale').textContent = voto;
-            miglioriSelezionati.votoMigliorPortiere = voto;
-            
-            // Controllo se non c'è portiere selezionato
-            const portiereSelect = document.getElementById('migliorPortiere');
-            if (!portiereSelect.value) {
-                portiereSelect.classList.add('selezione-obbligatoria');
-                alert("Seleziona prima un portiere!");
-            } else {
-                portiereSelect.classList.remove('selezione-obbligatoria');
-            }
-        }
-        
-        // Gestione selezione migliori
+        // Gestione cambio selezioni migliori
         document.getElementById('migliorGiocatore').addEventListener('change', function() {
-            miglioriSelezionati.migliorGiocatore = this.value ? parseInt(this.value) : null;
-            this.classList.remove('selezione-obbligatoria');
-            
-            // Reset voto se cambia giocatore
-            if (!miglioriSelezionati.migliorGiocatore) {
-                miglioriSelezionati.votoMigliorGiocatore = 0;
-                document.getElementById('voto-miglior-giocatore-attuale').textContent = 'N/A';
-                document.querySelectorAll('#voto-miglior-giocatore .stella.selezionata').forEach(s => s.classList.remove('selezionata'));
-            }
+            partitaInCorso.migliori.giocatore = this.value ? parseInt(this.value) : null;
         });
         
         document.getElementById('migliorPortiere').addEventListener('change', function() {
-            miglioriSelezionati.migliorPortiere = this.value ? parseInt(this.value) : null;
-            this.classList.remove('selezione-obbligatoria');
-            
-            // Reset voto se cambia portiere
-            if (!miglioriSelezionati.migliorPortiere) {
-                miglioriSelezionati.votoMigliorPortiere = 0;
-                document.getElementById('voto-miglior-portiere-attuale').textContent = 'N/A';
-                document.querySelectorAll('#voto-miglior-portiere .stella.selezionata').forEach(s => s.classList.remove('selezionata'));
-            }
+            partitaInCorso.migliori.portiere = this.value ? parseInt(this.value) : null;
         });
         
-        function modificaContatore(tipoSquadra, giocatoreId, tipo, modifica) {
-            const elemento = document.getElementById(`${tipo}-${giocatoreId}`);
-            let valore = parseInt(elemento.textContent) || 0;
-            let nuovoValore = valore + modifica;
-            if(nuovoValore < 0) nuovoValore = 0;
+        function aggiungiEvento(giocatoreId, tipo, squadra) {
+            const giocatore = database.giocatori.find(g => g.id === giocatoreId);
+            if (!giocatore) return;
             
-            // Controllo gol
-            if(tipo === 'gol') {
-                const golCasa = parseInt(document.getElementById('golCasa').value) || 0;
-                const golOspite = parseInt(document.getElementById('golOspite').value) || 0;
-                const golTotaliPartita = tipoSquadra === 'casa' ? golCasa : golOspite;
-                let golAssegnati = partitaInCorso.eventi.filter(e => e.tipo === 'gol' && e.squadra === tipoSquadra)
-                    .reduce((sum, e) => sum + (e.valore || 1), 0);
-                
-                if(nuovoValore > golTotaliPartita) {
-                    alert(`Massimo ${golTotaliPartita} gol per la squadra ${tipoSquadra}!`);
-                    return;
-                }
-            }
-            
-            elemento.textContent = nuovoValore;
-            const eventoIndex = partitaInCorso.eventi.findIndex(e => e.giocatoreId === giocatoreId && e.tipo === tipo);
-            
-            if(nuovoValore === 0) {
-                if(eventoIndex !== -1) partitaInCorso.eventi.splice(eventoIndex, 1);
-            } else {
-                const giocatore = database.giocatori.find(g => g.id === giocatoreId);
-                if(eventoIndex !== -1) {
-                    partitaInCorso.eventi[eventoIndex].valore = nuovoValore;
-                } else {
-                    partitaInCorso.eventi.push({
-                        id: Date.now(), giocatoreId: giocatoreId, giocatoreNome: giocatore.nome,
-                        tipo: tipo, valore: nuovoValore, squadra: tipoSquadra,
-                        timestamp: new Date().toLocaleTimeString()
-                    });
-                }
-            }
+            partitaInCorso.eventi.push({
+                id: Date.now(),
+                giocatoreId: giocatoreId,
+                giocatoreNome: giocatore.nome,
+                tipo: tipo,
+                squadra: squadra,
+                timestamp: new Date().toLocaleTimeString()
+            });
             
             aggiornaEventiSalvati();
+            caricaGiocatoriPartita(); // Ricarica per aggiornare i contatori
+            controllaCorrispondenzaGol();
+        }
+        
+        function aggiornaEventiSalvati() {
+            const container = document.getElementById('eventiSalvati');
+            
+            if(partitaInCorso.eventi.length === 0) {
+                container.innerHTML = '<p>Nessun evento registrato</p>';
+                return;
+            }
+            
+            let html = '';
+            partitaInCorso.eventi.forEach((evento, index) => {
+                let icona = '', testo = '';
+                switch(evento.tipo) {
+                    case 'gol': icona = '⚽'; testo = `Gol di ${evento.giocatoreNome}`; break;
+                    case 'amm': icona = '🟨'; testo = `Ammonizione per ${evento.giocatoreNome}`; break;
+                    case 'esp': icona = '🟥'; testo = `Espulsione di ${evento.giocatoreNome}`; break;
+                }
+                html += `
+                    <div class="evento-item">
+                        <span>${icona} ${testo} (${evento.squadra})</span>
+                        <button class="btn-rimuovi" onclick="rimuoviEvento(${index})">Rimuovi</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+        
+        function rimuoviEvento(index) {
+            partitaInCorso.eventi.splice(index, 1);
+            aggiornaEventiSalvati();
+            caricaGiocatoriPartita();
             controllaCorrispondenzaGol();
         }
         
         function controllaCorrispondenzaGol() {
             const golCasa = parseInt(document.getElementById('golCasa').value) || 0;
             const golOspite = parseInt(document.getElementById('golOspite').value) || 0;
-            let golAssegnatiCasa = 0, golAssegnatiOspite = 0;
             
-            partitaInCorso.eventi.forEach(evento => {
-                if(evento.tipo === 'gol') {
-                    if(evento.squadra === 'casa') golAssegnatiCasa += evento.valore || 1;
-                    else golAssegnatiOspite += evento.valore || 1;
-                }
-            });
+            const golAssegnatiCasa = partitaInCorso.eventi.filter(e => 
+                e.tipo === 'gol' && e.squadra === 'casa'
+            ).length;
+            
+            const golAssegnatiOspite = partitaInCorso.eventi.filter(e => 
+                e.tipo === 'gol' && e.squadra === 'ospite'
+            ).length;
             
             const avviso = document.getElementById('avvisoGol');
             if(golAssegnatiCasa !== golCasa || golAssegnatiOspite !== golOspite) {
@@ -637,39 +625,13 @@
             }
         }
         
-        function aggiornaEventiSalvati() {
-            const container = document.getElementById('eventiSalvati');
-            if(partitaInCorso.eventi.length === 0) {
-                container.innerHTML = '<p>Nessun evento registrato</p>';
-                return;
-            }
-            
-            let html = '';
-            partitaInCorso.eventi.forEach((evento, index) => {
-                let icona = '', testo = '';
-                switch(evento.tipo) {
-                    case 'gol': icona = '⚽'; testo = `${evento.valore} gol di ${evento.giocatoreNome}`; break;
-                    case 'amm': icona = '🟨'; testo = `${evento.valore} ammonizione per ${evento.giocatoreNome}`; break;
-                    case 'esp': icona = '🟥'; testo = `${evento.valore} espulsione di ${evento.giocatoreNome}`; break;
-                }
-                html += `<div class="evento-item"><span>${icona} ${testo} (${evento.squadra})</span><button class="btn-rimuovi" onclick="rimuoviEvento(${index})">Rimuovi</button></div>`;
-            });
-            container.innerHTML = html;
-        }
-        
-        function rimuoviEvento(index) {
-            const evento = partitaInCorso.eventi[index];
-            const elemento = document.getElementById(`${evento.tipo}-${evento.giocatoreId}`);
-            if(elemento) elemento.textContent = '0';
-            partitaInCorso.eventi.splice(index, 1);
-            aggiornaEventiSalvati();
-            controllaCorrispondenzaGol();
-        }
-        
         function resetPartita() {
             if(confirm("Vuoi resettare tutti i dati della partita in corso?")) {
-                partitaInCorso = { eventi: [] };
-                miglioriSelezionati = { migliorGiocatore: null, votoMigliorGiocatore: 0, migliorPortiere: null, votoMigliorPortiere: 0 };
+                partitaInCorso = {
+                    eventi: [],
+                    migliori: { giocatore: null, votoGiocatore: 0, portiere: null, votoPortiere: 0 }
+                };
+                
                 document.getElementById('golCasa').value = 0;
                 document.getElementById('golOspite').value = 0;
                 document.getElementById('squadraCasa').value = '';
@@ -678,10 +640,11 @@
                 document.getElementById('giocatoriOspiteContainer').classList.add('hidden');
                 document.getElementById('selezioneMiglioriContainer').classList.add('hidden');
                 document.getElementById('eventiSalvatiContainer').classList.add('hidden');
+                
                 document.getElementById('voto-miglior-giocatore-attuale').textContent = 'N/A';
                 document.getElementById('voto-miglior-portiere-attuale').textContent = 'N/A';
                 document.querySelectorAll('.stella.selezionata').forEach(s => s.classList.remove('selezionata'));
-                document.querySelectorAll('.selezione-obbligatoria').forEach(el => el.classList.remove('selezione-obbligatoria'));
+                
                 alert("Partita resettata!");
             }
         }
@@ -696,39 +659,32 @@
             if(squadraCasa === squadraOspite) { alert("Seleziona due squadre diverse!"); return; }
             
             // Controllo gol assegnati
-            let golAssegnatiCasa = 0, golAssegnatiOspite = 0;
-            partitaInCorso.eventi.forEach(e => {
-                if(e.tipo === 'gol') {
-                    if(e.squadra === 'casa') golAssegnatiCasa += e.valore || 1;
-                    else golAssegnatiOspite += e.valore || 1;
-                }
-            });
+            const golAssegnatiCasa = partitaInCorso.eventi.filter(e => 
+                e.tipo === 'gol' && e.squadra === 'casa'
+            ).length;
+            
+            const golAssegnatiOspite = partitaInCorso.eventi.filter(e => 
+                e.tipo === 'gol' && e.squadra === 'ospite'
+            ).length;
             
             if(golAssegnatiCasa !== golCasa || golAssegnatiOspite !== golOspite) {
                 alert(`Gol assegnati non corrispondono!\nCasa: ${golAssegnatiCasa}/${golCasa}\nOspite: ${golAssegnatiOspite}/${golOspite}`);
                 return;
             }
             
-            // Controllo migliori selezionati
-            if(!miglioriSelezionati.migliorGiocatore) {
-                document.getElementById('migliorGiocatore').classList.add('selezione-obbligatoria');
+            // Controllo miglior giocatore
+            if(!partitaInCorso.migliori.giocatore) {
                 alert("Devi selezionare un miglior giocatore!"); 
+                document.getElementById('migliorGiocatore').classList.add('selezione-obbligatoria');
                 return;
             }
             
-            if(miglioriSelezionati.votoMigliorGiocatore === 0) {
+            if(partitaInCorso.migliori.votoGiocatore === 0) {
                 alert("Devi assegnare un voto al miglior giocatore!"); 
                 return;
             }
             
-            if(miglioriSelezionati.migliorPortiere) {
-                if(miglioriSelezionati.votoMigliorPortiere === 0) {
-                    alert("Devi assegnare un voto al miglior portiere!"); 
-                    return;
-                }
-            }
-            
-            // Calcola punti
+            // Calcola punti squadre
             let puntiCasa = 0, puntiOspite = 0;
             if(golCasa > golOspite) { puntiCasa = 3; }
             else if(golCasa < golOspite) { puntiOspite = 3; }
@@ -737,63 +693,82 @@
             // Aggiorna squadre
             database.squadre.forEach(s => {
                 if(s.nome === squadraCasa) {
-                    s.punti += puntiCasa; s.partiteGiocate++; s.golFatti += golCasa; s.golSubiti += golOspite;
-                    if(puntiCasa === 3) s.vittorie++; else if(puntiCasa === 1) s.pareggi++; else s.sconfitte++;
+                    s.punti += puntiCasa; s.partiteGiocate++; 
+                    s.golFatti += golCasa; s.golSubiti += golOspite;
+                    if(puntiCasa === 3) s.vittorie++; 
+                    else if(puntiCasa === 1) s.pareggi++; 
+                    else s.sconfitte++;
                 }
                 if(s.nome === squadraOspite) {
-                    s.punti += puntiOspite; s.partiteGiocate++; s.golFatti += golOspite; s.golSubiti += golCasa;
-                    if(puntiOspite === 3) s.vittorie++; else if(puntiOspite === 1) s.pareggi++; else s.sconfitte++;
+                    s.punti += puntiOspite; s.partiteGiocate++; 
+                    s.golFatti += golOspite; s.golSubiti += golCasa;
+                    if(puntiOspite === 3) s.vittorie++; 
+                    else if(puntiOspite === 1) s.pareggi++; 
+                    else s.sconfitte++;
                 }
             });
             
-            // Aggiorna giocatori - incrementa partite giocate
+            // Aggiorna statistiche giocatori
             partitaInCorso.eventi.forEach(evento => {
                 const g = database.giocatori.find(gi => gi.id === evento.giocatoreId);
                 if(!g) return;
-                g.partiteGiocate = (g.partiteGiocate || 0) + 1;
+                
                 switch(evento.tipo) {
-                    case 'gol': g.gol = (g.gol || 0) + evento.valore; break;
-                    case 'amm': g.ammonizioni = (g.ammonizioni || 0) + evento.valore; break;
-                    case 'esp': g.espulsioni = (g.espulsioni || 0) + evento.valore; break;
+                    case 'gol': g.gol = (g.gol || 0) + 1; break;
+                    case 'amm': g.ammonizioni = (g.ammonizioni || 0) + 1; break;
+                    case 'esp': g.espulsioni = (g.espulsioni || 0) + 1; break;
                 }
             });
             
-            // Aggiungi premi ai migliori
-            if(miglioriSelezionati.migliorGiocatore) {
-                const mg = database.giocatori.find(g => g.id === miglioriSelezionati.migliorGiocatore);
-                if(mg) {
-                    mg.punteggioTotale = (mg.punteggioTotale || 0) + miglioriSelezionati.votoMigliorGiocatore;
-                    mg.premiMigliorGiocatore = (mg.premiMigliorGiocatore || 0) + 1;
-                    mg.partiteGiocate = (mg.partiteGiocate || 0) + 1;
-                }
+            // Aggiungi voto al miglior giocatore
+            const migliorGiocatore = database.giocatori.find(g => 
+                g.id === partitaInCorso.migliori.giocatore
+            );
+            
+            if(migliorGiocatore) {
+                migliorGiocatore.punteggioTotale = (migliorGiocatore.punteggioTotale || 0) + 
+                                                  partitaInCorso.migliori.votoGiocatore;
+                migliorGiocatore.premiMigliorGiocatore = (migliorGiocatore.premiMigliorGiocatore || 0) + 1;
             }
             
-            if(miglioriSelezionati.migliorPortiere) {
-                const mp = database.giocatori.find(g => g.id === miglioriSelezionati.migliorPortiere);
-                if(mp) {
-                    mp.punteggioTotale = (mp.punteggioTotale || 0) + miglioriSelezionati.votoMigliorPortiere;
-                    mp.premiMigliorPortiere = (mp.premiMigliorPortiere || 0) + 1;
-                    mp.partiteGiocate = (mp.partiteGiocate || 0) + 1;
+            // Aggiungi voto al miglior portiere (se selezionato)
+            if(partitaInCorso.migliori.portiere && partitaInCorso.migliori.votoPortiere > 0) {
+                const migliorPortiere = database.giocatori.find(g => 
+                    g.id === partitaInCorso.migliori.portiere
+                );
+                
+                if(migliorPortiere) {
+                    migliorPortiere.punteggioTotale = (migliorPortiere.punteggioTotale || 0) + 
+                                                     partitaInCorso.migliori.votoPortiere;
+                    migliorPortiere.premiMigliorPortiere = (migliorPortiere.premiMigliorPortiere || 0) + 1;
                 }
             }
             
             // Salva partita
             const partitaId = Date.now();
             database.partite.push({
-                id: partitaId, data: new Date().toLocaleDateString(), ora: new Date().toLocaleTimeString(),
-                squadraCasa: squadraCasa, squadraOspite: squadraOspite, golCasa: golCasa, golOspite: golOspite,
+                id: partitaId,
+                data: new Date().toLocaleDateString('it-IT'),
+                ora: new Date().toLocaleTimeString('it-IT'),
+                squadraCasa: squadraCasa,
+                squadraOspite: squadraOspite,
+                golCasa: golCasa,
+                golOspite: golOspite,
                 eventi: [...partitaInCorso.eventi],
-                migliorGiocatore: miglioriSelezionati.migliorGiocatore, votoMigliorGiocatore: miglioriSelezionati.votoMigliorGiocatore,
-                migliorPortiere: miglioriSelezionati.migliorPortiere, votoMigliorPortiere: miglioriSelezionati.votoMigliorPortiere
+                migliorGiocatore: partitaInCorso.migliori.giocatore,
+                votoMigliorGiocatore: partitaInCorso.migliori.votoGiocatore,
+                migliorPortiere: partitaInCorso.migliori.portiere,
+                votoMigliorPortiere: partitaInCorso.migliori.votoPortiere
             });
             
             salvaDatabase();
             resetPartita();
-            alert(`Partita salvata!\n${squadraCasa} ${golCasa}-${golOspite} ${squadraOspite}`);
+            alert(`Partita salvata con successo!\n${squadraCasa} ${golCasa}-${golOspite} ${squadraOspite}`);
         }
         
         function caricaPartiteSalvate() {
             const container = document.getElementById('listaPartite');
+            
             if(database.partite.length === 0) {
                 container.innerHTML = '<p class="avviso">Nessuna partita salvata</p>';
                 return;
@@ -803,9 +778,18 @@
             database.partite.slice().reverse().forEach((partita, index) => {
                 const realIndex = database.partite.length - 1 - index;
                 
-                // Trova nomi dei giocatori migliori
-                const migliorGiocatoreNome = database.giocatori.find(g => g.id === partita.migliorGiocatore)?.nome || 'N/A';
-                const migliorPortiereNome = database.giocatori.find(g => g.id === partita.migliorPortiere)?.nome || 'N/A';
+                // Trova nomi giocatori
+                const migliorGiocatoreNome = database.giocatori.find(g => 
+                    g.id === partita.migliorGiocatore
+                )?.nome || 'N/A';
+                
+                const migliorPortiereNome = partita.migliorPortiere ? 
+                    database.giocatori.find(g => g.id === partita.migliorPortiere)?.nome || 'N/A' : 'Nessuno';
+                
+                // Conta eventi
+                const gol = partita.eventi.filter(e => e.tipo === 'gol').length;
+                const ammonizioni = partita.eventi.filter(e => e.tipo === 'amm').length;
+                const espulsioni = partita.eventi.filter(e => e.tipo === 'esp').length;
                 
                 html += `
                     <div class="partita-item">
@@ -820,17 +804,21 @@
                             <button class="btn-elimina" onclick="eliminaPartita(${realIndex})">🗑️ Elimina</button>
                         </div>
                         <div style="margin-top: 10px; font-size: 0.9em;">
-                            ${partita.migliorGiocatore ? `<p>🏆 <strong>Miglior Giocatore:</strong> ${migliorGiocatoreNome} (Voto: ${partita.votoMigliorGiocatore}/10)</p>` : ''}
-                            ${partita.migliorPortiere ? `<p>🥅 <strong>Miglior Portiere:</strong> ${migliorPortiereNome} (Voto: ${partita.votoMigliorPortiere}/10)</p>` : ''}
+                            <p>⚽ Gol giocatori: ${gol} | 🟨 Ammonizioni: ${ammonizioni} | 🟥 Espulsioni: ${espulsioni}</p>
+                            <p>🏆 <strong>Miglior Giocatore:</strong> ${migliorGiocatoreNome} (Voto: ${partita.votoMigliorGiocatore}/10)</p>
+                            ${partita.migliorPortiere ? 
+                                `<p>🥅 <strong>Miglior Portiere:</strong> ${migliorPortiereNome} (Voto: ${partita.votoMigliorPortiere}/10)</p>` : 
+                                '<p>🥅 <strong>Miglior Portiere:</strong> Nessuno selezionato</p>'
+                            }
                         </div>
                     </div>
                 `;
             });
+            
             container.innerHTML = html;
         }
         
         function apriModificaPartita(index) {
-            partitaDaModificare = index;
             const partita = database.partite[index];
             
             let html = `
@@ -844,10 +832,10 @@
                     <input type="number" id="modificaGolOspite" value="${partita.golOspite}" min="0">
                 </div>
                 <div class="conferma-eliminazione">
-                    <p><strong>⚠️ Attenzione:</strong> Modificando il risultato verranno aggiornati automaticamente i punti delle squadre e le statistiche dei giocatori.</p>
+                    <p><strong>⚠️ Attenzione:</strong> Modificando il risultato verranno aggiornati automaticamente i punti delle squadre.</p>
                 </div>
                 <div style="margin-top: 20px;">
-                    <button class="btn btn-blue" onclick="applicaModifichePartita()">💾 Salva Modifiche</button>
+                    <button class="btn btn-blue" onclick="applicaModifichePartita(${index})">💾 Salva Modifiche</button>
                     <button class="btn" onclick="chiudiModal()">❌ Annulla</button>
                 </div>
             `;
@@ -856,14 +844,11 @@
             document.getElementById('modalModifica').style.display = 'block';
         }
         
-        function applicaModifichePartita() {
-            if (partitaDaModificare === null) return;
-            
-            const partita = database.partite[partitaDaModificare];
+        function applicaModifichePartita(index) {
+            const partita = database.partite[index];
             const nuovoGolCasa = parseInt(document.getElementById('modificaGolCasa').value) || 0;
             const nuovoGolOspite = parseInt(document.getElementById('modificaGolOspite').value) || 0;
             
-            // Se i gol non sono cambiati, chiudi semplicemente
             if (nuovoGolCasa === partita.golCasa && nuovoGolOspite === partita.golOspite) {
                 chiudiModal();
                 return;
@@ -883,20 +868,14 @@
             // Aggiorna squadre
             database.squadre.forEach(s => {
                 if(s.nome === partita.squadraCasa) {
-                    // Rimuovi vecchi punti e statistiche
-                    s.punti -= vecchiPuntiCasa;
-                    s.golFatti -= partita.golCasa;
-                    s.golSubiti -= partita.golOspite;
+                    s.punti = s.punti - vecchiPuntiCasa + nuoviPuntiCasa;
+                    s.golFatti = s.golFatti - partita.golCasa + nuovoGolCasa;
+                    s.golSubiti = s.golSubiti - partita.golOspite + nuovoGolOspite;
                     
                     // Aggiorna vittorie/pareggi/sconfitte
                     if(vecchiPuntiCasa === 3) s.vittorie--;
                     else if(vecchiPuntiCasa === 1) s.pareggi--;
                     else s.sconfitte--;
-                    
-                    // Aggiungi nuovi punti e statistiche
-                    s.punti += nuoviPuntiCasa;
-                    s.golFatti += nuovoGolCasa;
-                    s.golSubiti += nuovoGolOspite;
                     
                     if(nuoviPuntiCasa === 3) s.vittorie++;
                     else if(nuoviPuntiCasa === 1) s.pareggi++;
@@ -904,17 +883,13 @@
                 }
                 
                 if(s.nome === partita.squadraOspite) {
-                    s.punti -= vecchiPuntiOspite;
-                    s.golFatti -= partita.golOspite;
-                    s.golSubiti -= partita.golCasa;
+                    s.punti = s.punti - vecchiPuntiOspite + nuoviPuntiOspite;
+                    s.golFatti = s.golFatti - partita.golOspite + nuovoGolOspite;
+                    s.golSubiti = s.golSubiti - partita.golCasa + nuovoGolCasa;
                     
                     if(vecchiPuntiOspite === 3) s.vittorie--;
                     else if(vecchiPuntiOspite === 1) s.pareggi--;
                     else s.sconfitte--;
-                    
-                    s.punti += nuoviPuntiOspite;
-                    s.golFatti += nuovoGolOspite;
-                    s.golSubiti += nuovoGolCasa;
                     
                     if(nuoviPuntiOspite === 3) s.vittorie++;
                     else if(nuoviPuntiOspite === 1) s.pareggi++;
@@ -934,11 +909,10 @@
         
         function chiudiModal() {
             document.getElementById('modalModifica').style.display = 'none';
-            partitaDaModificare = null;
         }
         
         function eliminaPartita(index) {
-            if(!confirm("⚠️ ATTENZIONE: Eliminando questa partita verranno rimossi tutti i punti assegnati e le statistiche ad essa legate.\n\nSei sicuro di voler procedere?")) return;
+            if(!confirm("⚠️ ATTENZIONE: Eliminando questa partita verranno rimossi tutti i punti assegnati.\n\nSei sicuro di voler procedere?")) return;
             
             const partita = database.partite[index];
             
@@ -950,42 +924,48 @@
             
             database.squadre.forEach(s => {
                 if(s.nome === partita.squadraCasa) {
-                    s.punti -= puntiCasa; s.partiteGiocate--; s.golFatti -= partita.golCasa; s.golSubiti -= partita.golOspite;
-                    if(puntiCasa === 3) s.vittorie--; else if(puntiCasa === 1) s.pareggi--; else s.sconfitte--;
+                    s.punti -= puntiCasa; s.partiteGiocate--; 
+                    s.golFatti -= partita.golCasa; s.golSubiti -= partita.golOspite;
+                    if(puntiCasa === 3) s.vittorie--; 
+                    else if(puntiCasa === 1) s.pareggi--; 
+                    else s.sconfitte--;
                 }
                 if(s.nome === partita.squadraOspite) {
-                    s.punti -= puntiOspite; s.partiteGiocate--; s.golFatti -= partita.golOspite; s.golSubiti -= partita.golCasa;
-                    if(puntiOspite === 3) s.vittorie--; else if(puntiOspite === 1) s.pareggi--; else s.sconfitte--;
+                    s.punti -= puntiOspite; s.partiteGiocate--; 
+                    s.golFatti -= partita.golOspite; s.golSubiti -= partita.golCasa;
+                    if(puntiOspite === 3) s.vittorie--; 
+                    else if(puntiOspite === 1) s.pareggi--; 
+                    else s.sconfitte--;
                 }
             });
             
             // Rimuovi statistiche giocatori
-            if(partita.eventi) {
-                partita.eventi.forEach(evento => {
-                    const g = database.giocatori.find(gi => gi.id === evento.giocatoreId);
-                    if(!g) return;
-                    switch(evento.tipo) {
-                        case 'gol': g.gol = Math.max(0, (g.gol || 0) - (evento.valore || 1)); break;
-                        case 'amm': g.ammonizioni = Math.max(0, (g.ammonizioni || 0) - (evento.valore || 1)); break;
-                        case 'esp': g.espulsioni = Math.max(0, (g.espulsioni || 0) - (evento.valore || 1)); break;
-                    }
-                });
-            }
+            partita.eventi.forEach(evento => {
+                const g = database.giocatori.find(gi => gi.id === evento.giocatoreId);
+                if(!g) return;
+                
+                switch(evento.tipo) {
+                    case 'gol': g.gol = Math.max(0, g.gol - 1); break;
+                    case 'amm': g.ammonizioni = Math.max(0, g.ammonizioni - 1); break;
+                    case 'esp': g.espulsioni = Math.max(0, g.espulsioni - 1); break;
+                }
+            });
             
-            // Rimuovi premi migliori
+            // Rimuovi voto miglior giocatore
             if(partita.migliorGiocatore) {
                 const mg = database.giocatori.find(g => g.id === partita.migliorGiocatore);
                 if(mg) {
-                    mg.punteggioTotale = Math.max(0, (mg.punteggioTotale || 0) - (partita.votoMigliorGiocatore || 0));
-                    mg.premiMigliorGiocatore = Math.max(0, (mg.premiMigliorGiocatore || 0) - 1);
+                    mg.punteggioTotale = Math.max(0, mg.punteggioTotale - partita.votoMigliorGiocatore);
+                    mg.premiMigliorGiocatore = Math.max(0, mg.premiMigliorGiocatore - 1);
                 }
             }
             
-            if(partita.migliorPortiere) {
+            // Rimuovi voto miglior portiere
+            if(partita.migliorPortiere && partita.votoMigliorPortiere > 0) {
                 const mp = database.giocatori.find(g => g.id === partita.migliorPortiere);
                 if(mp) {
-                    mp.punteggioTotale = Math.max(0, (mp.punteggioTotale || 0) - (partita.votoMigliorPortiere || 0));
-                    mp.premiMigliorPortiere = Math.max(0, (mp.premiMigliorPortiere || 0) - 1);
+                    mp.punteggioTotale = Math.max(0, mp.punteggioTotale - partita.votoMigliorPortiere);
+                    mp.premiMigliorPortiere = Math.max(0, mp.premiMigliorPortiere - 1);
                 }
             }
             
@@ -996,7 +976,7 @@
             alert("Partita eliminata con successo!");
         }
         
-        // Funzioni eliminazione dati (esistenti ma abbreviate)
+        // Funzioni eliminazione dati (esistenti)
         function mostraOpzioniElimina() {
             const tipo = document.getElementById('tipoElimina').value;
             const container = document.getElementById('opzioniElimina');

@@ -26,45 +26,46 @@
             text-align: center;
         }
         
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
+        .menu-admin {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto 40px;
         }
         
-        .tab-btn {
-            padding: 12px 30px;
+        .menu-btn {
             background: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
+            padding: 60px 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.5em;
             font-weight: bold;
+            cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border: 3px solid transparent;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
         
-        .tab-btn:hover {
-            transform: translateY(-2px);
+        .menu-btn:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
         
-        .tab-btn.active {
-            background: #1e3c72;
+        .menu-btn:nth-child(1) {
+            background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
             color: white;
         }
         
-        .tab-content {
-            display: none;
-            max-width: 1200px;
-            margin: 0 auto;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+        .menu-btn:nth-child(2) {
+            background: linear-gradient(135deg, #32CD32 0%, #228B22 100%);
+            color: white;
         }
         
-        .tab-content.active {
-            display: grid;
+        .icona {
+            font-size: 3em;
+            display: block;
+            margin-bottom: 15px;
         }
         
         .sezione {
@@ -72,6 +73,12 @@
             padding: 25px;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .sezione.attiva {
+            display: block;
         }
         
         h2 {
@@ -141,104 +148,126 @@
             background: linear-gradient(135deg, #FF0000 0%, #DC143C 100%);
         }
         
-        .lista {
-            margin-top: 20px;
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 10px;
+        .btn-yellow {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #333;
         }
         
-        .item {
-            padding: 12px;
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+        
+        .giocatori-partita {
+            border: 2px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            background: #f9f9f9;
+        }
+        
+        .giocatore-eventi {
+            margin-bottom: 15px;
+            padding: 10px;
             border-bottom: 1px solid #eee;
+        }
+        
+        .giocatore-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 10px;
         }
         
-        .item:last-child {
-            border-bottom: none;
+        .contatori {
+            display: flex;
+            gap: 15px;
         }
         
-        .badge {
-            background: #FF4500;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-size: 12px;
-            margin-left: 5px;
+        .contatore {
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         
-        .badge-gol {
+        .btn-contatore {
+            background: #ddd;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .valore-contatore {
+            min-width: 30px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .gol-segnati {
             background: #32CD32;
+            color: white;
         }
         
-        .badge-amm {
+        .ammonizioni {
             background: #FFD700;
             color: #333;
         }
         
-        .badge-esp {
+        .espulsioni {
             background: #DC143C;
-        }
-        
-        .badge-voto {
-            background: #8A2BE2;
-        }
-        
-        .giocatore-info {
-            flex: 1;
-        }
-        
-        .giocatore-nome {
-            font-weight: bold;
-        }
-        
-        .giocatore-dettagli {
-            font-size: 0.9em;
-            color: #666;
-        }
-        
-        .azioni {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .btn-small {
-            padding: 5px 10px;
-            font-size: 12px;
-            border-radius: 3px;
-            border: none;
-            cursor: pointer;
             color: white;
         }
         
-        .btn-modifica {
-            background: #1E90FF;
+        .eventi-salvati {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f4ff;
+            border-radius: 8px;
+            border: 1px solid #b3d9ff;
         }
         
-        .btn-elimina {
-            background: #DC143C;
+        .evento-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #cce0ff;
         }
         
-        .sezione-elimina {
-            grid-column: 1 / -1;
-            background: #fff5f5;
-            border: 2px solid #ffcccc;
+        .evento-item:last-child {
+            border-bottom: none;
+        }
+        
+        .btn-rimuovi {
+            background: #ff6666;
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
         }
         
         .voto-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
             margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #ddd;
         }
         
         .voto-stelle {
             display: flex;
             gap: 5px;
+            margin-top: 5px;
         }
         
         .stella {
@@ -252,28 +281,23 @@
             color: #FFD700;
         }
         
-        .player-events {
-            border: 1px solid #ddd;
+        .hidden {
+            display: none;
+        }
+        
+        .avviso {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
             padding: 10px;
             border-radius: 5px;
             margin-top: 10px;
-            background: #f9f9f9;
         }
         
-        .player-event-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .player-event-item:last-child {
-            border-bottom: none;
-        }
-        
-        .hidden {
-            display: none;
+        .avviso.errore {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
         }
     </style>
 </head>
@@ -283,174 +307,129 @@
         <p>Gestione completa del torneo</p>
     </div>
     
-    <div class="tabs">
-        <button class="tab-btn active" onclick="apriTab('gestione')">👥 GESTIONE SQUADRE & GIOCATORI</button>
-        <button class="tab-btn" onclick="apriTab('partite')">⚽ GESTIONE PARTITE</button>
-        <button class="tab-btn" onclick="apriTab('elimina')">🗑️ ELIMINA DATI</button>
+    <!-- MENU PRINCIPALE ADMIN -->
+    <div class="menu-admin" id="menuPrincipale">
+        <div class="menu-btn" onclick="mostraSezione('gestione')">
+            <span class="icona">👥</span>
+            GESTIONE SQUADRE & GIOCATORI
+        </div>
+        <div class="menu-btn" onclick="mostraSezione('partite')">
+            <span class="icona">⚽</span>
+            GESTIONE PARTITE
+        </div>
     </div>
     
-    <!-- TAB 1: GESTIONE SQUADRE E GIOCATORI -->
-    <div id="gestione" class="tab-content active">
-        <!-- SEZIONE AGGIUNGI SQUADRA -->
-        <div class="sezione">
-            <h2>➕ AGGIUNGI SQUADRA</h2>
-            <div class="form-group">
-                <label>Nome Squadra:</label>
-                <input type="text" id="nomeSquadra" placeholder="Es: Rovigo FC">
-            </div>
-            <div class="form-group">
-                <label>Allenatore:</label>
-                <input type="text" id="allenatore" placeholder="Nome allenatore">
-            </div>
-            <div class="form-group">
-                <label>Colori:</label>
-                <input type="text" id="colori" placeholder="Es: Rosso-Blu">
-            </div>
+    <!-- SEZIONE GESTIONE SQUADRE E GIOCATORI -->
+    <div id="gestione" class="sezione">
+        <h2>👥 GESTIONE SQUADRE & GIOCATORI</h2>
+        
+        <!-- AGGIUNGI SQUADRA -->
+        <div class="form-group">
+            <h3>➕ AGGIUNGI SQUADRA</h3>
+            <input type="text" id="nomeSquadra" placeholder="Nome Squadra (Es: Rovigo FC)">
+            <input type="text" id="allenatore" placeholder="Allenatore">
+            <input type="text" id="colori" placeholder="Colori (Es: Rosso-Blu)">
             <button class="btn btn-green btn-full" onclick="aggiungiSquadra()">AGGIUNGI SQUADRA</button>
         </div>
         
-        <!-- SEZIONE AGGIUNGI GIOCATORE -->
-        <div class="sezione">
-            <h2>👥 AGGIUNGI GIOCATORE</h2>
-            <div class="form-group">
-                <label>Squadra:</label>
-                <select id="squadraGiocatore">
-                    <option value="">Seleziona squadra</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Nome Giocatore:</label>
-                <input type="text" id="nomeGiocatore" placeholder="Nome e cognome">
-            </div>
-            <div class="form-group">
-                <label>Numero Maglia:</label>
-                <input type="number" id="numeroMaglia" placeholder="Es: 10">
-            </div>
-            <div class="form-group">
-                <label>Ruolo:</label>
-                <select id="ruolo">
-                    <option value="Portiere">Portiere</option>
-                    <option value="Difensore">Difensore</option>
-                    <option value="Centrocampista">Centrocampista</option>
-                    <option value="Attaccante">Attaccante</option>
-                </select>
-            </div>
+        <!-- AGGIUNGI GIOCATORE -->
+        <div class="form-group">
+            <h3>👤 AGGIUNGI GIOCATORE</h3>
+            <select id="squadraGiocatore">
+                <option value="">Seleziona Squadra</option>
+            </select>
+            <input type="text" id="nomeGiocatore" placeholder="Nome e Cognome">
+            <input type="number" id="numeroMaglia" placeholder="Numero Maglia">
+            <select id="ruolo">
+                <option value="Portiere">Portiere</option>
+                <option value="Giocatore">Giocatore</option>
+            </select>
             <button class="btn btn-blue btn-full" onclick="aggiungiGiocatore()">AGGIUNGI GIOCATORE</button>
         </div>
         
-        <!-- SEZIONE ELENCHI -->
-        <div class="sezione" style="grid-column: span 2;">
-            <h2>📋 ELENCHI</h2>
-            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <button class="btn btn-green" onclick="mostraSquadre()">VISUALIZZA SQUADRE</button>
-                <button class="btn btn-blue" onclick="mostraGiocatori()">VISUALIZZA GIOCATORI</button>
-                <button class="btn" onclick="mostraPartite()">VISUALIZZA PARTITE</button>
-            </div>
+        <!-- ELIMINA DATI -->
+        <div class="form-group">
+            <h3>🗑️ ELIMINA DATI</h3>
+            <select id="tipoElimina" onchange="mostraOpzioniElimina()">
+                <option value="">Cosa vuoi eliminare?</option>
+                <option value="giocatore">Elimina Giocatore</option>
+                <option value="squadra">Elimina Squadra</option>
+                <option value="tutto">Elimina TUTTO</option>
+            </select>
             
-            <div class="lista" id="listaDati">
-                <!-- Qui appariranno i dati -->
-            </div>
-        </div>
-    </div>
-    
-    <!-- TAB 2: GESTIONE PARTITE -->
-    <div id="partite" class="tab-content">
-        <!-- SEZIONE INSERISCI RISULTATO -->
-        <div class="sezione">
-            <h2>⚽ INSERISCI RISULTATO PARTITA</h2>
-            <div class="form-group">
-                <label>Squadra Casa:</label>
-                <select id="squadraCasa" onchange="caricaGiocatoriSquadra('casa')">
-                    <option value="">Seleziona squadra</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Squadra Ospite:</label>
-                <select id="squadraOspite" onchange="caricaGiocatoriSquadra('ospite')">
-                    <option value="">Seleziona squadra</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Gol Casa:</label>
-                <input type="number" id="golCasa" min="0" value="0" onchange="aggiornaGolTotali()">
-            </div>
-            <div class="form-group">
-                <label>Gol Ospite:</label>
-                <input type="number" id="golOspite" min="0" value="0" onchange="aggiornaGolTotali()">
-            </div>
-            
-            <div id="giocatoriCasaContainer" class="hidden">
-                <h3>Giocatori Squadra Casa</h3>
-                <div id="giocatoriCasa"></div>
-            </div>
-            
-            <div id="giocatoriOspiteContainer" class="hidden">
-                <h3>Giocatori Squadra Ospite</h3>
-                <div id="giocatoriOspite"></div>
-            </div>
-            
-            <button class="btn btn-full" onclick="inserisciRisultatoCompleto()">SALVA RISULTATO COMPLETO</button>
-        </div>
-        
-        <!-- SEZIONE EVENTI PARTITA -->
-        <div class="sezione">
-            <h2>🎯 EVENTI PARTITA</h2>
-            <div class="lista" id="eventiPartita">
-                <!-- Gli eventi verranno aggiunti qui -->
-            </div>
-        </div>
-    </div>
-    
-    <!-- TAB 3: ELIMINA DATI -->
-    <div id="elimina" class="tab-content">
-        <div class="sezione sezione-elimina">
-            <h2>⚠️ ELIMINA DATI</h2>
-            <p><strong>Attenzione:</strong> Queste azioni sono irreversibili!</p>
-            
-            <div class="form-group">
-                <label>Seleziona cosa eliminare:</label>
-                <select id="tipoElimina">
-                    <option value="">Seleziona...</option>
-                    <option value="giocatore">Elimina Giocatore</option>
-                    <option value="squadra">Elimina Squadra</option>
-                    <option value="partita">Elimina Partita</option>
-                    <option value="tutto">Elimina TUTTO</option>
-                </select>
-            </div>
-            
-            <div id="selezioneElimina" class="hidden">
+            <div id="opzioniElimina" class="hidden">
                 <!-- Qui appariranno le opzioni specifiche -->
             </div>
             
-            <button class="btn btn-red btn-full" onclick="eseguiEliminazione()" style="margin-top: 20px;">
-                🗑️ ELIMINA
-            </button>
+            <button class="btn btn-red btn-full hidden" id="btnElimina" onclick="eseguiEliminazione()">ELIMINA</button>
         </div>
         
-        <div class="sezione">
-            <h2>📊 STATISTICHE DATI</h2>
-            <div class="lista">
-                <div class="item">
-                    <span>Squadre registrate:</span>
-                    <span class="badge" id="statSquadre">0</span>
+        <button class="btn btn-back" onclick="tornaMenu()">← TORNA AL MENU</button>
+    </div>
+    
+    <!-- SEZIONE GESTIONE PARTITE -->
+    <div id="partite" class="sezione">
+        <h2>⚽ GESTIONE PARTITE</h2>
+        
+        <!-- SELEZIONE SQUADRE -->
+        <div class="form-group">
+            <h3>🏟️ SELEZIONA PARTITA</h3>
+            <select id="squadraCasa" onchange="caricaGiocatoriSquadra('casa')">
+                <option value="">Squadra Casa</option>
+            </select>
+            <select id="squadraOspite" onchange="caricaGiocatoriSquadra('ospite')">
+                <option value="">Squadra Ospite</option>
+            </select>
+        </div>
+        
+        <!-- RISULTATO PARTITA -->
+        <div class="form-group">
+            <h3>📊 RISULTATO PARTITA</h3>
+            <div style="display: flex; gap: 20px; align-items: center;">
+                <div style="flex: 1;">
+                    <label>Gol Casa:</label>
+                    <input type="number" id="golCasa" min="0" value="0" style="font-size: 24px; text-align: center;">
                 </div>
-                <div class="item">
-                    <span>Giocatori registrati:</span>
-                    <span class="badge" id="statGiocatori">0</span>
-                </div>
-                <div class="item">
-                    <span>Partite giocate:</span>
-                    <span class="badge" id="statPartite">0</span>
-                </div>
-                <div class="item">
-                    <span>Gol totali:</span>
-                    <span class="badge" id="statGol">0</span>
+                <div style="font-size: 24px; font-weight: bold;">-</div>
+                <div style="flex: 1;">
+                    <label>Gol Ospite:</label>
+                    <input type="number" id="golOspite" min="0" value="0" style="font-size: 24px; text-align: center;">
                 </div>
             </div>
         </div>
+        
+        <!-- GIOCATORI CASA -->
+        <div id="giocatoriCasaContainer" class="hidden">
+            <h3>👥 GIOCATORI CASA</h3>
+            <div id="giocatoriCasa" class="giocatori-partita"></div>
+        </div>
+        
+        <!-- GIOCATORI OSPITE -->
+        <div id="giocatoriOspiteContainer" class="hidden">
+            <h3>👥 GIOCATORI OSPITE</h3>
+            <div id="giocatoriOspite" class="giocatori-partita"></div>
+        </div>
+        
+        <!-- EVENTI SALVATI -->
+        <div id="eventiSalvatiContainer" class="hidden">
+            <h3>📝 EVENTI REGISTRATI</h3>
+            <div id="eventiSalvati" class="eventi-salvati">
+                Nessun evento registrato
+            </div>
+            
+            <div class="avviso" id="avvisoGol">
+                ⚠️ Controlla che il totale gol dei giocatori corrisponda al risultato della partita
+            </div>
+        </div>
+        
+        <!-- BOTTONI AZIONE -->
+        <div class="btn-group" style="margin-top: 20px;">
+            <button class="btn btn-yellow" onclick="resetPartita()">🔄 RESET PARTITA</button>
+            <button class="btn btn-green" onclick="salvaPartita()">💾 SALVA PARTITA</button>
+        </div>
+        
+        <button class="btn btn-back" onclick="tornaMenu()">← TORNA AL MENU</button>
     </div>
-    
-    <button class="btn btn-back" onclick="tornaIndietro()">← TORNA ALLA HOME</button>
     
     <script>
         // Database in memoria
@@ -460,50 +439,39 @@
             partite: JSON.parse(localStorage.getItem('rovigoal_partite')) || []
         };
         
-        // Variabili temporanee per la partita in corso
+        // Partita in corso
         let partitaInCorso = {
             eventi: [],
-            giocatoriCasa: [],
-            giocatoriOspite: []
+            golTotaliCasa: 0,
+            golTotaliOspite: 0
         };
         
         // Inizializzazione
         document.addEventListener('DOMContentLoaded', function() {
             caricaSquadreNeiSelect();
-            caricaStatisticheElimina();
+            document.getElementById('menuPrincipale').style.display = 'grid';
+            document.getElementById('gestione').classList.remove('attiva');
+            document.getElementById('partite').classList.remove('attiva');
         });
         
-        // Funzione per cambiare tab
-        function apriTab(tabName) {
-            // Nascondi tutti i tab
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
+        // Mostra/nascondi sezioni
+        function mostraSezione(sezione) {
+            document.getElementById('menuPrincipale').style.display = 'none';
+            document.getElementById('gestione').classList.remove('attiva');
+            document.getElementById('partite').classList.remove('attiva');
+            document.getElementById(sezione).classList.add('attiva');
             
-            // Rimuovi active da tutti i tab buttons
-            document.querySelectorAll('.tab-btn').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Mostra il tab selezionato
-            document.getElementById(tabName).classList.add('active');
-            
-            // Attiva il button del tab
-            event.target.classList.add('active');
-            
-            // Se è il tab elimina, carica le statistiche
-            if(tabName === 'elimina') {
-                caricaStatisticheElimina();
-                document.getElementById('tipoElimina').value = '';
-                document.getElementById('selezioneElimina').innerHTML = '';
-                document.getElementById('selezioneElimina').classList.add('hidden');
+            if(sezione === 'gestione') {
+                caricaSquadreNeiSelect();
+            } else if(sezione === 'partite') {
+                resetPartita();
             }
-            
-            // Se è il tab partite, resetta
-            if(tabName === 'partite') {
-                partitaInCorso = { eventi: [], giocatoriCasa: [], giocatoriOspite: [] };
-                document.getElementById('eventiPartita').innerHTML = '<p>Nessun evento registrato</p>';
-            }
+        }
+        
+        function tornaMenu() {
+            document.getElementById('menuPrincipale').style.display = 'grid';
+            document.getElementById('gestione').classList.remove('attiva');
+            document.getElementById('partite').classList.remove('attiva');
         }
         
         // Carica squadre nei select
@@ -517,7 +485,6 @@
             selects.forEach(select => {
                 if(!select) return;
                 
-                // Salva il valore selezionato
                 const valoreSalvato = select.value;
                 
                 // Pulisci le opzioni (mantenendo la prima)
@@ -540,7 +507,7 @@
             });
         }
         
-        // Funzioni per aggiungere dati
+        // Aggiungi squadra
         function aggiungiSquadra() {
             const nome = document.getElementById('nomeSquadra').value.trim();
             const allenatore = document.getElementById('allenatore').value.trim();
@@ -551,7 +518,6 @@
                 return;
             }
             
-            // Controlla se la squadra esiste già
             if(database.squadre.some(s => s.nome.toLowerCase() === nome.toLowerCase())) {
                 alert(`La squadra "${nome}" esiste già!`);
                 return;
@@ -582,6 +548,7 @@
             alert(`Squadra "${nome}" aggiunta con successo!`);
         }
         
+        // Aggiungi giocatore
         function aggiungiGiocatore() {
             const squadra = document.getElementById('squadraGiocatore').value;
             const nome = document.getElementById('nomeGiocatore').value.trim();
@@ -602,8 +569,7 @@
                 gol: 0,
                 ammonizioni: 0,
                 espulsioni: 0,
-                voti: [],
-                mediaVoto: 0
+                punteggioTotale: 0  // Somma di tutti i voti
             };
             
             database.giocatori.push(nuovoGiocatore);
@@ -615,7 +581,7 @@
             alert(`Giocatore "${nome}" aggiunto alla squadra ${squadra}!`);
         }
         
-        // Carica giocatori per squadra (per partita)
+        // Carica giocatori per squadra
         function caricaGiocatoriSquadra(tipo) {
             const squadraSelect = tipo === 'casa' 
                 ? document.getElementById('squadraCasa') 
@@ -641,30 +607,45 @@
             
             let html = '';
             if(giocatoriSquadra.length === 0) {
-                html = '<p>Nessun giocatore registrato per questa squadra</p>';
+                html = '<p class="avviso">Nessun giocatore registrato per questa squadra</p>';
             } else {
                 giocatoriSquadra.forEach(giocatore => {
                     html += `
-                        <div class="player-events">
-                            <div class="player-event-item">
+                        <div class="giocatore-eventi">
+                            <div class="giocatore-header">
                                 <div>
                                     <strong>${giocatore.nome}</strong>
                                     <small>(${giocatore.ruolo} #${giocatore.numero || 'N/A'})</small>
                                 </div>
-                                <div>
-                                    <button onclick="aggiungiEvento('${tipo}', ${giocatore.id}, 'gol')">⚽ Gol</button>
-                                    <button onclick="aggiungiEvento('${tipo}', ${giocatore.id}, 'ammonizione')">🟨 Ammonizione</button>
-                                    <button onclick="aggiungiEvento('${tipo}', ${giocatore.id}, 'espulsione')">🟥 Espulsione</button>
+                                <div class="contatori">
+                                    <div class="contatore">
+                                        <button class="btn-contatore gol-segnati" onclick="modificaContatore('${tipo}', ${giocatore.id}, 'gol', -1)">-</button>
+                                        <span class="valore-contatore" id="gol-${giocatore.id}">0</span>
+                                        <button class="btn-contatore gol-segnati" onclick="modificaContatore('${tipo}', ${giocatore.id}, 'gol', 1)">+</button>
+                                        <span>⚽</span>
+                                    </div>
+                                    <div class="contatore">
+                                        <button class="btn-contatore ammonizioni" onclick="modificaContatore('${tipo}', ${giocatore.id}, 'amm', -1)">-</button>
+                                        <span class="valore-contatore" id="amm-${giocatore.id}">0</span>
+                                        <button class="btn-contatore ammonizioni" onclick="modificaContatore('${tipo}', ${giocatore.id}, 'amm', 1)">+</button>
+                                        <span>🟨</span>
+                                    </div>
+                                    <div class="contatore">
+                                        <button class="btn-contatore espulsioni" onclick="modificaContatore('${tipo}', ${giocatore.id}, 'esp', -1)">-</button>
+                                        <span class="valore-contatore" id="esp-${giocatore.id}">0</span>
+                                        <button class="btn-contatore espulsioni" onclick="modificaContatore('${tipo}', ${giocatore.id}, 'esp', 1)">+</button>
+                                        <span>🟥</span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="voto-container">
-                                <span>Voto:</span>
+                                <label>Voto (1-10):</label>
                                 <div class="voto-stelle" id="voto-${giocatore.id}">
                                     ${[1,2,3,4,5,6,7,8,9,10].map(v => 
-                                        `<span class="stella" onclick="assegnaVoto(${giocatore.id}, ${v})">★</span>`
+                                        `<span class="stella" onclick="assegnaVoto('${tipo}', ${giocatore.id}, ${v})">★</span>`
                                     ).join('')}
                                 </div>
-                                <span id="voto-attuale-${giocatore.id}"></span>
+                                <span>Voto attuale: <span id="voto-attuale-${giocatore.id}">N/A</span></span>
                             </div>
                         </div>
                     `;
@@ -674,38 +655,92 @@
             document.getElementById(giocatoriDivId).innerHTML = html;
             document.getElementById(containerId).classList.remove('hidden');
             
-            // Salva i giocatori per la partita in corso
-            if(tipo === 'casa') {
-                partitaInCorso.giocatoriCasa = giocatoriSquadra;
-            } else {
-                partitaInCorso.giocatoriOspite = giocatoriSquadra;
+            // Mostra container eventi se entrambe le squadre sono selezionate
+            const squadraCasa = document.getElementById('squadraCasa').value;
+            const squadraOspite = document.getElementById('squadraOspite').value;
+            if(squadraCasa && squadraOspite) {
+                document.getElementById('eventiSalvatiContainer').classList.remove('hidden');
+                aggiornaEventiSalvati();
             }
         }
         
-        // Aggiungi evento a un giocatore
-        function aggiungiEvento(tipoSquadra, giocatoreId, tipoEvento) {
-            const giocatore = database.giocatori.find(g => g.id === giocatoreId);
-            if(!giocatore) return;
+        // Modifica contatori gol/amm/esp
+        function modificaContatore(tipoSquadra, giocatoreId, tipo, modifica) {
+            const elemento = document.getElementById(`${tipo}-${giocatoreId}`);
+            let valore = parseInt(elemento.textContent) || 0;
             
-            // Crea evento
-            const evento = {
-                id: Date.now(),
-                giocatoreId: giocatoreId,
-                giocatoreNome: giocatore.nome,
-                tipo: tipoEvento,
-                squadra: tipoSquadra,
-                timestamp: new Date().toLocaleTimeString()
-            };
+            // Calcola nuovo valore
+            let nuovoValore = valore + modifica;
             
-            // Aggiungi alla partita in corso
-            partitaInCorso.eventi.push(evento);
+            // Non permettere valori negativi
+            if(nuovoValore < 0) nuovoValore = 0;
             
-            // Aggiorna visualizzazione
-            aggiornaEventiPartita();
+            // Controllo speciale per i gol: non superare i gol totali della partita
+            if(tipo === 'gol') {
+                const golCasa = parseInt(document.getElementById('golCasa').value) || 0;
+                const golOspite = parseInt(document.getElementById('golOspite').value) || 0;
+                const golTotaliPartita = tipoSquadra === 'casa' ? golCasa : golOspite;
+                
+                // Calcola gol già assegnati a tutti i giocatori di questa squadra
+                let golAssegnati = 0;
+                database.giocatori.forEach(g => {
+                    const eventiGiocatore = partitaInCorso.eventi.filter(e => 
+                        e.giocatoreId === g.id && e.tipo === 'gol'
+                    );
+                    golAssegnati += eventiGiocatore.length;
+                });
+                
+                if(nuovoValore > golTotaliPartita) {
+                    alert(`Non puoi assegnare più gol di quelli segnati dalla squadra! (Massimo: ${golTotaliPartita})`);
+                    return;
+                }
+            }
+            
+            // Aggiorna visuale
+            elemento.textContent = nuovoValore;
+            
+            // Trova o crea evento
+            const eventoEsistenteIndex = partitaInCorso.eventi.findIndex(e => 
+                e.giocatoreId === giocatoreId && e.tipo === tipo
+            );
+            
+            if(nuovoValore === 0) {
+                // Rimuovi evento se valore è 0
+                if(eventoEsistenteIndex !== -1) {
+                    partitaInCorso.eventi.splice(eventoEsistenteIndex, 1);
+                }
+            } else {
+                const giocatore = database.giocatori.find(g => g.id === giocatoreId);
+                if(!giocatore) return;
+                
+                const tipoTesto = tipo === 'gol' ? 'gol' : tipo === 'amm' ? 'ammonizione' : 'espulsione';
+                
+                if(eventoEsistenteIndex !== -1) {
+                    // Aggiorna evento esistente
+                    partitaInCorso.eventi[eventoEsistenteIndex].valore = nuovoValore;
+                } else {
+                    // Crea nuovo evento
+                    partitaInCorso.eventi.push({
+                        id: Date.now(),
+                        giocatoreId: giocatoreId,
+                        giocatoreNome: giocatore.nome,
+                        tipo: tipo,
+                        valore: nuovoValore,
+                        squadra: tipoSquadra,
+                        timestamp: new Date().toLocaleTimeString()
+                    });
+                }
+            }
+            
+            // Aggiorna visualizzazione eventi
+            aggiornaEventiSalvati();
+            
+            // Controlla corrispondenza gol
+            controllaCorrispondenzaGol();
         }
         
         // Assegna voto a giocatore
-        function assegnaVoto(giocatoreId, voto) {
+        function assegnaVoto(tipoSquadra, giocatoreId, voto) {
             // Aggiorna stelle
             const stelleDiv = document.getElementById(`voto-${giocatoreId}`);
             const stelle = stelleDiv.querySelectorAll('.stella');
@@ -719,57 +754,91 @@
             });
             
             // Mostra voto attuale
-            document.getElementById(`voto-attuale-${giocatoreId}`).textContent = `Voto: ${voto}/10`;
+            document.getElementById(`voto-attuale-${giocatoreId}`).textContent = voto;
             
-            // Salva voto temporaneo per la partita
-            const eventoEsistente = partitaInCorso.eventi.find(e => 
+            // Trova o crea evento voto
+            const eventoEsistenteIndex = partitaInCorso.eventi.findIndex(e => 
                 e.giocatoreId === giocatoreId && e.tipo === 'voto'
             );
             
-            if(eventoEsistente) {
-                eventoEsistente.valore = voto;
+            const giocatore = database.giocatori.find(g => g.id === giocatoreId);
+            
+            if(eventoEsistenteIndex !== -1) {
+                // Aggiorna evento esistente
+                partitaInCorso.eventi[eventoEsistenteIndex].valore = voto;
             } else {
-                const giocatore = database.giocatori.find(g => g.id === giocatoreId);
+                // Crea nuovo evento
                 partitaInCorso.eventi.push({
                     id: Date.now(),
                     giocatoreId: giocatoreId,
                     giocatoreNome: giocatore.nome,
                     tipo: 'voto',
                     valore: voto,
-                    squadra: giocatore.squadra === document.getElementById('squadraCasa').value ? 'casa' : 'ospite',
+                    squadra: tipoSquadra,
                     timestamp: new Date().toLocaleTimeString()
                 });
             }
             
-            aggiornaEventiPartita();
+            // Aggiorna visualizzazione eventi
+            aggiornaEventiSalvati();
         }
         
-        // Aggiorna visualizzazione eventi partita
-        function aggiornaEventiPartita() {
-            const container = document.getElementById('eventiPartita');
+        // Controlla corrispondenza gol
+        function controllaCorrispondenzaGol() {
+            const golCasa = parseInt(document.getElementById('golCasa').value) || 0;
+            const golOspite = parseInt(document.getElementById('golOspite').value) || 0;
+            
+            // Calcola gol assegnati ai giocatori
+            let golAssegnatiCasa = 0;
+            let golAssegnatiOspite = 0;
+            
+            partitaInCorso.eventi.forEach(evento => {
+                if(evento.tipo === 'gol') {
+                    if(evento.squadra === 'casa') {
+                        golAssegnatiCasa += evento.valore || 1;
+                    } else {
+                        golAssegnatiOspite += evento.valore || 1;
+                    }
+                }
+            });
+            
+            const avviso = document.getElementById('avvisoGol');
+            
+            if(golAssegnatiCasa !== golCasa || golAssegnatiOspite !== golOspite) {
+                avviso.textContent = `⚠️ ATTENZIONE: Gol assegnati non corrispondono al risultato! Casa: ${golAssegnatiCasa}/${golCasa} - Ospite: ${golAssegnatiOspite}/${golOspite}`;
+                avviso.classList.add('errore');
+            } else {
+                avviso.textContent = '✅ Gol assegnati correttamente!';
+                avviso.classList.remove('errore');
+            }
+        }
+        
+        // Aggiorna eventi salvati
+        function aggiornaEventiSalvati() {
+            const container = document.getElementById('eventiSalvati');
             
             if(partitaInCorso.eventi.length === 0) {
                 container.innerHTML = '<p>Nessun evento registrato</p>';
                 return;
             }
             
-            let html = '<h3>Eventi Registrati:</h3>';
-            partitaInCorso.eventi.forEach(evento => {
+            let html = '';
+            partitaInCorso.eventi.forEach((evento, index) => {
                 let icona = '';
                 let testo = '';
                 
                 switch(evento.tipo) {
                     case 'gol':
                         icona = '⚽';
-                        testo = `Gol di ${evento.giocatoreNome}`;
+                        testo = `${evento.valore || 1} gol di ${evento.giocatoreNome}`;
                         break;
-                    case 'ammonizione':
+                    case 'amm':
                         icona = '🟨';
-                        testo = `Ammonizione per ${evento.giocatoreNome}`;
+                        testo = `${evento.valore || 1} ammonizione per ${evento.giocatoreNome}`;
                         break;
-                    case 'espulsione':
+                    case 'esp':
                         icona = '🟥';
-                        testo = `Espulsione di ${evento.giocatoreNome}`;
+                        testo = `${evento.valore || 1} espulsione di ${evento.giocatoreNome}`;
                         break;
                     case 'voto':
                         icona = '⭐';
@@ -778,18 +847,69 @@
                 }
                 
                 html += `
-                    <div class="player-event-item">
-                        <span>${icona} ${testo}</span>
-                        <span class="badge">${evento.timestamp}</span>
+                    <div class="evento-item">
+                        <span>${icona} ${testo} (${evento.squadra === 'casa' ? 'Casa' : 'Ospite'})</span>
+                        <button class="btn-rimuovi" onclick="rimuoviEvento(${index})">Rimuovi</button>
                     </div>
                 `;
             });
             
             container.innerHTML = html;
+            controllaCorrispondenzaGol();
         }
         
-        // Inserisci risultato completo con eventi
-        function inserisciRisultatoCompleto() {
+        // Rimuovi evento
+        function rimuoviEvento(index) {
+            const evento = partitaInCorso.eventi[index];
+            
+            // Resetta contatori visivi
+            if(evento.tipo === 'gol') {
+                const elemento = document.getElementById(`gol-${evento.giocatoreId}`);
+                if(elemento) elemento.textContent = '0';
+            } else if(evento.tipo === 'amm') {
+                const elemento = document.getElementById(`amm-${evento.giocatoreId}`);
+                if(elemento) elemento.textContent = '0';
+            } else if(evento.tipo === 'esp') {
+                const elemento = document.getElementById(`esp-${evento.giocatoreId}`);
+                if(elemento) elemento.textContent = '0';
+            } else if(evento.tipo === 'voto') {
+                const stelleDiv = document.getElementById(`voto-${evento.giocatoreId}`);
+                if(stelleDiv) {
+                    const stelle = stelleDiv.querySelectorAll('.stella');
+                    stelle.forEach(stella => stella.classList.remove('selezionata'));
+                }
+                const votoAttuale = document.getElementById(`voto-attuale-${evento.giocatoreId}`);
+                if(votoAttuale) votoAttuale.textContent = 'N/A';
+            }
+            
+            // Rimuovi evento
+            partitaInCorso.eventi.splice(index, 1);
+            aggiornaEventiSalvati();
+        }
+        
+        // Reset partita
+        function resetPartita() {
+            if(confirm("Vuoi resettare tutti i dati della partita in corso?")) {
+                partitaInCorso = {
+                    eventi: [],
+                    golTotaliCasa: 0,
+                    golTotaliOspite: 0
+                };
+                
+                document.getElementById('golCasa').value = 0;
+                document.getElementById('golOspite').value = 0;
+                document.getElementById('squadraCasa').value = '';
+                document.getElementById('squadraOspite').value = '';
+                document.getElementById('giocatoriCasaContainer').classList.add('hidden');
+                document.getElementById('giocatoriOspiteContainer').classList.add('hidden');
+                document.getElementById('eventiSalvatiContainer').classList.add('hidden');
+                
+                alert("Partita resettata!");
+            }
+        }
+        
+        // Salva partita
+        function salvaPartita() {
             const squadraCasa = document.getElementById('squadraCasa').value;
             const squadraOspite = document.getElementById('squadraOspite').value;
             const golCasa = parseInt(document.getElementById('golCasa').value) || 0;
@@ -802,6 +922,25 @@
             
             if(squadraCasa === squadraOspite) {
                 alert("Seleziona due squadre diverse!");
+                return;
+            }
+            
+            // Controlla corrispondenza gol
+            let golAssegnatiCasa = 0;
+            let golAssegnatiOspite = 0;
+            
+            partitaInCorso.eventi.forEach(evento => {
+                if(evento.tipo === 'gol') {
+                    if(evento.squadra === 'casa') {
+                        golAssegnatiCasa += evento.valore || 1;
+                    } else {
+                        golAssegnatiOspite += evento.valore || 1;
+                    }
+                }
+            });
+            
+            if(golAssegnatiCasa !== golCasa || golAssegnatiOspite !== golOspite) {
+                alert(`ATTENZIONE: Gol assegnati non corrispondono al risultato!\nCasa: ${golAssegnatiCasa}/${golCasa}\nOspite: ${golAssegnatiOspite}/${golOspite}`);
                 return;
             }
             
@@ -840,29 +979,24 @@
                 }
             });
             
-            // Aggiorna statistiche giocatori dagli eventi
+            // Aggiorna statistiche giocatori
             partitaInCorso.eventi.forEach(evento => {
                 const giocatore = database.giocatori.find(g => g.id === evento.giocatoreId);
                 if(!giocatore) return;
                 
                 switch(evento.tipo) {
                     case 'gol':
-                        giocatore.gol = (giocatore.gol || 0) + 1;
+                        giocatore.gol = (giocatore.gol || 0) + (evento.valore || 1);
                         break;
-                    case 'ammonizione':
-                        giocatore.ammonizioni = (giocatore.ammonizioni || 0) + 1;
+                    case 'amm':
+                        giocatore.ammonizioni = (giocatore.ammonizioni || 0) + (evento.valore || 1);
                         break;
-                    case 'espulsione':
-                        giocatore.espulsioni = (giocatore.espulsioni || 0) + 1;
+                    case 'esp':
+                        giocatore.espulsioni = (giocatore.espulsioni || 0) + (evento.valore || 1);
                         break;
                     case 'voto':
-                        // Aggiungi voto all'array voti
-                        giocatore.voti = giocatore.voti || [];
-                        giocatore.voti.push(evento.valore);
-                        
-                        // Calcola nuova media
-                        const sommaVoti = giocatore.voti.reduce((a, b) => a + b, 0);
-                        giocatore.mediaVoto = sommaVoti / giocatore.voti.length;
+                        // Aggiungi voto al punteggio totale
+                        giocatore.punteggioTotale = (giocatore.punteggioTotale || 0) + evento.valore;
                         break;
                 }
             });
@@ -882,198 +1016,21 @@
             database.partite.push(nuovaPartita);
             salvaDatabase();
             
-            // Reset form
-            document.getElementById('golCasa').value = 0;
-            document.getElementById('golOspite').value = 0;
-            document.getElementById('giocatoriCasaContainer').classList.add('hidden');
-            document.getElementById('giocatoriOspiteContainer').classList.add('hidden');
-            document.getElementById('squadraCasa').value = '';
-            document.getElementById('squadraOspite').value = '';
-            partitaInCorso = { eventi: [], giocatoriCasa: [], giocatoriOspite: [] };
-            document.getElementById('eventiPartita').innerHTML = '<p>Nessun evento registrato</p>';
+            // Reset
+            resetPartita();
             
-            alert(`Partita registrata con successo!\n${squadraCasa} ${golCasa}-${golOspite} ${squadraOspite}`);
+            alert(`Partita salvata con successo!\n${squadraCasa} ${golCasa}-${golOspite} ${squadraOspite}`);
         }
         
-        // Funzioni per visualizzare dati
-        function mostraSquadre() {
-            const lista = document.getElementById('listaDati');
-            
-            if(database.squadre.length === 0) {
-                lista.innerHTML = '<p class="item">Nessuna squadra registrata</p>';
-                return;
-            }
-            
-            let html = '<h3>Squadre Registrate:</h3>';
-            database.squadre.forEach(squadra => {
-                const dr = squadra.golFatti - squadra.golSubiti;
-                html += `
-                    <div class="item">
-                        <div class="giocatore-info">
-                            <div class="giocatore-nome">${squadra.nome}</div>
-                            <div class="giocatore-dettagli">
-                                ${squadra.allenatore} | ${squadra.colori}
-                            </div>
-                        </div>
-                        <div class="azioni">
-                            <span class="badge">${squadra.punti} PTS</span>
-                            <button class="btn-small btn-elimina" onclick="eliminaSquadra(${squadra.id})">Elimina</button>
-                        </div>
-                    </div>
-                `;
-            });
-            lista.innerHTML = html;
-        }
-        
-        function mostraGiocatori() {
-            const lista = document.getElementById('listaDati');
-            
-            if(database.giocatori.length === 0) {
-                lista.innerHTML = '<p class="item">Nessun giocatore registrato</p>';
-                return;
-            }
-            
-            let html = '<h3>Giocatori Registrati:</h3>';
-            database.giocatori.forEach(giocatore => {
-                let badges = '';
-                if(giocatore.gol > 0) badges += `<span class="badge badge-gol">⚽ ${giocatore.gol}</span> `;
-                if(giocatore.ammonizioni > 0) badges += `<span class="badge badge-amm">🟨 ${giocatore.ammonizioni}</span> `;
-                if(giocatore.espulsioni > 0) badges += `<span class="badge badge-esp">🟥 ${giocatore.espulsioni}</span> `;
-                if(giocatore.mediaVoto > 0) badges += `<span class="badge badge-voto">⭐ ${giocatore.mediaVoto.toFixed(1)}</span>`;
-                
-                html += `
-                    <div class="item">
-                        <div class="giocatore-info">
-                            <div class="giocatore-nome">
-                                ${giocatore.nome} 
-                                ${giocatore.numero ? `(#${giocatore.numero})` : ''}
-                            </div>
-                            <div class="giocatore-dettagli">
-                                ${giocatore.squadra} - ${giocatore.ruolo}
-                            </div>
-                        </div>
-                        <div class="azioni">
-                            ${badges}
-                            <button class="btn-small btn-elimina" onclick="eliminaGiocatore(${giocatore.id})">Elimina</button>
-                        </div>
-                    </div>
-                `;
-            });
-            lista.innerHTML = html;
-        }
-        
-        function mostraPartite() {
-            const lista = document.getElementById('listaDati');
-            
-            if(database.partite.length === 0) {
-                lista.innerHTML = '<p class="item">Nessuna partita registrata</p>';
-                return;
-            }
-            
-            let html = '<h3>Partite Giocate:</h3>';
-            // Mostra le ultime 10 partite (più recenti prima)
-            const partiteRecent = [...database.partite].reverse().slice(0, 10);
-            
-            partiteRecent.forEach(partita => {
-                html += `
-                    <div class="item">
-                        <div>
-                            <strong>${partita.squadraCasa} ${partita.golCasa}-${partita.golOspite} ${partita.squadraOspite}</strong><br>
-                            <small>${partita.data} ${partita.ora}</small>
-                        </div>
-                        <div class="azioni">
-                            <button class="btn-small btn-elimina" onclick="eliminaPartita(${partita.id})">Elimina</button>
-                        </div>
-                    </div>
-                `;
-            });
-            lista.innerHTML = html;
-        }
-        
-        // Funzioni di eliminazione
-        function eliminaSquadra(id) {
-            if(confirm("ATTENZIONE: Eliminando una squadra verranno eliminati anche tutti i suoi giocatori. Continuare?")) {
-                // Elimina la squadra
-                database.squadre = database.squadre.filter(s => s.id !== id);
-                
-                // Elimina tutti i giocatori della squadra
-                database.giocatori = database.giocatori.filter(g => {
-                    const squadraGiocatore = database.squadre.find(s => s.nome === g.squadra);
-                    return squadraGiocatore !== undefined;
-                });
-                
-                salvaDatabase();
-                caricaSquadreNeiSelect();
-                alert("Squadra e giocatori eliminati con successo!");
-                mostraSquadre();
-            }
-        }
-        
-        function eliminaGiocatore(id) {
-            if(confirm("Eliminare questo giocatore?")) {
-                database.giocatori = database.giocatori.filter(g => g.id !== id);
-                salvaDatabase();
-                alert("Giocatore eliminato con successo!");
-                mostraGiocatori();
-            }
-        }
-        
-        function eliminaPartita(id) {
-            if(confirm("Eliminare questa partita? I risultati verranno tolti dalla classifica.")) {
-                // Trovare la partita da eliminare
-                const partita = database.partite.find(p => p.id === id);
-                if(!partita) return;
-                
-                // Rimuovere i punti assegnati alle squadre
-                let puntiCasa, puntiOspite;
-                if(partita.golCasa > partita.golOspite) {
-                    puntiCasa = 3;
-                    puntiOspite = 0;
-                } else if(partita.golCasa < partita.golOspite) {
-                    puntiCasa = 0;
-                    puntiOspite = 3;
-                } else {
-                    puntiCasa = 1;
-                    puntiOspite = 1;
-                }
-                
-                // Sottrarre punti e statistiche alle squadre
-                database.squadre.forEach(squadra => {
-                    if(squadra.nome === partita.squadraCasa) {
-                        squadra.punti -= puntiCasa;
-                        squadra.partiteGiocate--;
-                        squadra.golFatti -= partita.golCasa;
-                        squadra.golSubiti -= partita.golOspite;
-                        if(puntiCasa === 3) squadra.vittorie--;
-                        else if(puntiCasa === 1) squadra.pareggi--;
-                        else squadra.sconfitte--;
-                    }
-                    if(squadra.nome === partita.squadraOspite) {
-                        squadra.punti -= puntiOspite;
-                        squadra.partiteGiocate--;
-                        squadra.golFatti -= partita.golOspite;
-                        squadra.golSubiti -= partita.golCasa;
-                        if(puntiOspite === 3) squadra.vittorie--;
-                        else if(puntiOspite === 1) squadra.pareggi--;
-                        else squadra.sconfitte--;
-                    }
-                });
-                
-                // Eliminare la partita
-                database.partite = database.partite.filter(p => p.id !== id);
-                salvaDatabase();
-                alert("Partita eliminata con successo!");
-                mostraPartite();
-            }
-        }
-        
-        // Gestione eliminazione dati
-        document.getElementById('tipoElimina').addEventListener('change', function() {
-            const tipo = this.value;
-            const container = document.getElementById('selezioneElimina');
+        // Funzioni eliminazione dati
+        function mostraOpzioniElimina() {
+            const tipo = document.getElementById('tipoElimina').value;
+            const container = document.getElementById('opzioniElimina');
+            const btnElimina = document.getElementById('btnElimina');
             
             if(!tipo) {
                 container.classList.add('hidden');
+                btnElimina.classList.add('hidden');
                 return;
             }
             
@@ -1082,7 +1039,6 @@
             switch(tipo) {
                 case 'giocatore':
                     html = `
-                        <label>Seleziona giocatore:</label>
                         <select id="giocatoreDaEliminare">
                             <option value="">Seleziona giocatore</option>
                             ${database.giocatori.map(g => 
@@ -1094,7 +1050,6 @@
                     
                 case 'squadra':
                     html = `
-                        <label>Seleziona squadra:</label>
                         <select id="squadraDaEliminare">
                             <option value="">Seleziona squadra</option>
                             ${database.squadre.map(s => 
@@ -1102,19 +1057,6 @@
                             ).join('')}
                         </select>
                         <p><small>Attenzione: Verranno eliminati anche tutti i giocatori della squadra!</small></p>
-                    `;
-                    break;
-                    
-                case 'partita':
-                    html = `
-                        <label>Seleziona partita:</label>
-                        <select id="partitaDaEliminare">
-                            <option value="">Seleziona partita</option>
-                            ${database.partite.map(p => 
-                                `<option value="${p.id}">${p.squadraCasa} ${p.golCasa}-${p.golOspite} ${p.squadraOspite} (${p.data})</option>`
-                            ).join('')}
-                        </select>
-                        <p><small>Attenzione: I punti verranno sottratti dalla classifica!</small></p>
                     `;
                     break;
                     
@@ -1140,7 +1082,8 @@
             
             container.innerHTML = html;
             container.classList.remove('hidden');
-        });
+            btnElimina.classList.remove('hidden');
+        }
         
         function eseguiEliminazione() {
             const tipo = document.getElementById('tipoElimina').value;
@@ -1148,17 +1091,36 @@
             switch(tipo) {
                 case 'giocatore':
                     const giocatoreId = parseInt(document.getElementById('giocatoreDaEliminare').value);
-                    if(giocatoreId) eliminaGiocatore(giocatoreId);
+                    if(giocatoreId) {
+                        if(confirm("Eliminare questo giocatore?")) {
+                            database.giocatori = database.giocatori.filter(g => g.id !== giocatoreId);
+                            salvaDatabase();
+                            alert("Giocatore eliminato!");
+                            mostraOpzioniElimina();
+                        }
+                    }
                     break;
                     
                 case 'squadra':
                     const squadraId = parseInt(document.getElementById('squadraDaEliminare').value);
-                    if(squadraId) eliminaSquadra(squadraId);
-                    break;
-                    
-                case 'partita':
-                    const partitaId = parseInt(document.getElementById('partitaDaEliminare').value);
-                    if(partitaId) eliminaPartita(partitaId);
+                    if(squadraId) {
+                        if(confirm("ATTENZIONE: Eliminando una squadra verranno eliminati anche tutti i suoi giocatori. Continuare?")) {
+                            // Trova nome squadra
+                            const squadra = database.squadre.find(s => s.id === squadraId);
+                            if(!squadra) return;
+                            
+                            // Elimina squadra
+                            database.squadre = database.squadre.filter(s => s.id !== squadraId);
+                            
+                            // Elimina giocatori della squadra
+                            database.giocatori = database.giocatori.filter(g => g.squadra !== squadra.nome);
+                            
+                            salvaDatabase();
+                            caricaSquadreNeiSelect();
+                            alert("Squadra e giocatori eliminati!");
+                            mostraOpzioniElimina();
+                        }
+                    }
                     break;
                     
                 case 'tutto':
@@ -1172,29 +1134,14 @@
                         database = { squadre: [], giocatori: [], partite: [] };
                         salvaDatabase();
                         caricaSquadreNeiSelect();
-                        caricaStatisticheElimina();
                         alert("Tutti i dati sono stati eliminati!");
-                        document.getElementById('selezioneElimina').innerHTML = '';
-                        document.getElementById('selezioneElimina').classList.add('hidden');
+                        document.getElementById('tipoElimina').value = '';
+                        document.getElementById('opzioniElimina').innerHTML = '';
+                        document.getElementById('opzioniElimina').classList.add('hidden');
+                        document.getElementById('btnElimina').classList.add('hidden');
                     }
                     break;
-                    
-                default:
-                    alert("Seleziona un'opzione di eliminazione!");
             }
-        }
-        
-        // Carica statistiche per tab elimina
-        function caricaStatisticheElimina() {
-            document.getElementById('statSquadre').textContent = database.squadre.length;
-            document.getElementById('statGiocatori').textContent = database.giocatori.length;
-            document.getElementById('statPartite').textContent = database.partite.length;
-            
-            const totGol = database.partite.reduce((total, partita) => {
-                return total + (partita.golCasa || 0) + (partita.golOspite || 0);
-            }, 0);
-            
-            document.getElementById('statGol').textContent = totGol;
         }
         
         // Salva nel localStorage
@@ -1202,10 +1149,6 @@
             localStorage.setItem('rovigoal_squadre', JSON.stringify(database.squadre));
             localStorage.setItem('rovigoal_giocatori', JSON.stringify(database.giocatori));
             localStorage.setItem('rovigoal_partite', JSON.stringify(database.partite));
-        }
-        
-        function tornaIndietro() {
-            window.location.href = 'main.html';
         }
         
         // Controllo password all'entrata

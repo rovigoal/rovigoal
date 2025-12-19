@@ -245,6 +245,19 @@
             font-size: 1.1em;
             color: #1e3c72;
         }
+        
+        .avviso {
+            background: #e7f5ff;
+            border-left: 4px solid #1c7ed6;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-portiere {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left: 4px solid #2196F3;
+        }
     </style>
 </head>
 <body>
@@ -321,16 +334,22 @@
         
         <!-- TAB 4: PORTIERI -->
         <div id="portieri" class="tab-content">
-            <h2>Statistiche Portieri</h2>
+            <h2>🥅 CLASSIFICA PORTIERI</h2>
+            <div class="avviso">
+                <strong>Nota:</strong> Questa classifica tiene conto dei voti assegnati come "Miglior Portiere" durante le partite
+            </div>
             <table>
                 <thead>
                     <tr>
                         <th width="60">#</th>
                         <th>Portiere</th>
                         <th>Squadra</th>
-                        <th>Gol Subiti</th>
-                        <th>Partite</th>
-                        <th>Media Gol/Partita</th>
+                        <th width="100">Punteggio</th>
+                        <th width="100">Premi</th>
+                        <th width="100">Media Voto</th>
+                        <th width="100">Partite</th>
+                        <th width="100">Gol Subiti</th>
+                        <th width="100">Media Gol/Partita</th>
                     </tr>
                 </thead>
                 <tbody id="tabellaPortieri"></tbody>
@@ -474,10 +493,12 @@
         
         // Calcola partite giocate da un giocatore
         function calcolaPartiteGiocate(giocatore, partite) {
-            if(giocatore.punteggioTotale && giocatore.punteggioTotale > 0) {
-                return Math.max(1, Math.floor(giocatore.punteggioTotale / 10));
+            // Usa partiteGiocate se esiste, altrimenti calcola
+            if (giocatore.partiteGiocate && giocatore.partiteGiocate > 0) {
+                return giocatore.partiteGiocate;
             }
             
+            // Altrimenti calcola dalle partite
             const squadra = giocatore.squadra;
             if(!squadra) return 0;
             
@@ -485,7 +506,30 @@
                 p.squadraCasa === squadra || p.squadraOspite === squadra
             ).length;
             
-            return partiteSquadra || 1;
+            return partiteSquadra || 0;
+        }
+        
+        // Calcola gol subiti da un portiere
+        function calcolaGolSubiti(portiere, partite) {
+            // Se il portiere ha già golSubiti salvati, usa quelli
+            if (portiere.golSubiti !== undefined) {
+                return portiere.golSubiti;
+            }
+            
+            // Altrimenti calcola approssimativamente
+            const squadra = portiere.squadra;
+            if (!squadra) return 0;
+            
+            let golSubiti = 0;
+            partite.forEach(partita => {
+                if (partita.squadraCasa === squadra) {
+                    golSubiti += partita.golOspite;
+                } else if (partita.squadraOspite === squadra) {
+                    golSubiti += partita.golCasa;
+                }
+            });
+            
+            return golSubiti;
         }
         
         // Funzioni per caricare le tabelle
@@ -606,10 +650,15 @@
         function caricaTabellaPortieri(giocatori, partite) {
             const tbody = document.getElementById('tabellaPortieri');
             
-            if(giocatori.length === 0) {
+            // Filtra solo portieri
+            const portieri = giocatori.filter(g => 
+                g.ruolo && g.ruolo.toLowerCase() === 'portiere'
+            );
+            
+            if(portieri.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="empty-state">
+                        <td colspan="9" class="empty-state">
                             Nessun portiere registrato
                         </td>
                     </tr>
@@ -617,20 +666,55 @@
                 return;
             }
             
-            let html = '';
-            giocatori.forEach((giocatore, index) => {
-                const golSubiti = giocatore.gol_subiti || 0;
-                const partiteGiocate = calcolaPartiteGiocate(giocatore, partite);
+            // Calcola statistiche per ogni portiere
+            const portieriConStat = portieri.map(portiere => {
+                const partiteGiocate = calcolaPartiteGiocate(portiere, partite);
+                const golSubiti = calcolaGolSubiti(portiere, partite);
                 const mediaGol = partiteGiocate > 0 ? (golSubiti / partiteGiocate).toFixed(2) : '0.00';
+                const premi = portiere.premiMigliorPortiere || 0;
+                const punteggioTotale = portiere.punteggioTotale || 0;
+                const mediaVoto = premi > 0 ? (punteggioTotale / premi).toFixed(2) : '0.00';
+                
+                return {
+                    ...portiere,
+                    partiteGiocate,
+                    golSubiti,
+                    mediaGol,
+                    premi,
+                    punteggioTotale,
+                    mediaVoto
+                };
+            });
+            
+            // Ordina per punteggio totale (voti ricevuti come miglior portiere)
+            portieriConStat.sort((a, b) => b.punteggioTotale - a.punteggioTotale);
+            
+            let html = '';
+            portieriConStat.forEach((portiere, index) => {
+                let medaglia = '';
+                if(index === 0 && portiere.punteggioTotale > 0) medaglia = '<span class="medaglie medaglia-oro">🥇</span>';
+                else if(index === 1 && portiere.punteggioTotale > 0) medaglia = '<span class="medaglie medaglia-argento">🥈</span>';
+                else if(index === 2 && portiere.punteggioTotale > 0) medaglia = '<span class="medaglie medaglia-bronzo">🥉</span>';
+                
+                const classeRiga = portiere.premi > 0 ? 'stat-portiere' : '';
                 
                 html += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${giocatore.nome}</td>
-                        <td>${giocatore.squadra || 'N/A'}</td>
-                        <td>${golSubiti}</td>
-                        <td>${partiteGiocate}</td>
-                        <td>${mediaGol}</td>
+                    <tr class="${classeRiga}">
+                        <td class="posizione">${index + 1}${medaglia}</td>
+                        <td class="giocatore">${portiere.nome}</td>
+                        <td class="squadra">${portiere.squadra || 'N/A'}</td>
+                        <td class="voto-cell ${portiere.punteggioTotale > 0 ? 'voto-alto' : ''}">
+                            <strong>${portiere.punteggioTotale}</strong>
+                        </td>
+                        <td>
+                            ${portiere.premi > 0 ? `<strong>${portiere.premi}</strong> 🏅` : '0'}
+                        </td>
+                        <td class="${portiere.mediaVoto > 7 ? 'voto-alto' : portiere.mediaVoto > 5 ? 'voto-medio' : 'voto-basso'}">
+                            ${portiere.premi > 0 ? `<strong>${portiere.mediaVoto}/10</strong>` : 'N/A'}
+                        </td>
+                        <td>${portiere.partiteGiocate}</td>
+                        <td>${portiere.golSubiti}</td>
+                        <td>${portiere.mediaGol}</td>
                     </tr>
                 `;
             });
@@ -660,11 +744,12 @@
                 else if(index === 2) medaglia = '<span class="medaglie medaglia-bronzo">🥉</span>';
                 
                 const partiteGiocate = calcolaPartiteGiocate(giocatore, partite);
-                const mediaPerPartita = partiteGiocate > 0 ? giocatore.punteggioTotale / partiteGiocate : 0;
+                const mediaPerPartita = partiteGiocate > 0 ? (giocatore.punteggioTotale / partiteGiocate).toFixed(2) : '0.00';
                 
                 let classeVoto = '';
-                if(mediaPerPartita >= 7) classeVoto = 'voto-alto';
-                else if(mediaPerPartita >= 5) classeVoto = 'voto-medio';
+                const mediaNum = parseFloat(mediaPerPartita);
+                if(mediaNum >= 7) classeVoto = 'voto-alto';
+                else if(mediaNum >= 5) classeVoto = 'voto-medio';
                 else classeVoto = 'voto-basso';
                 
                 html += `
@@ -678,7 +763,7 @@
                         </td>
                         <td>${partiteGiocate}</td>
                         <td class="${classeVoto}">
-                            <strong>${mediaPerPartita.toFixed(2)}</strong>
+                            <strong>${mediaPerPartita}</strong>
                             <br>
                             <span class="media-partita">per partita</span>
                         </td>
@@ -756,12 +841,13 @@
                             case 'esp':
                                 espulsioni += evento.valore || 1;
                                 break;
-                            case 'voto':
-                                votiAssegnati++;
-                                break;
                         }
                     });
                 }
+                
+                // Conta voti assegnati
+                if (partita.votoMigliorGiocatore && partita.votoMigliorGiocatore > 0) votiAssegnati++;
+                if (partita.votoMigliorPortiere && partita.votoMigliorPortiere > 0) votiAssegnati++;
                 
                 const isAperta = partiteAperte.has(partita.id);
                 
@@ -785,6 +871,14 @@
                             <p><strong>Data:</strong> ${partita.data} ${partita.ora}</p>
                             <p><strong>Risultato:</strong> ${partita.squadraCasa} ${partita.golCasa} - ${partita.golOspite} ${partita.squadraOspite}</p>
                             
+                            ${partita.migliorGiocatore ? `
+                                <p><strong>🏆 Miglior Giocatore:</strong> ${trovaNomeGiocatore(partita.migliorGiocatore)} (Voto: ${partita.votoMigliorGiocatore}/10)</p>
+                            ` : ''}
+                            
+                            ${partita.migliorPortiere ? `
+                                <p><strong>🥅 Miglior Portiere:</strong> ${trovaNomeGiocatore(partita.migliorPortiere)} (Voto: ${partita.votoMigliorPortiere}/10)</p>
+                            ` : ''}
+                            
                             ${partita.eventi && partita.eventi.length > 0 ? `
                                 <h5>Eventi della partita:</h5>
                                 <div class="eventi-partita">
@@ -805,10 +899,6 @@
                                                 icona = '🟥';
                                                 testo = `${evento.valore || 1} espulsione di ${evento.giocatoreNome}`;
                                                 break;
-                                            case 'voto':
-                                                icona = '⭐';
-                                                testo = `Voto ${evento.valore}/10 a ${evento.giocatoreNome}`;
-                                                break;
                                         }
                                         
                                         return `<div class="evento-badge">${icona} ${testo}</div>`;
@@ -821,6 +911,13 @@
             });
             
             tbody.innerHTML = html;
+        }
+        
+        // Trova nome giocatore per ID
+        function trovaNomeGiocatore(giocatoreId) {
+            const giocatori = JSON.parse(localStorage.getItem('rovigoal_giocatori')) || [];
+            const giocatore = giocatori.find(g => g.id === giocatoreId);
+            return giocatore ? giocatore.nome : 'Giocatore non trovato';
         }
         
         // Filtra partite

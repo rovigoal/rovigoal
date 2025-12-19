@@ -93,24 +93,24 @@
             background-color: #f9f9f9;
         }
         
-        .cannoniere .posizione {
+        .posizione {
             width: 50px;
             text-align: center;
             font-weight: bold;
             font-size: 1.2em;
         }
         
-        .cannoniere .giocatore {
+        .giocatore {
             font-weight: bold;
         }
         
-        .cannoniere .gol {
+        .gol {
             text-align: center;
             font-weight: bold;
             color: #228B22;
         }
         
-        .cannoniere .squadra {
+        .squadra {
             color: #666;
             font-size: 0.9em;
         }
@@ -156,12 +156,6 @@
         
         .badge-giallo { background: #FFFACD; color: #8B6914; }
         .badge-rosso { background: #FFB6C1; color: #8B0000; }
-        .badge-voto { 
-            background: #8A2BE2; 
-            color: white;
-            margin: 2px;
-            display: inline-block;
-        }
         
         .voto-cell {
             text-align: center;
@@ -172,10 +166,14 @@
         .voto-medio { color: #FF8C00; }
         .voto-basso { color: #DC143C; }
         
-        .voti-recenti {
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
+        .punteggio-totale {
+            font-size: 1.3em;
+            color: #8A2BE2;
+        }
+        
+        .media-partita {
+            font-size: 0.9em;
+            color: #666;
         }
     </style>
 </head>
@@ -191,9 +189,10 @@
             <button class="tab" onclick="apriTab('ammoniti')">🟨 AMMONITI</button>
             <button class="tab" onclick="apriTab('espulsi')">🟥 ESPULSI</button>
             <button class="tab" onclick="apriTab('portieri')">🥅 PORTIERI</button>
-            <button class="tab" onclick="apriTab('voti')">⭐ VOTI GIOCATORI</button>
+            <button class="tab" onclick="apriTab('punteggi')">⭐ PUNTEGGI GIOCATORI</button>
         </div>
         
+        <!-- TAB 1: CANNONIERI -->
         <div id="cannoniere" class="tab-content active">
             <h2>Classifica Cannonieri</h2>
             <table>
@@ -204,7 +203,8 @@
                         <th>Squadra</th>
                         <th>Ruolo</th>
                         <th width="100">Gol</th>
-                        <th>Media</th>
+                        <th>Partite</th>
+                        <th>Media Gol/Partita</th>
                     </tr>
                 </thead>
                 <tbody id="tabellaCannoniere">
@@ -213,6 +213,7 @@
             </table>
         </div>
         
+        <!-- TAB 2: AMMONITI -->
         <div id="ammoniti" class="tab-content">
             <h2>Giocatori più Ammoniti</h2>
             <table>
@@ -223,6 +224,8 @@
                         <th>Squadra</th>
                         <th>Ruolo</th>
                         <th width="100">Ammonizioni</th>
+                        <th>Partite</th>
+                        <th>Media/Partita</th>
                     </tr>
                 </thead>
                 <tbody id="tabellaAmmoniti">
@@ -231,6 +234,7 @@
             </table>
         </div>
         
+        <!-- TAB 3: ESPULSI -->
         <div id="espulsi" class="tab-content">
             <h2>Giocatori Espulsi</h2>
             <table>
@@ -241,6 +245,7 @@
                         <th>Squadra</th>
                         <th>Ruolo</th>
                         <th width="100">Espulsioni</th>
+                        <th>Partite</th>
                     </tr>
                 </thead>
                 <tbody id="tabellaEspulsi">
@@ -249,6 +254,7 @@
             </table>
         </div>
         
+        <!-- TAB 4: PORTIERI -->
         <div id="portieri" class="tab-content">
             <h2>Statistiche Portieri</h2>
             <table>
@@ -259,7 +265,7 @@
                         <th>Squadra</th>
                         <th>Gol Subiti</th>
                         <th>Partite</th>
-                        <th>Media</th>
+                        <th>Media Gol/Partita</th>
                     </tr>
                 </thead>
                 <tbody id="tabellaPortieri">
@@ -268,8 +274,9 @@
             </table>
         </div>
         
-        <div id="voti" class="tab-content">
-            <h2>Classifica per Voto</h2>
+        <!-- TAB 5: PUNTEGGI -->
+        <div id="punteggi" class="tab-content">
+            <h2>⭐ Classifica Punteggi Giocatori</h2>
             <table>
                 <thead>
                     <tr>
@@ -277,13 +284,13 @@
                         <th>Giocatore</th>
                         <th>Squadra</th>
                         <th>Ruolo</th>
-                        <th width="100">Voto Medio</th>
+                        <th width="120">Punteggio Totale</th>
                         <th>Partite Giocate</th>
-                        <th>Ultimi Voti</th>
+                        <th>Media per Partita</th>
                     </tr>
                 </thead>
-                <tbody id="tabellaVoti">
-                    <!-- Dati voti -->
+                <tbody id="tabellaPunteggi">
+                    <!-- Dati punteggi -->
                 </tbody>
             </table>
         </div>
@@ -317,59 +324,80 @@
         // Carica statistiche
         function caricaStatistiche(tipo) {
             const giocatori = JSON.parse(localStorage.getItem('rovigoal_giocatori')) || [];
+            const partite = JSON.parse(localStorage.getItem('rovigoal_partite')) || [];
             
             let giocatoriFiltrati = [];
             
             switch(tipo) {
                 case 'cannoniere':
-                    // Ordina per gol (discendente)
+                    // Filtra e ordina per gol
                     giocatoriFiltrati = [...giocatori].filter(g => (g.gol || 0) > 0);
                     giocatoriFiltrati.sort((a, b) => (b.gol || 0) - (a.gol || 0));
-                    caricaTabellaCannoniere(giocatoriFiltrati);
+                    caricaTabellaCannoniere(giocatoriFiltrati, partite);
                     break;
                     
                 case 'ammoniti':
-                    // Ordina per ammonizioni (discendente)
+                    // Filtra e ordina per ammonizioni
                     giocatoriFiltrati = [...giocatori].filter(g => (g.ammonizioni || 0) > 0);
                     giocatoriFiltrati.sort((a, b) => (b.ammonizioni || 0) - (a.ammonizioni || 0));
-                    caricaTabellaAmmoniti(giocatoriFiltrati);
+                    caricaTabellaAmmoniti(giocatoriFiltrati, partite);
                     break;
                     
                 case 'espulsi':
-                    // Ordina per espulsioni (discendente)
+                    // Filtra e ordina per espulsioni
                     giocatoriFiltrati = [...giocatori].filter(g => (g.espulsioni || 0) > 0);
                     giocatoriFiltrati.sort((a, b) => (b.espulsioni || 0) - (a.espulsioni || 0));
-                    caricaTabellaEspulsi(giocatoriFiltrati);
+                    caricaTabellaEspulsi(giocatoriFiltrati, partite);
                     break;
                     
                 case 'portieri':
                     // Filtra solo portieri
                     giocatoriFiltrati = [...giocatori].filter(g => 
-                        g.ruolo && g.ruolo.toLowerCase().includes('portiere')
+                        g.ruolo && g.ruolo.toLowerCase() === 'portiere'
                     );
-                    caricaTabellaPortieri(giocatoriFiltrati);
+                    caricaTabellaPortieri(giocatoriFiltrati, partite);
                     break;
                     
-                case 'voti':
-                    // Filtra giocatori con voti
+                case 'punteggi':
+                    // Filtra giocatori con punteggio
                     giocatoriFiltrati = [...giocatori].filter(g => 
-                        g.voti && g.voti.length > 0 && g.mediaVoto > 0
+                        g.punteggioTotale && g.punteggioTotale > 0
                     );
-                    // Ordina per voto medio (discendente)
-                    giocatoriFiltrati.sort((a, b) => b.mediaVoto - a.mediaVoto);
-                    caricaTabellaVoti(giocatoriFiltrati);
+                    // Ordina per punteggio totale (discendente)
+                    giocatoriFiltrati.sort((a, b) => b.punteggioTotale - a.punteggioTotale);
+                    caricaTabellaPunteggi(giocatoriFiltrati, partite);
                     break;
             }
         }
         
+        // Calcola partite giocate da un giocatore
+        function calcolaPartiteGiocate(giocatore, partite) {
+            // Conta in quante partite ha giocato (semplificato)
+            // Nella realtà, dovremmo tracciare quali giocatori giocano ogni partita
+            // Per ora usiamo una stima basata sui voti ricevuti
+            if(giocatore.punteggioTotale && giocatore.punteggioTotale > 0) {
+                return Math.max(1, Math.floor(giocatore.punteggioTotale / 10));
+            }
+            
+            // Se non ha punteggio, stimiamo dalle partite della sua squadra
+            const squadra = giocatore.squadra;
+            if(!squadra) return 0;
+            
+            const partiteSquadra = partite.filter(p => 
+                p.squadraCasa === squadra || p.squadraOspite === squadra
+            ).length;
+            
+            return partiteSquadra || 1;
+        }
+        
         // Funzioni per caricare le tabelle
-        function caricaTabellaCannoniere(giocatori) {
+        function caricaTabellaCannoniere(giocatori, partite) {
             const tbody = document.getElementById('tabellaCannoniere');
             
             if(giocatori.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="empty-state">
+                        <td colspan="7" class="empty-state">
                             Nessun gol registrato ancora
                         </td>
                     </tr>
@@ -384,6 +412,9 @@
                 else if(index === 1) medaglia = '<span class="medaglie medaglia-argento">🥈</span>';
                 else if(index === 2) medaglia = '<span class="medaglie medaglia-bronzo">🥉</span>';
                 
+                const partiteGiocate = calcolaPartiteGiocate(giocatore, partite);
+                const mediaGol = partiteGiocate > 0 ? (giocatore.gol / partiteGiocate).toFixed(2) : '0.00';
+                
                 html += `
                     <tr>
                         <td class="posizione">${index + 1}${medaglia}</td>
@@ -391,7 +422,8 @@
                         <td class="squadra">${giocatore.squadra || 'N/A'}</td>
                         <td>${giocatore.ruolo || 'Giocatore'}</td>
                         <td class="gol">${giocatore.gol || 0}</td>
-                        <td>${calcolaMediaGol(giocatore)}</td>
+                        <td>${partiteGiocate}</td>
+                        <td>${mediaGol}</td>
                     </tr>
                 `;
             });
@@ -399,13 +431,13 @@
             tbody.innerHTML = html;
         }
         
-        function caricaTabellaAmmoniti(giocatori) {
+        function caricaTabellaAmmoniti(giocatori, partite) {
             const tbody = document.getElementById('tabellaAmmoniti');
             
             if(giocatori.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="5" class="empty-state">
+                        <td colspan="7" class="empty-state">
                             Nessuna ammonizione registrata
                         </td>
                     </tr>
@@ -415,6 +447,9 @@
             
             let html = '';
             giocatori.forEach((giocatore, index) => {
+                const partiteGiocate = calcolaPartiteGiocate(giocatore, partite);
+                const mediaAmm = partiteGiocate > 0 ? (giocatore.ammonizioni / partiteGiocate).toFixed(2) : '0.00';
+                
                 html += `
                     <tr>
                         <td>${index + 1}</td>
@@ -425,6 +460,8 @@
                             ${giocatore.ammonizioni || 0}
                             <span class="badge badge-giallo">🟨</span>
                         </td>
+                        <td>${partiteGiocate}</td>
+                        <td>${mediaAmm}</td>
                     </tr>
                 `;
             });
@@ -432,13 +469,13 @@
             tbody.innerHTML = html;
         }
         
-        function caricaTabellaEspulsi(giocatori) {
+        function caricaTabellaEspulsi(giocatori, partite) {
             const tbody = document.getElementById('tabellaEspulsi');
             
             if(giocatori.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="5" class="empty-state">
+                        <td colspan="6" class="empty-state">
                             Nessuna espulsione registrata
                         </td>
                     </tr>
@@ -448,6 +485,8 @@
             
             let html = '';
             giocatori.forEach((giocatore, index) => {
+                const partiteGiocate = calcolaPartiteGiocate(giocatore, partite);
+                
                 html += `
                     <tr>
                         <td>${index + 1}</td>
@@ -458,6 +497,7 @@
                             ${giocatore.espulsioni || 0}
                             <span class="badge badge-rosso">🟥</span>
                         </td>
+                        <td>${partiteGiocate}</td>
                     </tr>
                 `;
             });
@@ -465,7 +505,7 @@
             tbody.innerHTML = html;
         }
         
-        function caricaTabellaPortieri(giocatori) {
+        function caricaTabellaPortieri(giocatori, partite) {
             const tbody = document.getElementById('tabellaPortieri');
             
             if(giocatori.length === 0) {
@@ -481,10 +521,10 @@
             
             let html = '';
             giocatori.forEach((giocatore, index) => {
-                // Per i portieri, possiamo aggiungere gol subiti se li registriamo
+                // Per i portieri, usiamo gol_subiti se esiste, altrimenti stima
                 const golSubiti = giocatore.gol_subiti || 0;
-                const partite = giocatore.partite_portiere || 0;
-                const media = partite > 0 ? (golSubiti / partite).toFixed(2) : '0.00';
+                const partiteGiocate = calcolaPartiteGiocate(giocatore, partite);
+                const mediaGol = partiteGiocate > 0 ? (golSubiti / partiteGiocate).toFixed(2) : '0.00';
                 
                 html += `
                     <tr>
@@ -492,8 +532,8 @@
                         <td>${giocatore.nome}</td>
                         <td>${giocatore.squadra || 'N/A'}</td>
                         <td>${golSubiti}</td>
-                        <td>${partite}</td>
-                        <td>${media} per partita</td>
+                        <td>${partiteGiocate}</td>
+                        <td>${mediaGol}</td>
                     </tr>
                 `;
             });
@@ -501,14 +541,14 @@
             tbody.innerHTML = html;
         }
         
-        function caricaTabellaVoti(giocatori) {
-            const tbody = document.getElementById('tabellaVoti');
+        function caricaTabellaPunteggi(giocatori, partite) {
+            const tbody = document.getElementById('tabellaPunteggi');
             
             if(giocatori.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="7" class="empty-state">
-                            Nessun voto registrato ancora
+                            Nessun punteggio registrato ancora
                         </td>
                     </tr>
                 `;
@@ -522,14 +562,16 @@
                 else if(index === 1) medaglia = '<span class="medaglie medaglia-argento">🥈</span>';
                 else if(index === 2) medaglia = '<span class="medaglie medaglia-bronzo">🥉</span>';
                 
-                // Prendi gli ultimi 3 voti
-                const ultimiVoti = giocatore.voti ? giocatore.voti.slice(-3).reverse() : [];
-                const votiHtml = ultimiVoti.map(v => `<span class="badge badge-voto">${v}</span>`).join(' ');
+                // Calcola partite giocate
+                const partiteGiocate = calcolaPartiteGiocate(giocatore, partite);
                 
-                // Determina classe colore in base al voto
+                // Calcola media per partita
+                const mediaPerPartita = partiteGiocate > 0 ? giocatore.punteggioTotale / partiteGiocate : 0;
+                
+                // Determina classe colore in base alla media
                 let classeVoto = '';
-                if(giocatore.mediaVoto >= 7) classeVoto = 'voto-alto';
-                else if(giocatore.mediaVoto >= 5) classeVoto = 'voto-medio';
+                if(mediaPerPartita >= 7) classeVoto = 'voto-alto';
+                else if(mediaPerPartita >= 5) classeVoto = 'voto-medio';
                 else classeVoto = 'voto-basso';
                 
                 html += `
@@ -539,24 +581,19 @@
                         <td class="squadra">${giocatore.squadra || 'N/A'}</td>
                         <td>${giocatore.ruolo || 'Giocatore'}</td>
                         <td class="voto-cell ${classeVoto}">
-                            <strong>${giocatore.mediaVoto.toFixed(2)}</strong>
+                            <span class="punteggio-totale">${giocatore.punteggioTotale}</span>
                         </td>
-                        <td>${giocatore.voti ? giocatore.voti.length : 0}</td>
-                        <td>
-                            <div class="voti-recenti">
-                                ${votiHtml || '-'}
-                            </div>
+                        <td>${partiteGiocate}</td>
+                        <td class="${classeVoto}">
+                            <strong>${mediaPerPartita.toFixed(2)}</strong>
+                            <br>
+                            <span class="media-partita">per partita</span>
                         </td>
                     </tr>
                 `;
             });
             
             tbody.innerHTML = html;
-        }
-        
-        function calcolaMediaGol(giocatore) {
-            // In futuro potremmo avere il numero di partite del giocatore
-            return giocatore.gol > 0 ? `${giocatore.gol} gol` : '0 gol';
         }
         
         function tornaIndietro() {
@@ -570,6 +607,15 @@
         
         // Carica le statistiche all'avvio (cannoniere di default)
         caricaStatistiche('cannoniere');
+        
+        // Aggiorna statistiche ogni 30 secondi
+        setInterval(() => {
+            const tabAttivo = document.querySelector('.tab.active');
+            if(tabAttivo) {
+                const tabName = tabAttivo.getAttribute('onclick').match(/\('(.+)'\)/)[1];
+                caricaStatistiche(tabName);
+            }
+        }, 30000);
     </script>
 </body>
 </html>

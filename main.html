@@ -5,161 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rovigoal - Area Principale</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 25px;
-            text-align: center;
-            border-radius: 15px;
-            margin-bottom: 40px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-        }
-        
-        .header h1 {
-            font-size: 2.8em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        
-        .menu {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .pulsante {
-            background: white;
-            padding: 60px 20px;
-            border-radius: 20px;
-            text-align: center;
-            font-size: 1.5em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 3px solid transparent;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        
-        .pulsante:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        }
-        
-        .pulsante:nth-child(1) {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            color: #333;
-        }
-        
-        .pulsante:nth-child(2) {
-            background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%);
-            color: white;
-        }
-        
-        .pulsante:nth-child(3) {
-            background: linear-gradient(135deg, #32CD32 0%, #228B22 100%);
-            color: white;
-        }
-        
-        .pulsante:nth-child(4) {
-            background: linear-gradient(135deg, #FF4500 0%, #DC143C 100%);
-            color: white;
-        }
-        
-        .icona {
-            font-size: 3em;
-            display: block;
-            margin-bottom: 15px;
-        }
-        
-        .logout {
-            display: block;
-            margin: 50px auto 0;
-            padding: 15px 40px;
-            background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%);
-            color: white;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 1.2em;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        
-        .logout:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-        
-        .info-footer {
-            text-align: center;
-            margin-top: 30px;
-            color: #666;
-            font-size: 0.9em;
-        }
-        
-        .stats-summary {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .stat-box {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px 20px;
-            border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            text-align: center;
-            min-width: 150px;
-        }
-        
-        .stat-number {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #1e3c72;
-        }
-        
-        .stat-label {
-            font-size: 0.8em;
-            color: #666;
-            margin-top: 5px;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Arial', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 20px; }
+        .header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 25px; text-align: center; border-radius: 15px; margin-bottom: 40px; box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+        .header h1 { font-size: 2.8em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .pulsante { background: white; padding: 60px 20px; border-radius: 20px; text-align: center; font-size: 1.5em; font-weight: bold; cursor: pointer; transition: all 0.3s ease; border: 3px solid transparent; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .pulsante:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .pulsante:nth-child(1) { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #333; }
+        .pulsante:nth-child(2) { background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); color: white; }
+        .pulsante:nth-child(3) { background: linear-gradient(135deg, #32CD32 0%, #228B22 100%); color: white; }
+        .pulsante:nth-child(4) { background: linear-gradient(135deg, #FF4500 0%, #DC143C 100%); color: white; }
+        .icona { font-size: 3em; display: block; margin-bottom: 15px; }
+        .logout { display: block; margin: 50px auto 0; padding: 15px 40px; background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%); color: white; border: none; border-radius: 30px; cursor: pointer; font-size: 1.2em; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .logout:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .info-footer { text-align: center; margin-top: 30px; color: #666; font-size: 0.9em; }
+        .stats-summary { display: flex; justify-content: center; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
+        .stat-box { background: rgba(255,255,255,0.9); padding: 10px 20px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); text-align: center; min-width: 150px; }
+        .stat-number { font-size: 1.5em; font-weight: bold; color: #1e3c72; }
+        .stat-label { font-size: 0.8em; color: #666; margin-top: 5px; }
         @media (max-width: 768px) {
-            .menu {
-                grid-template-columns: 1fr;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            .pulsante {
-                padding: 40px 20px;
-            }
-            
-            .stats-summary {
-                flex-direction: column;
-                align-items: center;
-            }
+            .menu { grid-template-columns: 1fr; }
+            .header h1 { font-size: 2em; }
+            .pulsante { padding: 40px 20px; }
+            .stats-summary { flex-direction: column; align-items: center; }
         }
     </style>
 </head>
@@ -167,33 +36,17 @@
     <div class="header">
         <h1>ROVIGOAL</h1>
         <p>Gestione Torneo Calcio</p>
-        
-        <div class="stats-summary" id="statsSummary">
-            <!-- Le statistiche verranno caricate qui -->
-        </div>
+        <div class="stats-summary" id="statsSummary"></div>
     </div>
     
     <div class="menu">
-        <div class="pulsante" onclick="apriClassifica()">
-            <span class="icona">🏆</span>
-            CLASSIFICA
-        </div>
-        <div class="pulsante" onclick="apriSquadra()">
-            <span class="icona">👥</span>
-            SQUADRA
-        </div>
-        <div class="pulsante" onclick="apriStatistiche()">
-            <span class="icona">📊</span>
-            STATISTICHE
-        </div>
-        <div class="pulsante" onclick="apriAdmin()">
-            <span class="icona">🔧</span>
-            ADMIN
-        </div>
+        <div class="pulsante" onclick="apriClassifica()"><span class="icona">🏆</span>CLASSIFICA</div>
+        <div class="pulsante" onclick="apriSquadra()"><span class="icona">👥</span>SQUADRA</div>
+        <div class="pulsante" onclick="apriStatistiche()"><span class="icona">📊</span>STATISTICHE</div>
+        <div class="pulsante" onclick="apriAdmin()"><span class="icona">🔧</span>ADMIN</div>
     </div>
     
     <button class="logout" onclick="logout()">ESCI</button>
-    
     <div class="info-footer">
         <p>Il tuo torneo di calcio a Rovigo e dintorni</p>
         <p>Data ultimo aggiornamento: <span id="ultimoAggiornamento"></span></p>
@@ -204,68 +57,29 @@
             const squadre = JSON.parse(localStorage.getItem('rovigoal_squadre')) || [];
             const giocatori = JSON.parse(localStorage.getItem('rovigoal_giocatori')) || [];
             const partite = JSON.parse(localStorage.getItem('rovigoal_partite')) || [];
-            
             const container = document.getElementById('statsSummary');
             
-            let html = '';
-            
-            if(squadre.length > 0 || giocatori.length > 0 || partite.length > 0) {
-                html = `
-                    <div class="stat-box">
-                        <div class="stat-number">${squadre.length}</div>
-                        <div class="stat-label">Squadre</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">${giocatori.length}</div>
-                        <div class="stat-label">Giocatori</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">${partite.length}</div>
-                        <div class="stat-label">Partite</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">${calcolaTotaleGol(partite)}</div>
-                        <div class="stat-label">Gol Totali</div>
-                    </div>
+            if(squadre.length > 0) {
+                container.innerHTML = `
+                    <div class="stat-box"><div class="stat-number">${squadre.length}</div><div class="stat-label">Squadre</div></div>
+                    <div class="stat-box"><div class="stat-number">${giocatori.length}</div><div class="stat-label">Giocatori</div></div>
+                    <div class="stat-box"><div class="stat-number">${partite.length}</div><div class="stat-label">Partite</div></div>
+                    <div class="stat-box"><div class="stat-number">${partite.reduce((t,p) => t + p.golCasa + p.golOspite, 0)}</div><div class="stat-label">Gol Totali</div></div>
                 `;
             } else {
-                html = `
-                    <div class="stat-box">
-                        <div class="stat-number">0</div>
-                        <div class="stat-label">Squadre registrate</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">0</div>
-                        <div class="stat-label">Partite giocate</div>
-                    </div>
+                container.innerHTML = `
+                    <div class="stat-box"><div class="stat-number">0</div><div class="stat-label">Squadre registrate</div></div>
+                    <div class="stat-box"><div class="stat-number">0</div><div class="stat-label">Partite giocate</div></div>
                 `;
             }
             
-            container.innerHTML = html;
-            
             const now = new Date();
-            document.getElementById('ultimoAggiornamento').textContent = 
-                now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT');
+            document.getElementById('ultimoAggiornamento').textContent = now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT');
         }
         
-        function calcolaTotaleGol(partite) {
-            return partite.reduce((total, partita) => {
-                return total + (partita.golCasa || 0) + (partita.golOspite || 0);
-            }, 0);
-        }
-        
-        function apriClassifica() {
-            window.location.href = 'classifica.html';
-        }
-        
-        function apriSquadra() {
-            window.location.href = 'squadra.html';
-        }
-        
-        function apriStatistiche() {
-            window.location.href = 'statistiche.html';
-        }
-        
+        function apriClassifica() { window.location.href = 'classifica.html'; }
+        function apriSquadra() { window.location.href = 'squadra.html'; }
+        function apriStatistiche() { window.location.href = 'statistiche.html'; }
         function apriAdmin() {
             const password = prompt("Inserisci la password ADMIN:");
             if(password === "1246912.!!") {

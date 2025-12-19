@@ -953,3 +953,271 @@
                             </div>
                         </div>
                         <div class="azioni">
+                            ${badges}
+                            <button class="btn-small btn-elimina" onclick="eliminaGiocatore(${giocatore.id})">Elimina</button>
+                        </div>
+                    </div>
+                `;
+            });
+            lista.innerHTML = html;
+        }
+        
+        function mostraPartite() {
+            const lista = document.getElementById('listaDati');
+            
+            if(database.partite.length === 0) {
+                lista.innerHTML = '<p class="item">Nessuna partita registrata</p>';
+                return;
+            }
+            
+            let html = '<h3>Partite Giocate:</h3>';
+            // Mostra le ultime 10 partite (più recenti prima)
+            const partiteRecent = [...database.partite].reverse().slice(0, 10);
+            
+            partiteRecent.forEach(partita => {
+                html += `
+                    <div class="item">
+                        <div>
+                            <strong>${partita.squadraCasa} ${partita.golCasa}-${partita.golOspite} ${partita.squadraOspite}</strong><br>
+                            <small>${partita.data} ${partita.ora}</small>
+                        </div>
+                        <div class="azioni">
+                            <button class="btn-small btn-elimina" onclick="eliminaPartita(${partita.id})">Elimina</button>
+                        </div>
+                    </div>
+                `;
+            });
+            lista.innerHTML = html;
+        }
+        
+        // Funzioni di eliminazione
+        function eliminaSquadra(id) {
+            if(confirm("ATTENZIONE: Eliminando una squadra verranno eliminati anche tutti i suoi giocatori. Continuare?")) {
+                // Elimina la squadra
+                database.squadre = database.squadre.filter(s => s.id !== id);
+                
+                // Elimina tutti i giocatori della squadra
+                database.giocatori = database.giocatori.filter(g => {
+                    const squadraGiocatore = database.squadre.find(s => s.nome === g.squadra);
+                    return squadraGiocatore !== undefined;
+                });
+                
+                salvaDatabase();
+                caricaSquadreNeiSelect();
+                alert("Squadra e giocatori eliminati con successo!");
+                mostraSquadre();
+            }
+        }
+        
+        function eliminaGiocatore(id) {
+            if(confirm("Eliminare questo giocatore?")) {
+                database.giocatori = database.giocatori.filter(g => g.id !== id);
+                salvaDatabase();
+                alert("Giocatore eliminato con successo!");
+                mostraGiocatori();
+            }
+        }
+        
+        function eliminaPartita(id) {
+            if(confirm("Eliminare questa partita? I risultati verranno tolti dalla classifica.")) {
+                // Trovare la partita da eliminare
+                const partita = database.partite.find(p => p.id === id);
+                if(!partita) return;
+                
+                // Rimuovere i punti assegnati alle squadre
+                let puntiCasa, puntiOspite;
+                if(partita.golCasa > partita.golOspite) {
+                    puntiCasa = 3;
+                    puntiOspite = 0;
+                } else if(partita.golCasa < partita.golOspite) {
+                    puntiCasa = 0;
+                    puntiOspite = 3;
+                } else {
+                    puntiCasa = 1;
+                    puntiOspite = 1;
+                }
+                
+                // Sottrarre punti e statistiche alle squadre
+                database.squadre.forEach(squadra => {
+                    if(squadra.nome === partita.squadraCasa) {
+                        squadra.punti -= puntiCasa;
+                        squadra.partiteGiocate--;
+                        squadra.golFatti -= partita.golCasa;
+                        squadra.golSubiti -= partita.golOspite;
+                        if(puntiCasa === 3) squadra.vittorie--;
+                        else if(puntiCasa === 1) squadra.pareggi--;
+                        else squadra.sconfitte--;
+                    }
+                    if(squadra.nome === partita.squadraOspite) {
+                        squadra.punti -= puntiOspite;
+                        squadra.partiteGiocate--;
+                        squadra.golFatti -= partita.golOspite;
+                        squadra.golSubiti -= partita.golCasa;
+                        if(puntiOspite === 3) squadra.vittorie--;
+                        else if(puntiOspite === 1) squadra.pareggi--;
+                        else squadra.sconfitte--;
+                    }
+                });
+                
+                // Eliminare la partita
+                database.partite = database.partite.filter(p => p.id !== id);
+                salvaDatabase();
+                alert("Partita eliminata con successo!");
+                mostraPartite();
+            }
+        }
+        
+        // Gestione eliminazione dati
+        document.getElementById('tipoElimina').addEventListener('change', function() {
+            const tipo = this.value;
+            const container = document.getElementById('selezioneElimina');
+            
+            if(!tipo) {
+                container.classList.add('hidden');
+                return;
+            }
+            
+            let html = '';
+            
+            switch(tipo) {
+                case 'giocatore':
+                    html = `
+                        <label>Seleziona giocatore:</label>
+                        <select id="giocatoreDaEliminare">
+                            <option value="">Seleziona giocatore</option>
+                            ${database.giocatori.map(g => 
+                                `<option value="${g.id}">${g.nome} (${g.squadra})</option>`
+                            ).join('')}
+                        </select>
+                    `;
+                    break;
+                    
+                case 'squadra':
+                    html = `
+                        <label>Seleziona squadra:</label>
+                        <select id="squadraDaEliminare">
+                            <option value="">Seleziona squadra</option>
+                            ${database.squadre.map(s => 
+                                `<option value="${s.id}">${s.nome}</option>`
+                            ).join('')}
+                        </select>
+                        <p><small>Attenzione: Verranno eliminati anche tutti i giocatori della squadra!</small></p>
+                    `;
+                    break;
+                    
+                case 'partita':
+                    html = `
+                        <label>Seleziona partita:</label>
+                        <select id="partitaDaEliminare">
+                            <option value="">Seleziona partita</option>
+                            ${database.partite.map(p => 
+                                `<option value="${p.id}">${p.squadraCasa} ${p.golCasa}-${p.golOspite} ${p.squadraOspite} (${p.data})</option>`
+                            ).join('')}
+                        </select>
+                        <p><small>Attenzione: I punti verranno sottratti dalla classifica!</small></p>
+                    `;
+                    break;
+                    
+                case 'tutto':
+                    html = `
+                        <div style="background: #ffcccc; padding: 15px; border-radius: 5px; margin-top: 10px;">
+                            <h3>⚠️ PERICOLO ⚠️</h3>
+                            <p>Stai per eliminare TUTTI i dati:</p>
+                            <ul>
+                                <li>${database.squadre.length} squadre</li>
+                                <li>${database.giocatori.length} giocatori</li>
+                                <li>${database.partite.length} partite</li>
+                            </ul>
+                            <p>Questa operazione è IRREVERSIBILE!</p>
+                            <label>
+                                <input type="checkbox" id="confermaEliminaTutto"> 
+                                Confermo di voler eliminare TUTTI i dati
+                            </label>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            container.innerHTML = html;
+            container.classList.remove('hidden');
+        });
+        
+        function eseguiEliminazione() {
+            const tipo = document.getElementById('tipoElimina').value;
+            
+            switch(tipo) {
+                case 'giocatore':
+                    const giocatoreId = parseInt(document.getElementById('giocatoreDaEliminare').value);
+                    if(giocatoreId) eliminaGiocatore(giocatoreId);
+                    break;
+                    
+                case 'squadra':
+                    const squadraId = parseInt(document.getElementById('squadraDaEliminare').value);
+                    if(squadraId) eliminaSquadra(squadraId);
+                    break;
+                    
+                case 'partita':
+                    const partitaId = parseInt(document.getElementById('partitaDaEliminare').value);
+                    if(partitaId) eliminaPartita(partitaId);
+                    break;
+                    
+                case 'tutto':
+                    const conferma = document.getElementById('confermaEliminaTutto');
+                    if(!conferma || !conferma.checked) {
+                        alert("Devi selezionare la casella di conferma!");
+                        return;
+                    }
+                    
+                    if(confirm("⚠️ SEI SICURO DI VOLER ELIMINARE TUTTI I DATI? ⚠️\nQuesta operazione non può essere annullata!")) {
+                        database = { squadre: [], giocatori: [], partite: [] };
+                        salvaDatabase();
+                        caricaSquadreNeiSelect();
+                        caricaStatisticheElimina();
+                        alert("Tutti i dati sono stati eliminati!");
+                        document.getElementById('selezioneElimina').innerHTML = '';
+                        document.getElementById('selezioneElimina').classList.add('hidden');
+                    }
+                    break;
+                    
+                default:
+                    alert("Seleziona un'opzione di eliminazione!");
+            }
+        }
+        
+        // Carica statistiche per tab elimina
+        function caricaStatisticheElimina() {
+            document.getElementById('statSquadre').textContent = database.squadre.length;
+            document.getElementById('statGiocatori').textContent = database.giocatori.length;
+            document.getElementById('statPartite').textContent = database.partite.length;
+            
+            const totGol = database.partite.reduce((total, partita) => {
+                return total + (partita.golCasa || 0) + (partita.golOspite || 0);
+            }, 0);
+            
+            document.getElementById('statGol').textContent = totGol;
+        }
+        
+        // Salva nel localStorage
+        function salvaDatabase() {
+            localStorage.setItem('rovigoal_squadre', JSON.stringify(database.squadre));
+            localStorage.setItem('rovigoal_giocatori', JSON.stringify(database.giocatori));
+            localStorage.setItem('rovigoal_partite', JSON.stringify(database.partite));
+        }
+        
+        function tornaIndietro() {
+            window.location.href = 'main.html';
+        }
+        
+        // Controllo password all'entrata
+        if(!localStorage.getItem('admin_accesso') || localStorage.getItem('admin_accesso') !== 'true') {
+            const password = prompt("Inserisci la password ADMIN:");
+            if(password !== "1246912.!!") {
+                alert("Accesso negato!");
+                window.location.href = 'main.html';
+            } else {
+                localStorage.setItem('admin_accesso', 'true');
+            }
+        }
+    </script>
+</body>
+</html>

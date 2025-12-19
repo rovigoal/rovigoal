@@ -725,57 +725,65 @@
             tbody.innerHTML = html;
         }
         
-        function caricaTabellaPunteggi(giocatori, partite) {
-            const tbody = document.getElementById('tabellaPunteggi');
-            
-            if(giocatori.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="empty-state">
-                            Nessun punteggio registrato ancora
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            let html = '';
-            giocatori.forEach((giocatore, index) => {
-                let medaglia = '';
-                if(index === 0) medaglia = '<span class="medaglie medaglia-oro">🥇</span>';
-                else if(index === 1) medaglia = '<span class="medaglie medaglia-argento">🥈</span>';
-                else if(index === 2) medaglia = '<span class="medaglie medaglia-bronzo">🥉</span>';
-                
-                const partiteGiocate = calcolaPartiteGiocate(giocatore, partite);
-                const mediaPerPartita = partiteGiocate > 0 ? (giocatore.punteggioTotale / partiteGiocate).toFixed(2) : '0.00';
-                
-                let classeVoto = '';
-                const mediaNum = parseFloat(mediaPerPartita);
-                if(mediaNum >= 7) classeVoto = 'voto-alto';
-                else if(mediaNum >= 5) classeVoto = 'voto-medio';
-                else classeVoto = 'voto-basso';
-                
-                html += `
-                    <tr>
-                        <td class="posizione">${index + 1}${medaglia}</td>
-                        <td class="giocatore">${giocatore.nome}</td>
-                        <td class="squadra">${giocatore.squadra || 'N/A'}</td>
-                        <td>${giocatore.ruolo || 'Giocatore'}</td>
-                        <td class="voto-cell ${classeVoto}">
-                            <span class="punteggio-totale">${giocatore.punteggioTotale}</span>
-                        </td>
-                        <td>${partiteGiocate}</td>
-                        <td class="${classeVoto}">
-                            <strong>${mediaPerPartita}</strong>
-                            <br>
-                            <span class="media-partita">per partita</span>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            tbody.innerHTML = html;
-        }
+       function caricaTabellaPunteggi(giocatori, partite) {
+    const tbody = document.getElementById('tabellaPunteggi');
+    
+    // SOLO giocatori con voti da miglior giocatore
+    const giocatoriConVoti = giocatori.filter(g => 
+        g.punteggioTotale && g.punteggioTotale > 0
+    );
+    
+    if(giocatoriConVoti.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="empty-state">
+                    Nessun giocatore ha ancora ricevuto voti come "Miglior Giocatore"
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    // Ordina per punteggio totale (voti sommati)
+    giocatoriConVoti.sort((a, b) => b.punteggioTotale - a.punteggioTotale);
+    
+    let html = '';
+    giocatoriConVoti.forEach((giocatore, index) => {
+        let medaglia = '';
+        if(index === 0) medaglia = '<span class="medaglie medaglia-oro">🥇</span>';
+        else if(index === 1) medaglia = '<span class="medaglie medaglia-argento">🥈</span>';
+        else if(index === 2) medaglia = '<span class="medaglie medaglia-bronzo">🥉</span>';
+        
+        const premi = giocatore.premiMigliorGiocatore || 0;
+        const mediaVoto = premi > 0 ? (giocatore.punteggioTotale / premi).toFixed(2) : '0.00';
+        
+        let classeVoto = '';
+        const mediaNum = parseFloat(mediaVoto);
+        if(mediaNum >= 7) classeVoto = 'voto-alto';
+        else if(mediaNum >= 5) classeVoto = 'voto-medio';
+        else classeVoto = 'voto-basso';
+        
+        html += `
+            <tr>
+                <td class="posizione">${index + 1}${medaglia}</td>
+                <td class="giocatore">${giocatore.nome}</td>
+                <td class="squadra">${giocatore.squadra || 'N/A'}</td>
+                <td>${giocatore.ruolo || 'Giocatore'}</td>
+                <td class="voto-cell ${classeVoto}">
+                    <span class="punteggio-totale">${giocatore.punteggioTotale}</span>
+                </td>
+                <td>
+                    <strong>${premi}</strong> 🏆
+                </td>
+                <td class="${classeVoto}">
+                    <strong>${mediaVoto}/10</strong>
+                </td>
+            </tr>
+        `;
+    });
+    
+    tbody.innerHTML = html;
+}
         
         // Carica tabella partite
         function caricaTabellaPartite(partite) {
@@ -967,4 +975,5 @@
     </script>
 </body>
 </html>
+
 

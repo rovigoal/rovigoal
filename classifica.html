@@ -163,7 +163,6 @@
                     <th>GF</th>
                     <th>GS</th>
                     <th>DR</th>
-                    <th>ULT. 5</th>
                 </tr>
             </thead>
             <tbody id="tabellaClassifica">
@@ -180,14 +179,12 @@
             const squadre = JSON.parse(localStorage.getItem('rovigoal_squadre')) || [];
             const partite = JSON.parse(localStorage.getItem('rovigoal_partite')) || [];
             
-            // Ordina squadre per punti (discendente)
+            // Ordina squadre per punti
             squadre.sort((a, b) => {
                 if(b.punti !== a.punti) return b.punti - a.punti;
-                // In caso di pari punti, differenza reti
                 const drA = a.golFatti - a.golSubiti;
                 const drB = b.golFatti - b.golSubiti;
                 if(drB !== drA) return drB - drA;
-                // In caso di pari DR, gol fatti
                 return b.golFatti - a.golFatti;
             });
             
@@ -211,7 +208,7 @@
             if(squadre.length === 0) {
                 tabella.innerHTML = `
                     <tr>
-                        <td colspan="11" style="text-align: center; padding: 40px;">
+                        <td colspan="10" style="text-align: center; padding: 40px;">
                             Nessuna squadra registrata. Vai in Area Admin per aggiungere squadre.
                         </td>
                     </tr>
@@ -223,14 +220,10 @@
                 const posizione = index + 1;
                 const dr = squadra.golFatti - squadra.golSubiti;
                 
-                // Determina classe per le prime tre posizioni
                 let classePosizione = '';
                 if(posizione === 1) classePosizione = 'primo';
                 else if(posizione === 2) classePosizione = 'secondo';
                 else if(posizione === 3) classePosizione = 'terzo';
-                
-                // Genera risultati ultime partite (placeholder)
-                const ultimePartite = '---';
                 
                 const riga = `
                     <tr class="${classePosizione}">
@@ -244,7 +237,6 @@
                         <td>${squadra.golFatti}</td>
                         <td>${squadra.golSubiti}</td>
                         <td>${dr > 0 ? '+' : ''}${dr}</td>
-                        <td>${ultimePartite}</td>
                     </tr>
                 `;
                 

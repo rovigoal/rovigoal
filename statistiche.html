@@ -156,6 +156,11 @@
         
         .badge-giallo { background: #FFFACD; color: #8B6914; }
         .badge-rosso { background: #FFB6C1; color: #8B0000; }
+        .badge-voto { 
+            background: #8A2BE2; 
+            color: white;
+            margin: 2px;
+        }
         
         .voto-cell {
             text-align: center;
@@ -175,6 +180,71 @@
             font-size: 0.9em;
             color: #666;
         }
+        
+        .partita-row {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .partita-row:hover {
+            background-color: #f0f8ff;
+        }
+        
+        .partita-dettagli {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 5px;
+            border-left: 4px solid #1e3c72;
+            display: none;
+        }
+        
+        .partita-dettagli.aperta {
+            display: block;
+        }
+        
+        .eventi-partita {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .evento-badge {
+            background: #e8f4ff;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            border: 1px solid #b3d9ff;
+        }
+        
+        .filtro-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .filtro-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        select {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            background: white;
+        }
+        
+        .risultato-partita {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #1e3c72;
+        }
     </style>
 </head>
 <body>
@@ -189,7 +259,8 @@
             <button class="tab" onclick="apriTab('ammoniti')">🟨 AMMONITI</button>
             <button class="tab" onclick="apriTab('espulsi')">🟥 ESPULSI</button>
             <button class="tab" onclick="apriTab('portieri')">🥅 PORTIERI</button>
-            <button class="tab" onclick="apriTab('punteggi')">⭐ PUNTEGGI GIOCATORI</button>
+            <button class="tab" onclick="apriTab('punteggi')">⭐ PUNTEGGI</button>
+            <button class="tab" onclick="apriTab('partite')">📅 PARTITE</button>
         </div>
         
         <!-- TAB 1: CANNONIERI -->
@@ -207,9 +278,7 @@
                         <th>Media Gol/Partita</th>
                     </tr>
                 </thead>
-                <tbody id="tabellaCannoniere">
-                    <!-- Dati cannonieri -->
-                </tbody>
+                <tbody id="tabellaCannoniere"></tbody>
             </table>
         </div>
         
@@ -228,9 +297,7 @@
                         <th>Media/Partita</th>
                     </tr>
                 </thead>
-                <tbody id="tabellaAmmoniti">
-                    <!-- Dati ammoniti -->
-                </tbody>
+                <tbody id="tabellaAmmoniti"></tbody>
             </table>
         </div>
         
@@ -248,9 +315,7 @@
                         <th>Partite</th>
                     </tr>
                 </thead>
-                <tbody id="tabellaEspulsi">
-                    <!-- Dati espulsi -->
-                </tbody>
+                <tbody id="tabellaEspulsi"></tbody>
             </table>
         </div>
         
@@ -268,9 +333,7 @@
                         <th>Media Gol/Partita</th>
                     </tr>
                 </thead>
-                <tbody id="tabellaPortieri">
-                    <!-- Dati portieri -->
-                </tbody>
+                <tbody id="tabellaPortieri"></tbody>
             </table>
         </div>
         
@@ -289,8 +352,46 @@
                         <th>Media per Partita</th>
                     </tr>
                 </thead>
-                <tbody id="tabellaPunteggi">
-                    <!-- Dati punteggi -->
+                <tbody id="tabellaPunteggi"></tbody>
+            </table>
+        </div>
+        
+        <!-- TAB 6: PARTITE -->
+        <div id="partite" class="tab-content">
+            <h2>📅 PARTITE GIOCATE</h2>
+            
+            <div class="filtro-container">
+                <div class="filtro-row">
+                    <div>
+                        <label for="filtroSquadra">Filtra per squadra:</label>
+                        <select id="filtroSquadra" onchange="filtraPartite()">
+                            <option value="">Tutte le squadre</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filtroData">Ordina per:</label>
+                        <select id="filtroData" onchange="filtraPartite()">
+                            <option value="recenti">Più recenti</option>
+                            <option value="vecchie">Più vecchie</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th width="100">Data</th>
+                        <th>Partita</th>
+                        <th width="100">Risultato</th>
+                        <th width="120">Gol Giocatori</th>
+                        <th width="100">Ammonizioni</th>
+                        <th width="100">Espulsioni</th>
+                        <th width="100">Voti Assegnati</th>
+                    </tr>
+                </thead>
+                <tbody id="tabellaPartite">
+                    <!-- Le partite verranno caricate qui -->
                 </tbody>
             </table>
         </div>
@@ -299,6 +400,9 @@
     </div>
     
     <script>
+        // Variabili globali
+        let partiteAperte = new Set();
+        
         // Funzione per cambiare tab
         function apriTab(tabName) {
             // Nascondi tutti i tab
@@ -330,28 +434,24 @@
             
             switch(tipo) {
                 case 'cannoniere':
-                    // Filtra e ordina per gol
                     giocatoriFiltrati = [...giocatori].filter(g => (g.gol || 0) > 0);
                     giocatoriFiltrati.sort((a, b) => (b.gol || 0) - (a.gol || 0));
                     caricaTabellaCannoniere(giocatoriFiltrati, partite);
                     break;
                     
                 case 'ammoniti':
-                    // Filtra e ordina per ammonizioni
                     giocatoriFiltrati = [...giocatori].filter(g => (g.ammonizioni || 0) > 0);
                     giocatoriFiltrati.sort((a, b) => (b.ammonizioni || 0) - (a.ammonizioni || 0));
                     caricaTabellaAmmoniti(giocatoriFiltrati, partite);
                     break;
                     
                 case 'espulsi':
-                    // Filtra e ordina per espulsioni
                     giocatoriFiltrati = [...giocatori].filter(g => (g.espulsioni || 0) > 0);
                     giocatoriFiltrati.sort((a, b) => (b.espulsioni || 0) - (a.espulsioni || 0));
                     caricaTabellaEspulsi(giocatoriFiltrati, partite);
                     break;
                     
                 case 'portieri':
-                    // Filtra solo portieri
                     giocatoriFiltrati = [...giocatori].filter(g => 
                         g.ruolo && g.ruolo.toLowerCase() === 'portiere'
                     );
@@ -359,27 +459,25 @@
                     break;
                     
                 case 'punteggi':
-                    // Filtra giocatori con punteggio
                     giocatoriFiltrati = [...giocatori].filter(g => 
                         g.punteggioTotale && g.punteggioTotale > 0
                     );
-                    // Ordina per punteggio totale (discendente)
                     giocatoriFiltrati.sort((a, b) => b.punteggioTotale - a.punteggioTotale);
                     caricaTabellaPunteggi(giocatoriFiltrati, partite);
+                    break;
+                    
+                case 'partite':
+                    caricaTabellaPartite(partite);
                     break;
             }
         }
         
         // Calcola partite giocate da un giocatore
         function calcolaPartiteGiocate(giocatore, partite) {
-            // Conta in quante partite ha giocato (semplificato)
-            // Nella realtà, dovremmo tracciare quali giocatori giocano ogni partita
-            // Per ora usiamo una stima basata sui voti ricevuti
             if(giocatore.punteggioTotale && giocatore.punteggioTotale > 0) {
                 return Math.max(1, Math.floor(giocatore.punteggioTotale / 10));
             }
             
-            // Se non ha punteggio, stimiamo dalle partite della sua squadra
             const squadra = giocatore.squadra;
             if(!squadra) return 0;
             
@@ -521,7 +619,6 @@
             
             let html = '';
             giocatori.forEach((giocatore, index) => {
-                // Per i portieri, usiamo gol_subiti se esiste, altrimenti stima
                 const golSubiti = giocatore.gol_subiti || 0;
                 const partiteGiocate = calcolaPartiteGiocate(giocatore, partite);
                 const mediaGol = partiteGiocate > 0 ? (golSubiti / partiteGiocate).toFixed(2) : '0.00';
@@ -562,13 +659,9 @@
                 else if(index === 1) medaglia = '<span class="medaglie medaglia-argento">🥈</span>';
                 else if(index === 2) medaglia = '<span class="medaglie medaglia-bronzo">🥉</span>';
                 
-                // Calcola partite giocate
                 const partiteGiocate = calcolaPartiteGiocate(giocatore, partite);
-                
-                // Calcola media per partita
                 const mediaPerPartita = partiteGiocate > 0 ? giocatore.punteggioTotale / partiteGiocate : 0;
                 
-                // Determina classe colore in base alla media
                 let classeVoto = '';
                 if(mediaPerPartita >= 7) classeVoto = 'voto-alto';
                 else if(mediaPerPartita >= 5) classeVoto = 'voto-medio';
@@ -596,6 +689,158 @@
             tbody.innerHTML = html;
         }
         
+        // Carica tabella partite
+        function caricaTabellaPartite(partite) {
+            const tbody = document.getElementById('tabellaPartite');
+            
+            // Carica squadre per il filtro
+            const squadre = JSON.parse(localStorage.getItem('rovigoal_squadre')) || [];
+            const filtroSquadra = document.getElementById('filtroSquadra');
+            
+            // Pulisci e aggiungi squadre al filtro
+            while(filtroSquadra.options.length > 1) {
+                filtroSquadra.remove(1);
+            }
+            
+            squadre.forEach(squadra => {
+                const option = document.createElement('option');
+                option.value = squadra.nome;
+                option.textContent = squadra.nome;
+                filtroSquadra.appendChild(option);
+            });
+            
+            if(partite.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            Nessuna partita registrata ancora
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Applica filtri
+            let partiteFiltrate = [...partite];
+            const filtroSquadraVal = document.getElementById('filtroSquadra').value;
+            const filtroData = document.getElementById('filtroData').value;
+            
+            if(filtroSquadraVal) {
+                partiteFiltrate = partiteFiltrate.filter(p => 
+                    p.squadraCasa === filtroSquadraVal || p.squadraOspite === filtroSquadraVal
+                );
+            }
+            
+            // Ordina per data
+            if(filtroData === 'recenti') {
+                partiteFiltrate.reverse(); // Più recenti prima
+            }
+            
+            let html = '';
+            partiteFiltrate.forEach((partita, index) => {
+                // Calcola statistiche dagli eventi
+                let golGiocatori = 0;
+                let ammonizioni = 0;
+                let espulsioni = 0;
+                let votiAssegnati = 0;
+                
+                if(partita.eventi) {
+                    partita.eventi.forEach(evento => {
+                        switch(evento.tipo) {
+                            case 'gol':
+                                golGiocatori += evento.valore || 1;
+                                break;
+                            case 'amm':
+                                ammonizioni += evento.valore || 1;
+                                break;
+                            case 'esp':
+                                espulsioni += evento.valore || 1;
+                                break;
+                            case 'voto':
+                                votiAssegnati++;
+                                break;
+                        }
+                    });
+                }
+                
+                const isAperta = partiteAperte.has(partita.id);
+                
+                html += `
+                    <tr class="partita-row" onclick="toggleDettagliPartita(${partita.id}, ${index})">
+                        <td>${partita.data}</td>
+                        <td>
+                            <strong>${partita.squadraCasa}</strong> vs <strong>${partita.squadraOspite}</strong>
+                            <br>
+                            <small>${partita.ora}</small>
+                        </td>
+                        <td class="risultato-partita">${partita.golCasa} - ${partita.golOspite}</td>
+                        <td>${golGiocatori}</td>
+                        <td>${ammonizioni}</td>
+                        <td>${espulsioni}</td>
+                        <td>${votiAssegnati}</td>
+                    </tr>
+                    <tr id="dettagli-${index}" class="partita-dettagli ${isAperta ? 'aperta' : ''}">
+                        <td colspan="7">
+                            <h4>Dettagli Partita</h4>
+                            <p><strong>Data:</strong> ${partita.data} ${partita.ora}</p>
+                            <p><strong>Risultato:</strong> ${partita.squadraCasa} ${partita.golCasa} - ${partita.golOspite} ${partita.squadraOspite}</p>
+                            
+                            ${partita.eventi && partita.eventi.length > 0 ? `
+                                <h5>Eventi della partita:</h5>
+                                <div class="eventi-partita">
+                                    ${partita.eventi.map(evento => {
+                                        let icona = '';
+                                        let testo = '';
+                                        
+                                        switch(evento.tipo) {
+                                            case 'gol':
+                                                icona = '⚽';
+                                                testo = `${evento.valore || 1} gol di ${evento.giocatoreNome}`;
+                                                break;
+                                            case 'amm':
+                                                icona = '🟨';
+                                                testo = `${evento.valore || 1} ammonizione per ${evento.giocatoreNome}`;
+                                                break;
+                                            case 'esp':
+                                                icona = '🟥';
+                                                testo = `${evento.valore || 1} espulsione di ${evento.giocatoreNome}`;
+                                                break;
+                                            case 'voto':
+                                                icona = '⭐';
+                                                testo = `Voto ${evento.valore}/10 a ${evento.giocatoreNome}`;
+                                                break;
+                                        }
+                                        
+                                        return `<div class="evento-badge">${icona} ${testo}</div>`;
+                                    }).join('')}
+                                </div>
+                            ` : '<p>Nessun evento registrato per questa partita.</p>'}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        // Filtra partite
+        function filtraPartite() {
+            caricaTabellaPartite(JSON.parse(localStorage.getItem('rovigoal_partite')) || []);
+        }
+        
+        // Mostra/nascondi dettagli partita
+        function toggleDettagliPartita(partitaId, index) {
+            const dettagli = document.getElementById(`dettagli-${index}`);
+            
+            if(partiteAperte.has(partitaId)) {
+                dettagli.classList.remove('aperta');
+                partiteAperte.delete(partitaId);
+            } else {
+                dettagli.classList.add('aperta');
+                partiteAperte.add(partitaId);
+            }
+        }
+        
         function tornaIndietro() {
             window.location.href = 'main.html';
         }
@@ -605,15 +850,18 @@
             window.location.href = 'index.html';
         }
         
-        // Carica le statistiche all'avvio (cannoniere di default)
+        // Carica le statistiche all'avvio
         caricaStatistiche('cannoniere');
         
         // Aggiorna statistiche ogni 30 secondi
         setInterval(() => {
             const tabAttivo = document.querySelector('.tab.active');
             if(tabAttivo) {
-                const tabName = tabAttivo.getAttribute('onclick').match(/\('(.+)'\)/)[1];
-                caricaStatistiche(tabName);
+                const onclick = tabAttivo.getAttribute('onclick');
+                if(onclick) {
+                    const tabName = onclick.match(/\('(.+)'\)/)[1];
+                    caricaStatistiche(tabName);
+                }
             }
         }, 30000);
     </script>

@@ -200,7 +200,6 @@
     </div>
     
     <script>
-        // Carica statistiche all'avvio
         function caricaStatistiche() {
             const squadre = JSON.parse(localStorage.getItem('rovigoal_squadre')) || [];
             const giocatori = JSON.parse(localStorage.getItem('rovigoal_giocatori')) || [];
@@ -244,7 +243,6 @@
             
             container.innerHTML = html;
             
-            // Aggiorna data ultimo aggiornamento
             const now = new Date();
             document.getElementById('ultimoAggiornamento').textContent = 
                 now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT');
@@ -256,7 +254,6 @@
             }, 0);
         }
         
-        // Funzioni per aprire le pagine
         function apriClassifica() {
             window.location.href = 'classifica.html';
         }
@@ -281,22 +278,17 @@
         
         function logout() {
             if(confirm("Sei sicuro di voler uscire?")) {
-                // Rimuovi tutti i dati di accesso
                 localStorage.removeItem('rovigoal_entrato');
                 localStorage.removeItem('admin_accesso');
                 window.location.href = 'index.html';
             }
         }
         
-        // Controllo accesso
         if(localStorage.getItem('rovigoal_entrato') !== 'true') {
             window.location.href = 'index.html';
         }
         
-        // Carica le statistiche all'avvio
         caricaStatistiche();
-        
-        // Aggiorna le statistiche ogni 30 secondi
         setInterval(caricaStatistiche, 30000);
     </script>
 </body>

@@ -115,6 +115,7 @@
         .gol { background: #90EE90; color: #006400; }
         .amm { background: #FFFACD; color: #8B6914; }
         .esp { background: #FFB6C1; color: #8B0000; }
+        .voto { background: #D8BFD8; color: #4B0082; }
         
         .btn-back {
             display: block;
@@ -157,6 +158,11 @@
             padding: 3px 8px;
             border-radius: 3px;
         }
+        
+        .punteggio-totale {
+            font-weight: bold;
+            color: #8A2BE2;
+        }
     </style>
 </head>
 <body>
@@ -166,9 +172,7 @@
     </div>
     
     <div class="container">
-        <div id="squadreList" class="squadre-container">
-            <!-- Le squadre verranno caricate qui -->
-        </div>
+        <div id="squadreList" class="squadre-container"></div>
         
         <button class="btn-back" onclick="tornaIndietro()">← TORNA ALLA HOME</button>
     </div>
@@ -220,6 +224,8 @@
                                     </div>
                                     <div class="giocatore-dettagli">
                                         ${giocatore.ruolo || 'Giocatore'}
+                                        ${giocatore.punteggioTotale > 0 ? 
+                                            `<span class="punteggio-totale"> | Punti: ${giocatore.punteggioTotale}</span>` : ''}
                                     </div>
                                 </div>
                                 <div class="giocatore-stats">
@@ -236,6 +242,7 @@
                 const totGol = giocatoriSquadra.reduce((sum, g) => sum + (g.gol || 0), 0);
                 const totAmm = giocatoriSquadra.reduce((sum, g) => sum + (g.ammonizioni || 0), 0);
                 const totEsp = giocatoriSquadra.reduce((sum, g) => sum + (g.espulsioni || 0), 0);
+                const totPunti = giocatoriSquadra.reduce((sum, g) => sum + (g.punteggioTotale || 0), 0);
                 
                 const squadraCard = `
                     <div class="squadra-card">
@@ -246,11 +253,13 @@
                                     ${totGol > 0 ? `<div class="stat">⚽ ${totGol}</div>` : ''}
                                     ${totAmm > 0 ? `<div class="stat">🟨 ${totAmm}</div>` : ''}
                                     ${totEsp > 0 ? `<div class="stat">🟥 ${totEsp}</div>` : ''}
+                                    ${totPunti > 0 ? `<div class="stat">⭐ ${totPunti}</div>` : ''}
                                 </div>
                             </div>
                             <div class="squadra-info">
                                 Allenatore: ${squadra.allenatore || 'Non specificato'} | 
-                                Colori: ${squadra.colori || 'Non specificati'}
+                                Colori: ${squadra.colori || 'Non specificati'} |
+                                Punti Classifica: <strong>${squadra.punti || 0}</strong>
                             </div>
                         </div>
                         <div class="giocatori-list">
@@ -274,6 +283,9 @@
         
         // Carica i dati all'avvio
         caricaSquadre();
+        
+        // Aggiorna ogni 30 secondi
+        setInterval(caricaSquadre, 30000);
     </script>
 </body>
 </html>

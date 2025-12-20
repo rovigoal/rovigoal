@@ -651,79 +651,62 @@
         }
         
         function caricaTabellaPortieri(giocatori, partite) {
-            const tbody = document.getElementById('tabellaPortieri');
-            
-            // Filtra solo portieri
-            const portieri = giocatori.filter(g => 
-                g.ruolo && g.ruolo.toLowerCase() === 'portiere'
-            );
-            
-            if(portieri.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="9" class="empty-state">
-                            Nessun portiere registrato
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            // Calcola statistiche per ogni portiere
-            const portieriConStat = portieri.map(portiere => {
-                const partiteGiocate = calcolaPartiteGiocate(portiere, partite);
-                const golSubiti = calcolaGolSubiti(portiere, partite);
-                const mediaGol = partiteGiocate > 0 ? (golSubiti / partiteGiocate).toFixed(2) : '0.00';
-                const premi = portiere.premiMigliorPortiere || 0;
-                const punteggioTotale = portiere.punteggioTotale || 0;
-                const mediaVoto = premi > 0 ? (punteggioTotale / premi).toFixed(2) : '0.00';
-                
-                return {
-                    ...portiere,
-                    partiteGiocate,
-                    golSubiti,
-                    mediaGol,
-                    premi,
-                    punteggioTotale,
-                    mediaVoto
-                };
-            });
-            
-            // Ordina per punteggio totale (voti ricevuti come miglior portiere)
-            portieriConStat.sort((a, b) => b.punteggioTotale - a.punteggioTotale);
-            
-            let html = '';
-            portieriConStat.forEach((portiere, index) => {
-                let medaglia = '';
-                if(index === 0 && portiere.punteggioTotale > 0) medaglia = '<span class="medaglie medaglia-oro">🥇</span>';
-                else if(index === 1 && portiere.punteggioTotale > 0) medaglia = '<span class="medaglie medaglia-argento">🥈</span>';
-                else if(index === 2 && portiere.punteggioTotale > 0) medaglia = '<span class="medaglie medaglia-bronzo">🥉</span>';
-                
-                const classeRiga = portiere.premi > 0 ? 'stat-portiere' : '';
-                
-                html += `
-                    <tr class="${classeRiga}">
-                        <td class="posizione">${index + 1}${medaglia}</td>
-                        <td class="giocatore">${portiere.nome}</td>
-                        <td class="squadra">${portiere.squadra || 'N/A'}</td>
-                        <td class="voto-cell ${portiere.punteggioTotale > 0 ? 'voto-alto' : ''}">
-                            <strong>${portiere.punteggioTotale}</strong>
-                        </td>
-                        <td>
-                            ${portiere.premi > 0 ? `<strong>${portiere.premi}</strong> 🏅` : '0'}
-                        </td>
-                        <td class="${portiere.mediaVoto > 7 ? 'voto-alto' : portiere.mediaVoto > 5 ? 'voto-medio' : 'voto-basso'}">
-                            ${portiere.premi > 0 ? `<strong>${portiere.mediaVoto}/10</strong>` : 'N/A'}
-                        </td>
-                        <td>${portiere.partiteGiocate}</td>
-                        <td>${portiere.golSubiti}</td>
-                        <td>${portiere.mediaGol}</td>
-                    </tr>
-                `;
-            });
-            
-            tbody.innerHTML = html;
-        }
+    const tbody = document.getElementById('tabellaPortieri');
+    
+    // Filtra SOLO i portieri che hanno ricevuto voti come miglior portiere
+    const portieriConVoti = giocatori.filter(g => 
+        g.ruolo && g.ruolo.toLowerCase() === 'portiere' && 
+        g.punteggioTotale && g.punteggioTotale > 0 && 
+        g.premiMigliorPortiere > 0  // SOLO SE HA RICEVUTO PREMI COME MIGLIOR PORTIERE
+    );
+    
+    if(portieriConVoti.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="9" class="empty-state">
+                    Nessun portiere ha ancora ricevuto voti come "Miglior Portiere"
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    // Ordina per punteggio totale (voti ricevuti come miglior portiere)
+    portieriConVoti.sort((a, b) => b.punteggioTotale - a.punteggioTotale);
+    
+    let html = '';
+    portieriConVoti.forEach((portiere, index) => {
+        let medaglia = '';
+        if(index === 0) medaglia = '<span class="medaglie medaglia-oro">🥇</span>';
+        else if(index === 1) medaglia = '<span class="medaglie medaglia-argento">🥈</span>';
+        else if(index === 2) medaglia = '<span class="medaglie medaglia-bronzo">🥉</span>';
+        
+        const premi = portiere.premiMigliorPortiere || 0;
+        const mediaVoto = premi > 0 ? (portiere.punteggioTotale / premi).toFixed(2) : '0.00';
+        
+        html += `
+            <tr class="stat-portiere">
+                <td class="posizione">${index + 1}${medaglia}</td>
+                <td class="giocatore">${portiere.nome}</td>
+                <td class="squadra">${portiere.squadra || 'N/A'}</td>
+                <td class="voto-cell voto-alto">
+                    <strong>${portiere.punteggioTotale}</strong>
+                </td>
+                <td>
+                    <strong>${premi}</strong> 🏅
+                </td>
+                <td class="voto-alto">
+                    <strong>${mediaVoto}/10</strong>
+                </td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+            </tr>
+        `;
+    });
+    
+    tbody.innerHTML = html;
+}
         
       function caricaTabellaPunteggi(giocatori, partite) {
     const tbody = document.getElementById('tabellaPunteggi');
@@ -977,6 +960,7 @@
     </script>
 </body>
 </html>
+
 
 
 

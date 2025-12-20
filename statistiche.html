@@ -725,26 +725,28 @@
             tbody.innerHTML = html;
         }
         
-       function caricaTabellaPunteggi(giocatori, partite) {
+      function caricaTabellaPunteggi(giocatori, partite) {
     const tbody = document.getElementById('tabellaPunteggi');
     
-    // SOLO giocatori con voti da miglior giocatore
+    // Filtra SOLO i GIOCATORI DI CAMPO (NON portieri) che hanno ricevuto voti
     const giocatoriConVoti = giocatori.filter(g => 
-        g.punteggioTotale && g.punteggioTotale > 0
+        g.punteggioTotale && g.punteggioTotale > 0 && 
+        g.premiMigliorGiocatore > 0 &&
+        g.ruolo === 'Giocatore'  // SOLO GIOCATORI DI CAMPO, NO PORTIERI
     );
     
     if(giocatoriConVoti.length === 0) {
         tbody.innerHTML = `
             <tr>
                 <td colspan="7" class="empty-state">
-                    Nessun giocatore ha ancora ricevuto voti come "Miglior Giocatore"
+                    Nessun giocatore di campo ha ancora ricevuto voti come "Miglior Giocatore"
                 </td>
             </tr>
         `;
         return;
     }
     
-    // Ordina per punteggio totale (voti sommati)
+    // Ordina per punteggio totale
     giocatoriConVoti.sort((a, b) => b.punteggioTotale - a.punteggioTotale);
     
     let html = '';
@@ -768,7 +770,7 @@
                 <td class="posizione">${index + 1}${medaglia}</td>
                 <td class="giocatore">${giocatore.nome}</td>
                 <td class="squadra">${giocatore.squadra || 'N/A'}</td>
-                <td>${giocatore.ruolo || 'Giocatore'}</td>
+                <td>Giocatore</td>
                 <td class="voto-cell ${classeVoto}">
                     <span class="punteggio-totale">${giocatore.punteggioTotale}</span>
                 </td>
@@ -975,5 +977,6 @@
     </script>
 </body>
 </html>
+
 
 

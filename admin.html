@@ -623,85 +623,85 @@
         }
         
         function caricaSelezioneMigliori(squadraCasa, squadraOspite, modalita) {
-            const giocatoriPartita = database.giocatori.filter(g => 
-                g.squadra === squadraCasa || g.squadra === squadraOspite
-            );
-            
-            if(modalita === 'normale') {
-                // Popola miglior giocatore (solo giocatori di campo)
-                const selectGiocatore = document.getElementById('migliorGiocatore');
-                selectGiocatore.innerHTML = '<option value="">-- Seleziona --</option>';
-                
-                giocatoriPartita.forEach(g => {
-                    if(g.ruolo === 'Giocatore') {
-                        const option = document.createElement('option');
-                        option.value = g.id;
-                        option.textContent = `${g.nome} (${g.squadra})`;
-                        selectGiocatore.appendChild(option);
-                    }
-                });
-                
-                // Popola miglior portiere (solo portieri)
-                const selectPortiere = document.getElementById('migliorPortiere');
-                selectPortiere.innerHTML = '<option value="">-- Seleziona --</option>';
-                
-                giocatoriPartita.forEach(g => {
-                    if(g.ruolo === 'Portiere') {
-                        const option = document.createElement('option');
-                        option.value = g.id;
-                        option.textContent = `${g.nome} (${g.squadra})`;
-                        selectPortiere.appendChild(option);
-                    }
-                });
-                
-                // Reset
-                partitaInCorso.migliorGiocatore = null;
-                partitaInCorso.votoGiocatore = 0;
-                partitaInCorso.migliorPortiere = null;
-                partitaInCorso.votoPortiere = 0;
-                
-                document.getElementById('voto-miglior-giocatore-attuale').textContent = 'N/A';
-                document.getElementById('voto-miglior-portiere-attuale').textContent = 'N/A';
-                
-            } else if(modalita === 'finale') {
-                // Popola miglior giocatore per finale
-                const selectGiocatore = document.getElementById('finaleMigliorGiocatore');
-                selectGiocatore.innerHTML = '<option value="">-- Seleziona --</option>';
-                
-                giocatoriPartita.forEach(g => {
-                    if(g.ruolo === 'Giocatore') {
-                        const option = document.createElement('option');
-                        option.value = g.id;
-                        option.textContent = `${g.nome} (${g.squadra})`;
-                        selectGiocatore.appendChild(option);
-                    }
-                });
-                
-                // Popola miglior portiere per finale
-                const selectPortiere = document.getElementById('finaleMigliorPortiere');
-                selectPortiere.innerHTML = '<option value="">-- Seleziona --</option>';
-                
-                giocatoriPartita.forEach(g => {
-                    if(g.ruolo === 'Portiere') {
-                        const option = document.createElement('option');
-                        option.value = g.id;
-                        option.textContent = `${g.nome} (${g.squadra})`;
-                        selectPortiere.appendChild(option);
-                    }
-                });
-                
-                // Reset
-                finaleInCorso.migliorGiocatore = null;
-                finaleInCorso.votoGiocatore = 0;
-                finaleInCorso.migliorPortiere = null;
-                finaleInCorso.votoPortiere = 0;
-                
-                document.getElementById('finale-voto-miglior-giocatore-attuale').textContent = 'N/A';
-                document.getElementById('finale-voto-miglior-portiere-attuale').textContent = 'N/A';
+    const giocatoriPartita = database.giocatori.filter(g => 
+        g.squadra === squadraCasa || g.squadra === squadraOspite
+    );
+    
+    if(modalita === 'normale') {
+        // Popola miglior giocatore (solo giocatori di campo - da ENTRAMBE le squadre)
+        const selectGiocatore = document.getElementById('migliorGiocatore');
+        selectGiocatore.innerHTML = '<option value="">-- Seleziona --</option>';
+        
+        giocatoriPartita.forEach(g => {
+            if(g.ruolo === 'Giocatore') {
+                const option = document.createElement('option');
+                option.value = g.id;
+                option.textContent = `${g.nome} (${g.squadra})`;
+                selectGiocatore.appendChild(option);
             }
-            
-            document.querySelectorAll('.stella.selezionata').forEach(s => s.classList.remove('selezionata'));
-        }
+        });
+        
+        // Popola miglior portiere (solo portieri - da ENTRAMBE le squadre)
+        const selectPortiere = document.getElementById('migliorPortiere');
+        selectPortiere.innerHTML = '<option value="">-- Seleziona --</option>';
+        
+        giocatoriPartita.forEach(g => {
+            if(g.ruolo === 'Portiere') {
+                const option = document.createElement('option');
+                option.value = g.id;
+                option.textContent = `${g.nome} (${g.squadra})`;
+                selectPortiere.appendChild(option);
+            }
+        });
+        
+        // Reset
+        partitaInCorso.migliorGiocatore = null;
+        partitaInCorso.votoGiocatore = 0;
+        partitaInCorso.migliorPortiere = null;
+        partitaInCorso.votoPortiere = 0;
+        
+        document.getElementById('voto-miglior-giocatore-attuale').textContent = 'N/A';
+        document.getElementById('voto-miglior-portiere-attuale').textContent = 'N/A';
+        
+    } else if(modalita === 'finale') {
+        // Popola miglior giocatore per finale (da ENTRAMBE le squadre)
+        const selectGiocatore = document.getElementById('finaleMigliorGiocatore');
+        selectGiocatore.innerHTML = '<option value="">-- Seleziona --</option>';
+        
+        giocatoriPartita.forEach(g => {
+            if(g.ruolo === 'Giocatore') {
+                const option = document.createElement('option');
+                option.value = g.id;
+                option.textContent = `${g.nome} (${g.squadra})`;
+                selectGiocatore.appendChild(option);
+            }
+        });
+        
+        // Popola miglior portiere per finale (da ENTRAMBE le squadre)
+        const selectPortiere = document.getElementById('finaleMigliorPortiere');
+        selectPortiere.innerHTML = '<option value="">-- Seleziona --</option>';
+        
+        giocatoriPartita.forEach(g => {
+            if(g.ruolo === 'Portiere') {
+                const option = document.createElement('option');
+                option.value = g.id;
+                option.textContent = `${g.nome} (${g.squadra})`;
+                selectPortiere.appendChild(option);
+            }
+        });
+        
+        // Reset
+        finaleInCorso.migliorGiocatore = null;
+        finaleInCorso.votoGiocatore = 0;
+        finaleInCorso.migliorPortiere = null;
+        finaleInCorso.votoPortiere = 0;
+        
+        document.getElementById('finale-voto-miglior-giocatore-attuale').textContent = 'N/A';
+        document.getElementById('finale-voto-miglior-portiere-attuale').textContent = 'N/A';
+    }
+    
+    document.querySelectorAll('.stella.selezionata').forEach(s => s.classList.remove('selezionata'));
+}
         
         // Gestione selezione migliori normale
         document.getElementById('migliorGiocatore').addEventListener('change', function() {
@@ -1261,3 +1261,4 @@
     </script>
 </body>
 </html>
+

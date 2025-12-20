@@ -9,13 +9,14 @@
         body { font-family: 'Arial', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 20px; }
         .header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 25px; text-align: center; border-radius: 15px; margin-bottom: 40px; box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
         .header h1 { font-size: 2.8em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-        .menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; max-width: 1400px; margin: 0 auto; padding: 20px; }
         .pulsante { background: white; padding: 60px 20px; border-radius: 20px; text-align: center; font-size: 1.5em; font-weight: bold; cursor: pointer; transition: all 0.3s ease; border: 3px solid transparent; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .pulsante:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
         .pulsante:nth-child(1) { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #333; }
         .pulsante:nth-child(2) { background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); color: white; }
         .pulsante:nth-child(3) { background: linear-gradient(135deg, #32CD32 0%, #228B22 100%); color: white; }
-        .pulsante:nth-child(4) { background: linear-gradient(135deg, #FF4500 0%, #DC143C 100%); color: white; }
+        .pulsante:nth-child(4) { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #333; border: 3px solid gold; }
+        .pulsante:nth-child(5) { background: linear-gradient(135deg, #FF4500 0%, #DC143C 100%); color: white; }
         .icona { font-size: 3em; display: block; margin-bottom: 15px; }
         .logout { display: block; margin: 50px auto 0; padding: 15px 40px; background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%); color: white; border: none; border-radius: 30px; cursor: pointer; font-size: 1.2em; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         .logout:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
@@ -43,6 +44,7 @@
         <div class="pulsante" onclick="apriClassifica()"><span class="icona">🏆</span>CLASSIFICA</div>
         <div class="pulsante" onclick="apriSquadra()"><span class="icona">👥</span>SQUADRA</div>
         <div class="pulsante" onclick="apriStatistiche()"><span class="icona">📊</span>STATISTICHE</div>
+        <div class="pulsante" onclick="apriFinale()"><span class="icona">🥇</span>FINALE</div>
         <div class="pulsante" onclick="apriAdmin()"><span class="icona">🔧</span>ADMIN</div>
     </div>
     
@@ -57,15 +59,26 @@
             const squadre = JSON.parse(localStorage.getItem('rovigoal_squadre')) || [];
             const giocatori = JSON.parse(localStorage.getItem('rovigoal_giocatori')) || [];
             const partite = JSON.parse(localStorage.getItem('rovigoal_partite')) || [];
+            const finale = JSON.parse(localStorage.getItem('rovigoal_finale')) || null;
             const container = document.getElementById('statsSummary');
             
             if(squadre.length > 0) {
-                container.innerHTML = `
+                let html = `
                     <div class="stat-box"><div class="stat-number">${squadre.length}</div><div class="stat-label">Squadre</div></div>
                     <div class="stat-box"><div class="stat-number">${giocatori.length}</div><div class="stat-label">Giocatori</div></div>
                     <div class="stat-box"><div class="stat-number">${partite.length}</div><div class="stat-label">Partite</div></div>
                     <div class="stat-box"><div class="stat-number">${partite.reduce((t,p) => t + p.golCasa + p.golOspite, 0)}</div><div class="stat-label">Gol Totali</div></div>
                 `;
+                
+                // Aggiungi se c'è una finale
+                if(finale) {
+                    html += `<div class="stat-box" style="background: gold; border: 2px solid orange;">
+                        <div class="stat-number">🏆</div>
+                        <div class="stat-label">Finale Giocata</div>
+                    </div>`;
+                }
+                
+                container.innerHTML = html;
             } else {
                 container.innerHTML = `
                     <div class="stat-box"><div class="stat-number">0</div><div class="stat-label">Squadre registrate</div></div>
@@ -80,6 +93,7 @@
         function apriClassifica() { window.location.href = 'classifica.html'; }
         function apriSquadra() { window.location.href = 'squadra.html'; }
         function apriStatistiche() { window.location.href = 'statistiche.html'; }
+        function apriFinale() { window.location.href = 'finale.html'; }
         function apriAdmin() {
             const password = prompt("Inserisci la password ADMIN:");
             if(password === "1246912.!!") {

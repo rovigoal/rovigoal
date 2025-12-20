@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rovigoal - Finale</title>
+    <title>Rovigoal - Partita Finale</title>
     <style>
         * {
             margin: 0;
@@ -25,4 +25,272 @@
             padding: 25px;
             border-radius: 15px;
             margin-bottom: 30px;
-            text
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 3px solid gold;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .partita-finale {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .risultato-finale {
+            text-align: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            border-radius: 10px;
+            border: 3px solid gold;
+        }
+        
+        .dettagli-partita {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .dettagli-partita {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .squadra-finale {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #dee2e6;
+        }
+        
+        .squadra-titolo {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #1e3c72;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .eventi-squadra {
+            margin-top: 15px;
+        }
+        
+        .evento-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .evento-item:last-child {
+            border-bottom: none;
+        }
+        
+        .migliori-finale {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 2px solid #2196F3;
+        }
+        
+        .migliori-titolo {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #1976D2;
+            text-align: center;
+        }
+        
+        .migliori-dettagli {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .miglior-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        
+        .btn-back {
+            display: block;
+            margin: 30px auto;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-back:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            background: white;
+            border-radius: 10px;
+            border: 2px dashed #ddd;
+        }
+        
+        .data-partita {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+        
+        .icona-gol { color: #32CD32; }
+        .icona-amm { color: #FFD700; }
+        .icona-esp { color: #DC143C; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏆 PARTITA FINALE</h1>
+        <p>La grande finale del torneo Rovigoal</p>
+    </div>
+    
+    <div class="container">
+        <div id="contenutoFinale"></div>
+        
+        <button class="btn-back" onclick="tornaIndietro()">← TORNA ALLA HOME</button>
+    </div>
+    
+    <script>
+        function caricaFinale() {
+            const finale = JSON.parse(localStorage.getItem('rovigoal_finale')) || null;
+            const giocatori = JSON.parse(localStorage.getItem('rovigoal_giocatori')) || [];
+            const container = document.getElementById('contenutoFinale');
+            
+            if(!finale) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h2>🏆 FINALE NON ANCORA GIOCATA</h2>
+                        <p>La partita finale non è stata ancora giocata o salvata.</p>
+                        <p style="margin-top: 20px; font-size: 0.9em;">
+                            L'amministratore deve prima impostare e salvare la finale nell'area Admin.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Trova nomi giocatori migliori
+            const migliorGiocatoreNome = giocatori.find(g => g.id === finale.migliorGiocatore)?.nome || 'N/A';
+            const migliorPortiereNome = finale.migliorPortiere ? 
+                giocatori.find(g => g.id === finale.migliorPortiere)?.nome || 'N/A' : 'Nessuno';
+            
+            // Calcola eventi per squadra
+            const eventiCasa = finale.eventi.filter(e => e.squadra === 'casa');
+            const eventiOspite = finale.eventi.filter(e => e.squadra === 'ospite');
+            
+            const golCasa = eventiCasa.filter(e => e.tipo === 'gol').length;
+            const ammonizioniCasa = eventiCasa.filter(e => e.tipo === 'amm').length;
+            const espulsioniCasa = eventiCasa.filter(e => e.tipo === 'esp').length;
+            
+            const golOspite = eventiOspite.filter(e => e.tipo === 'gol').length;
+            const ammonizioniOspite = eventiOspite.filter(e => e.tipo === 'amm').length;
+            const espulsioniOspite = eventiOspite.filter(e => e.tipo === 'esp').length;
+            
+            container.innerHTML = `
+                <div class="partita-finale">
+                    <div class="data-partita">
+                        <strong>Data:</strong> ${finale.data} ${finale.ora}
+                    </div>
+                    
+                    <div class="risultato-finale">
+                        ${finale.squadraCasa} ${finale.golCasa} - ${finale.golOspite} ${finale.squadraOspite}
+                    </div>
+                    
+                    <div class="dettagli-partita">
+                        <div class="squadra-finale">
+                            <div class="squadra-titolo">${finale.squadraCasa}</div>
+                            <div class="eventi-squadra">
+                                <div class="evento-item"><span>⚽ Gol</span><span class="icona-gol">${golCasa}</span></div>
+                                <div class="evento-item"><span>🟨 Ammonizioni</span><span class="icona-amm">${ammonizioniCasa}</span></div>
+                                <div class="evento-item"><span>🟥 Espulsioni</span><span class="icona-esp">${espulsioniCasa}</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="squadra-finale">
+                            <div class="squadra-titolo">${finale.squadraOspite}</div>
+                            <div class="eventi-squadra">
+                                <div class="evento-item"><span>⚽ Gol</span><span class="icona-gol">${golOspite}</span></div>
+                                <div class="evento-item"><span>🟨 Ammonizioni</span><span class="icona-amm">${ammonizioniOspite}</span></div>
+                                <div class="evento-item"><span>🟥 Espulsioni</span><span class="icona-esp">${espulsioniOspite}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="migliori-finale">
+                        <div class="migliori-titolo">🎖️ PREMI DELLA FINALE</div>
+                        <div class="migliori-dettagli">
+                            <div class="miglior-item">
+                                <div style="font-weight: bold; color: #1976D2;">🏆 MIGLIOR GIOCATORE</div>
+                                <div style="font-size: 1.2em; margin: 10px 0;">${migliorGiocatoreNome}</div>
+                                <div style="color: #FFD700; font-weight: bold;">Voto: ${finale.votoMigliorGiocatore}/10</div>
+                            </div>
+                            
+                            <div class="miglior-item">
+                                <div style="font-weight: bold; color: #1976D2;">🥅 MIGLIOR PORTIERE</div>
+                                <div style="font-size: 1.2em; margin: 10px 0;">${migliorPortiereNome}</div>
+                                ${finale.votoMigliorPortiere > 0 ? 
+                                    `<div style="color: #FFD700; font-weight: bold;">Voto: ${finale.votoMigliorPortiere}/10</div>` : 
+                                    `<div style="color: #666; font-style: italic;">Nessun voto assegnato</div>`
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function tornaIndietro() {
+            window.location.href = 'main.html';
+        }
+        
+        // Controllo accesso
+        if(localStorage.getItem('rovigoal_entrato') !== 'true') {
+            window.location.href = 'index.html';
+        }
+        
+        // Carica la finale all'avvio
+        caricaFinale();
+        
+        // Aggiorna ogni 30 secondi
+        setInterval(caricaFinale, 30000);
+    </script>
+</body>
+</html>

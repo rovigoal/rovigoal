@@ -951,25 +951,25 @@
             });
             
             // AGGIORNAMENTO IMPORTANTE: Classifiche separate
-            const migliorGiocatore = database.giocatori.find(g => g.id === oggetto.migliorGiocatore);
-            if(migliorGiocatore) {
-                // Se è un giocatore di campo, va nella classifica giocatori
-                if(migliorGiocatore.ruolo === 'Giocatore') {
-                    migliorGiocatore.punteggioTotale = (migliorGiocatore.punteggioTotale || 0) + oggetto.votoGiocatore;
-                    migliorGiocatore.premiMigliorGiocatore = (migliorGiocatore.premiMigliorGiocatore || 0) + 1;
-                }
-                // Se è un portiere, NON entra nella classifica giocatori
-            }
-            
-            // Se c'è un miglior portiere selezionato
-            if(oggetto.migliorPortiere && oggetto.votoPortiere > 0) {
-                const migliorPortiere = database.giocatori.find(g => g.id === oggetto.migliorPortiere);
-                if(migliorPortiere && migliorPortiere.ruolo === 'Portiere') {
-                    // Portieri vanno SOLO nella classifica portieri
-                    migliorPortiere.punteggioTotale = (migliorPortiere.punteggioTotale || 0) + oggetto.votoPortiere;
-                    migliorPortiere.premiMigliorPortiere = (migliorPortiere.premiMigliorPortiere || 0) + 1;
-                }
-            }
+const migliorGiocatore = database.giocatori.find(g => g.id === oggetto.migliorGiocatore);
+if(migliorGiocatore) {
+    // Se è un giocatore di campo, va nella classifica giocatori
+    if(migliorGiocatore.ruolo === 'Giocatore') {
+        migliorGiocatore.punteggioTotale = (migliorGiocatore.punteggioTotale || 0) + oggetto.votoGiocatore;
+        migliorGiocatore.premiMigliorGiocatore = (migliorGiocatore.premiMigliorGiocatore || 0) + 1;
+    }
+    // Se è un portiere, NON entra nella classifica giocatori
+}
+
+// Se c'è un miglior portiere selezionato
+if(oggetto.migliorPortiere && oggetto.votoPortiere > 0) {
+    const migliorPortiere = database.giocatori.find(g => g.id === oggetto.migliorPortiere);
+    if(migliorPortiere && migliorPortiere.ruolo === 'Portiere') {
+        // Portieri vanno SOLO nella classifica portieri
+        migliorPortiere.punteggioTotale = (migliorPortiere.punteggioTotale || 0) + oggetto.votoPortiere;
+        migliorPortiere.premiMigliorPortiere = (migliorPortiere.premiMigliorPortiere || 0) + 1;
+    }
+}
             
             if(modalita === 'normale') {
                 // Salva partita normale
@@ -1261,4 +1261,5 @@
     </script>
 </body>
 </html>
+
 

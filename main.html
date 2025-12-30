@@ -9,27 +9,207 @@
         body { font-family: 'Arial', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 20px; }
         .header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 25px; text-align: center; border-radius: 15px; margin-bottom: 40px; box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
         .header h1 { font-size: 2.8em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-        .menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; max-width: 1400px; margin: 0 auto; padding: 20px; }
-        .pulsante { background: white; padding: 60px 20px; border-radius: 20px; text-align: center; font-size: 1.5em; font-weight: bold; cursor: pointer; transition: all 0.3s ease; border: 3px solid transparent; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        
+        /* MENU PRINCIPALE - DESKTOP E MOBILE */
+        .menu { 
+            display: grid; 
+            grid-template-columns: repeat(5, 1fr);
+            gap: 25px; 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        
+        .pulsante { 
+            background: white; 
+            padding: 40px 15px; 
+            border-radius: 20px; 
+            text-align: center; 
+            font-size: 1.3em; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            border: 3px solid transparent; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
         .pulsante:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        
         .pulsante:nth-child(1) { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #333; }
         .pulsante:nth-child(2) { background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); color: white; }
         .pulsante:nth-child(3) { background: linear-gradient(135deg, #32CD32 0%, #228B22 100%); color: white; }
         .pulsante:nth-child(4) { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #333; border: 3px solid gold; }
-        .pulsante:nth-child(5) { background: linear-gradient(135deg, #FF4500 0%, #DC143C 100%); color: white; }
-        .icona { font-size: 3em; display: block; margin-bottom: 15px; }
-        .logout { display: block; margin: 50px auto 0; padding: 15px 40px; background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%); color: white; border: none; border-radius: 30px; cursor: pointer; font-size: 1.2em; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        
+        /* PULSANTE ADMIN SPECIALE - DESKTOP */
+        .pulsante.admin-desktop { 
+            background: linear-gradient(135deg, #FF4500 0%, #DC143C 100%); 
+            color: white; 
+        }
+        
+        /* PULSANTE ADMIN MOBILE - NASCOSTO SU DESKTOP */
+        .admin-mobile-container {
+            display: none;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .admin-mobile {
+            background: linear-gradient(135deg, #FF4500 0%, #DC143C 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        
+        .admin-mobile:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .icona { 
+            font-size: 2.5em; 
+            display: block; 
+            margin-bottom: 10px; 
+        }
+        
+        .logout { 
+            display: block; 
+            margin: 50px auto 0; 
+            padding: 15px 40px; 
+            background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%); 
+            color: white; 
+            border: none; 
+            border-radius: 30px; 
+            cursor: pointer; 
+            font-size: 1.2em; 
+            font-weight: bold; 
+            transition: all 0.3s ease; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); 
+        }
+        
         .logout:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        
         .info-footer { text-align: center; margin-top: 30px; color: #666; font-size: 0.9em; }
-        .stats-summary { display: flex; justify-content: center; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
-        .stat-box { background: rgba(255,255,255,0.9); padding: 10px 20px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); text-align: center; min-width: 150px; }
+        
+        .stats-summary { 
+            display: flex; 
+            justify-content: center; 
+            gap: 20px; 
+            margin-top: 20px; 
+            flex-wrap: wrap; 
+        }
+        
+        .stat-box { 
+            background: rgba(255,255,255,0.9); 
+            padding: 10px 20px; 
+            border-radius: 10px; 
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1); 
+            text-align: center; 
+            min-width: 150px; 
+        }
+        
         .stat-number { font-size: 1.5em; font-weight: bold; color: #1e3c72; }
         .stat-label { font-size: 0.8em; color: #666; margin-top: 5px; }
+        
+        /* MEDIA QUERY PER MOBILE */
+        @media (max-width: 1024px) {
+            .menu { 
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+            }
+            
+            .pulsante { 
+                padding: 30px 10px;
+                font-size: 1.1em;
+            }
+            
+            .icona {
+                font-size: 2em;
+            }
+        }
+        
         @media (max-width: 768px) {
-            .menu { grid-template-columns: 1fr; }
-            .header h1 { font-size: 2em; }
-            .pulsante { padding: 40px 20px; }
-            .stats-summary { flex-direction: column; align-items: center; }
+            .menu { 
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .header h1 { 
+                font-size: 2em; 
+            }
+            
+            .pulsante { 
+                padding: 25px 10px;
+                font-size: 1em;
+                border-radius: 15px;
+            }
+            
+            .icona {
+                font-size: 1.8em;
+                margin-bottom: 8px;
+            }
+            
+            /* NASCONDI ADMIN DAL MENU PRINCIPALE SU MOBILE */
+            .pulsante.admin-desktop {
+                display: none;
+            }
+            
+            /* MOSTRA PULSANTE ADMIN MOBILE */
+            .admin-mobile-container {
+                display: block;
+            }
+            
+            .stats-summary { 
+                flex-direction: column; 
+                align-items: center; 
+                gap: 10px;
+            }
+            
+            .stat-box {
+                min-width: 120px;
+                padding: 8px 15px;
+            }
+            
+            .stat-number {
+                font-size: 1.3em;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .menu { 
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .pulsante { 
+                padding: 20px 10px;
+            }
+            
+            .icona {
+                font-size: 1.5em;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .admin-mobile {
+                padding: 10px 20px;
+                font-size: 0.9em;
+            }
         }
     </style>
 </head>
@@ -45,7 +225,14 @@
         <div class="pulsante" onclick="apriSquadra()"><span class="icona">👥</span>SQUADRA</div>
         <div class="pulsante" onclick="apriStatistiche()"><span class="icona">📊</span>STATISTICHE</div>
         <div class="pulsante" onclick="apriFinale()"><span class="icona">🥇</span>FINALE</div>
-        <div class="pulsante" onclick="apriAdmin()"><span class="icona">🔧</span>ADMIN</div>
+        <div class="pulsante admin-desktop" onclick="apriAdmin()"><span class="icona">🔧</span>ADMIN</div>
+    </div>
+    
+    <!-- PULSANTE ADMIN PER MOBILE -->
+    <div class="admin-mobile-container">
+        <button class="admin-mobile" onclick="apriAdmin()">
+            <span>🔧</span> AREA ADMIN
+        </button>
     </div>
     
     <button class="logout" onclick="logout()">ESCI</button>

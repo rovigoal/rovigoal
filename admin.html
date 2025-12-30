@@ -935,35 +935,45 @@ window.onDatabaseUpdate = function(type, data) {
         }
         
         function caricaSelezioneMigliori(squadraCasa, squadraOspite, modalita) {
-            const giocatoriPartita = databaseData.giocatori.filter(g => 
-                g.squadra === squadraCasa || g.squadra === squadraOspite
-            );
-            
-            if(modalita === 'normale') {
-                // Popola miglior giocatore (solo giocatori di campo)
-                const selectGiocatore = document.getElementById('migliorGiocatore');
-                selectGiocatore.innerHTML = '<option value="">-- Seleziona --</option>';
-                
-                giocatoriPartita.forEach(g => {
-                    if(g.ruolo === 'Giocatore') {
-                        const option = document.createElement('option');
-                        option.value = g.id;
-                        option.textContent = `${g.nome} (${g.squadra})`;
-                        selectGiocatore.appendChild(option);
-                    }
-                });
-                
-                // Popola selezioni portieri
-                popolaPortieri('portiereCasa', squadraCasa);
-                popolaPortieri('portiereOspite', squadraOspite);
-                
-                // Reset
+    const giocatoriPartita = databaseData.giocatori.filter(g => 
+        g.squadra === squadraCasa || g.squadra === squadraOspite
+    );
+    
+    if(modalita === 'normale') {
+        // Popola miglior giocatore (solo giocatori di campo)
+        const selectGiocatore = document.getElementById('migliorGiocatore');
+        selectGiocatore.innerHTML = '<option value="">-- Seleziona --</option>';
+        
+        giocatoriPartita.forEach(g => {
+            if(g.ruolo === 'Giocatore') {
+                const option = document.createElement('option');
+                option.value = g.id;
+                option.textContent = `${g.nome} (${g.squadra})`;
+                selectGiocatore.appendChild(option);
+            }
+        });
+        
+        // Aggiungi listener per salvare la selezione
+        selectGiocatore.onchange = function() {
+            if(this.value) {
+                partitaInCorso.migliorGiocatore = parseInt(this.value);
+                console.log(`Miglior giocatore selezionato: ID ${partitaInCorso.migliorGiocatore}`);
+            } else {
                 partitaInCorso.migliorGiocatore = null;
-                partitaInCorso.votoGiocatore = 0;
-                partitaInCorso.portiereCasa = null;
-                partitaInCorso.portiereOspite = null;
-                partitaInCorso.votoPortiereCasa = 0;
-                partitaInCorso.votoPortiereOspite = 0;
+            }
+        };
+        
+        // Popola selezioni portieri
+        popolaPortieri('portiereCasa', squadraCasa);
+        popolaPortieri('portiereOspite', squadraOspite);
+        
+        // Reset
+        partitaInCorso.migliorGiocatore = null;
+        partitaInCorso.votoGiocatore = 0;
+        partitaInCorso.portiereCasa = null;
+        partitaInCorso.portiereOspite = null;
+        partitaInCorso.votoPortiereCasa = 0;
+        partitaInCorso.votoPortiereOspite = 0;
                 
                 document.getElementById('voto-miglior-giocatore-attuale').textContent = 'N/A';
                 document.getElementById('voto-portiere-casa-attuale').textContent = 'N/A';
@@ -1728,4 +1738,5 @@ window.onDatabaseUpdate = function(type, data) {
     </script>
 </body>
 </html>
+
 

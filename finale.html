@@ -28,6 +28,7 @@
             text-align: center;
             box-shadow: 0 8px 25px rgba(0,0,0,0.3);
             border: 3px solid gold;
+            position: relative;
         }
         
         .header h1 {
@@ -48,6 +49,12 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             color: #333;
             margin-bottom: 30px;
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .risultato-finale {
@@ -59,6 +66,13 @@
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             border-radius: 10px;
             border: 3px solid gold;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
         }
         
         .dettagli-partita {
@@ -79,6 +93,12 @@
             padding: 20px;
             border-radius: 10px;
             border: 2px solid #dee2e6;
+            transition: transform 0.3s ease;
+        }
+        
+        .squadra-finale:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .squadra-titolo {
@@ -100,6 +120,11 @@
             border-bottom: 1px solid #eee;
             display: flex;
             justify-content: space-between;
+            transition: background-color 0.2s;
+        }
+        
+        .evento-item:hover {
+            background-color: #f5f5f5;
         }
         
         .evento-item:last-child {
@@ -112,6 +137,12 @@
             border-radius: 10px;
             margin-top: 20px;
             border: 2px solid #2196F3;
+            animation: fadeIn 1s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         .migliori-titolo {
@@ -128,12 +159,29 @@
             gap: 15px;
         }
         
+        @media (max-width: 768px) {
+            .migliori-dettagli {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         .miglior-item {
             background: white;
             padding: 15px;
             border-radius: 8px;
             border: 1px solid #ddd;
             text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .miglior-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .miglior-item.winner {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            border: 2px solid gold;
         }
         
         .btn-back {
@@ -153,6 +201,7 @@
         .btn-back:hover {
             opacity: 0.9;
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         
         .empty-state {
@@ -162,6 +211,7 @@
             background: white;
             border-radius: 10px;
             border: 2px dashed #ddd;
+            animation: fadeIn 0.5s ease;
         }
         
         .data-partita {
@@ -171,30 +221,307 @@
             margin-bottom: 20px;
         }
         
-        .icona-gol { color: #32CD32; }
-        .icona-amm { color: #FFD700; }
-        .icona-esp { color: #DC143C; }
+        .icona-gol { color: #32CD32; font-weight: bold; }
+        .icona-amm { color: #FFD700; font-weight: bold; }
+        .icona-esp { color: #DC143C; font-weight: bold; }
+        
+        /* STATO CONNESSIONE */
+        .connessione-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .connessione-ok {
+            background: #4CAF50;
+            color: white;
+            border: 2px solid #45a049;
+        }
+        
+        .connessione-caricamento {
+            background: #FFA500;
+            color: white;
+            border: 2px solid #FF8C00;
+        }
+        
+        .connessione-ko {
+            background: #f44336;
+            color: white;
+            border: 2px solid #d32f2f;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* NOTIFICA AGGIORNAMENTO */
+        .notifica-aggiornamento {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 9999;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2s forwards;
+            font-weight: bold;
+            display: none;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; transform: translateX(100%); }
+        }
+        
+        /* VINCITORE EVIDENZIATO */
+        .vincitore {
+            animation: glow 2s infinite;
+        }
+        
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px gold; }
+            50% { box-shadow: 0 0 20px gold, 0 0 30px gold; }
+            100% { box-shadow: 0 0 5px gold; }
+        }
+        
+        /* INFO AGGIORNAMENTO */
+        .info-aggiornamento {
+            text-align: center;
+            color: #FFD700;
+            font-size: 0.9em;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        /* MEDIA QUERY MOBILE */
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .risultato-finale {
+                font-size: 2em;
+                padding: 15px;
+            }
+            
+            .partita-finale {
+                padding: 20px;
+            }
+            
+            .connessione-status {
+                top: 5px;
+                right: 5px;
+                padding: 4px 8px;
+                font-size: 0.7em;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .risultato-finale {
+                font-size: 1.8em;
+            }
+            
+            .squadra-titolo {
+                font-size: 1.3em;
+            }
+            
+            .migliori-titolo {
+                font-size: 1.2em;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- NOTIFICA AGGIORNAMENTO -->
+    <div id="notificaAggiornamento" class="notifica-aggiornamento">
+        🔄 Finale aggiornata in tempo reale!
+    </div>
+    
     <div class="header">
         <h1>🏆 PARTITA FINALE</h1>
         <p>La grande finale del torneo Rovigoal</p>
+        
+        <!-- STATO CONNESSIONE -->
+        <div id="connessioneStatus" class="connessione-status connessione-caricamento">
+            <div class="loading"></div> Caricamento...
+        </div>
     </div>
     
     <div class="container">
-        <div id="contenutoFinale"></div>
+        <!-- INFO AGGIORNAMENTO -->
+        <div class="info-aggiornamento" id="infoAggiornamento">
+            Aggiornamento in tempo reale attivo
+        </div>
+        
+        <div id="contenutoFinale">
+            <!-- La finale verrà caricata qui -->
+            <div class="empty-state">
+                <h2>🏆 Caricamento finale...</h2>
+                <p>Recupero dei dati della partita finale</p>
+                <div class="loading" style="margin: 20px auto; border: 3px solid #ddd; border-top-color: #1e3c72; width: 40px; height: 40px;"></div>
+            </div>
+        </div>
         
         <button class="btn-back" onclick="tornaIndietro()">← TORNA ALLA HOME</button>
     </div>
     
-    <script>
-        function caricaFinale() {
-            const finale = JSON.parse(localStorage.getItem('rovigoal_finale')) || null;
-            const giocatori = JSON.parse(localStorage.getItem('rovigoal_giocatori')) || [];
+    <script type="module">
+        // Importa il gestore database Supabase
+        import database from './database-supabase.js';
+        
+        // VARIABILI GLOBALI
+        let finaleData = null;
+        let giocatoriData = [];
+        let ultimoAggiornamento = null;
+        let contatoreAggiornamenti = 0;
+        
+        // INIZIALIZZAZIONE
+        document.addEventListener('DOMContentLoaded', async function() {
+            aggiornaStatoConnessione('caricamento');
+            
+            try {
+                // Prima controlla se ci sono dati in cache
+                await caricaDaCache();
+                
+                // Poi carica dati freschi da Supabase
+                await caricaDatiIniziali();
+                
+                // Setup listener in tempo reale
+                setupRealtimeListeners();
+                
+                aggiornaStatoConnessione('ok');
+                
+                // Mostra la finale
+                mostraFinale();
+                
+            } catch (error) {
+                console.error('Errore caricamento finale:', error);
+                aggiornaStatoConnessione('ko');
+                mostraErrore('Errore nel caricamento della finale. Riprova più tardi.');
+            }
+        });
+        
+        // CARICA DATI DA CACHE
+        async function caricaDaCache() {
+            try {
+                const cacheFinale = sessionStorage.getItem('cache_finale');
+                const cacheGiocatori = sessionStorage.getItem('cache_giocatori');
+                
+                if (cacheFinale && cacheGiocatori) {
+                    finaleData = JSON.parse(cacheFinale);
+                    giocatoriData = JSON.parse(cacheGiocatori);
+                    
+                    console.log('Dati caricati dalla cache:', {
+                        finale: !!finaleData,
+                        giocatori: giocatoriData.length
+                    });
+                    
+                    // Mostra subito i dati dalla cache
+                    mostraFinale();
+                    
+                    // Poi aggiorna con i dati freschi
+                    return true;
+                }
+            } catch (error) {
+                console.warn('Errore caricamento cache:', error);
+            }
+            return false;
+        }
+        
+        // CARICA DATI INIZIALI DA SUPABASE
+        async function caricaDatiIniziali() {
+            try {
+                // Carica dati in parallelo
+                const [finale, giocatori] = await Promise.all([
+                    database.getFinale(),
+                    database.getGiocatori()
+                ]);
+                
+                // Aggiorna dati
+                finaleData = finale;
+                giocatoriData = giocatori || [];
+                
+                ultimoAggiornamento = new Date();
+                
+                console.log('Dati Supabase caricati:', {
+                    finale: !!finaleData,
+                    giocatori: giocatoriData.length
+                });
+                
+                // Aggiorna cache
+                sessionStorage.setItem('cache_finale', JSON.stringify(finaleData));
+                sessionStorage.setItem('cache_giocatori', JSON.stringify(giocatoriData));
+                
+            } catch (error) {
+                console.error('Errore nel caricamento iniziale:', error);
+                throw error;
+            }
+        }
+        
+        // SETUP LISTENER TEMPO REALE
+        function setupRealtimeListeners() {
+            // Ascolta aggiornamenti dal database Supabase
+            window.onDatabaseUpdate = function(type, data) {
+                console.log(`Aggiornamento finale: ${type}`);
+                
+                // Aggiorna i dati locali
+                if (type === 'finale') {
+                    finaleData = data || null;
+                    sessionStorage.setItem('cache_finale', JSON.stringify(data));
+                } else if (type === 'giocatori') {
+                    giocatoriData = data || [];
+                    sessionStorage.setItem('cache_giocatori', JSON.stringify(data));
+                }
+                
+                ultimoAggiornamento = new Date();
+                contatoreAggiornamenti++;
+                
+                // Aggiorna l'interfaccia
+                mostraFinale();
+                aggiornaStatoConnessione('ok');
+                aggiornaInfoAggiornamento();
+                
+                // Mostra notifica
+                if (type === 'finale') {
+                    mostraNotificaAggiornamento();
+                }
+            };
+        }
+        
+        // MOSTRA LA FINALE
+        function mostraFinale() {
             const container = document.getElementById('contenutoFinale');
             
-            if(!finale) {
+            if (!finaleData) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <h2>🏆 FINALE NON ANCORA GIOCATA</h2>
@@ -202,19 +529,35 @@
                         <p style="margin-top: 20px; font-size: 0.9em;">
                             L'amministratore deve prima impostare e salvare la finale nell'area Admin.
                         </p>
+                        <div style="margin-top: 20px;">
+                            <button onclick="location.reload()" style="padding: 8px 20px; background: #1e3c72; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                                🔄 Ricarica
+                            </button>
+                        </div>
                     </div>
                 `;
                 return;
             }
             
+            // Determina vincitore
+            const vincitore = finaleData.gol_casa > finaleData.gol_ospite ? 
+                finaleData.squadra_casa : 
+                finaleData.gol_ospite > finaleData.gol_casa ? 
+                    finaleData.squadra_ospite : 'PAREGGIO';
+            
             // Trova nomi giocatori migliori
-            const migliorGiocatoreNome = giocatori.find(g => g.id === finale.migliorGiocatore)?.nome || 'N/A';
-            const migliorPortiereNome = finale.migliorPortiere ? 
-                giocatori.find(g => g.id === finale.migliorPortiere)?.nome || 'N/A' : 'Nessuno';
+            const migliorGiocatore = giocatoriData.find(g => g.id === finaleData.miglior_giocatore);
+            const migliorGiocatoreNome = migliorGiocatore ? migliorGiocatore.nome : 'N/A';
+            
+            const portiereCasa = giocatoriData.find(g => g.id === finaleData.portiere_casa);
+            const portiereOspite = giocatoriData.find(g => g.id === finaleData.portiere_ospite);
+            const portiereCasaNome = portiereCasa ? portiereCasa.nome : 'N/A';
+            const portiereOspiteNome = portiereOspite ? portiereOspite.nome : 'N/A';
             
             // Calcola eventi per squadra
-            const eventiCasa = finale.eventi.filter(e => e.squadra === 'casa');
-            const eventiOspite = finale.eventi.filter(e => e.squadra === 'ospite');
+            const eventi = finaleData.eventi || [];
+            const eventiCasa = eventi.filter(e => e.squadra === 'casa');
+            const eventiOspite = eventi.filter(e => e.squadra === 'ospite');
             
             const golCasa = eventiCasa.filter(e => e.tipo === 'gol').length;
             const ammonizioniCasa = eventiCasa.filter(e => e.tipo === 'amm').length;
@@ -224,73 +567,227 @@
             const ammonizioniOspite = eventiOspite.filter(e => e.tipo === 'amm').length;
             const espulsioniOspite = eventiOspite.filter(e => e.tipo === 'esp').length;
             
+            // Determina classe vincitore per animazione
+            const classeVincitoreCasa = finaleData.gol_casa > finaleData.gol_ospite ? 'vincitore' : '';
+            const classeVincitoreOspite = finaleData.gol_ospite > finaleData.gol_casa ? 'vincitore' : '';
+            
             container.innerHTML = `
                 <div class="partita-finale">
                     <div class="data-partita">
-                        <strong>Data:</strong> ${finale.data} ${finale.ora}
+                        <strong>Data:</strong> ${finaleData.data || 'N/D'} ${finaleData.ora || ''}
+                        ${ultimoAggiornamento ? 
+                            `<br><small>Ultimo aggiornamento: ${ultimoAggiornamento.toLocaleTimeString('it-IT')}</small>` : 
+                            ''
+                        }
                     </div>
                     
                     <div class="risultato-finale">
-                        ${finale.squadraCasa} ${finale.golCasa} - ${finale.golOspite} ${finale.squadraOspite}
+                        <div class="${classeVincitoreCasa}">${finaleData.squadra_casa}</div>
+                        <div>${finaleData.gol_casa || 0} - ${finaleData.gol_ospite || 0}</div>
+                        <div class="${classeVincitoreOspite}">${finaleData.squadra_ospite}</div>
                     </div>
                     
+                    ${vincitore !== 'PAREGGIO' ? `
+                        <div style="text-align: center; margin: 15px 0;">
+                            <div style="background: gold; color: #333; padding: 10px 20px; border-radius: 20px; display: inline-block; font-weight: bold; font-size: 1.2em;">
+                                🏆 VINCITORE: ${vincitore} 🏆
+                            </div>
+                        </div>
+                    ` : `
+                        <div style="text-align: center; margin: 15px 0;">
+                            <div style="background: silver; color: #333; padding: 10px 20px; border-radius: 20px; display: inline-block; font-weight: bold; font-size: 1.2em;">
+                                ⚖️ PAREGGIO ⚖️
+                            </div>
+                        </div>
+                    `}
+                    
                     <div class="dettagli-partita">
-                        <div class="squadra-finale">
-                            <div class="squadra-titolo">${finale.squadraCasa}</div>
+                        <div class="squadra-finale ${classeVincitoreCasa}">
+                            <div class="squadra-titolo">${finaleData.squadra_casa}</div>
                             <div class="eventi-squadra">
                                 <div class="evento-item"><span>⚽ Gol</span><span class="icona-gol">${golCasa}</span></div>
                                 <div class="evento-item"><span>🟨 Ammonizioni</span><span class="icona-amm">${ammonizioniCasa}</span></div>
                                 <div class="evento-item"><span>🟥 Espulsioni</span><span class="icona-esp">${espulsioniCasa}</span></div>
                             </div>
+                            ${portiereCasa ? `
+                                <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;">
+                                    <strong>🥅 Portiere:</strong> ${portiereCasaNome}
+                                    ${finaleData.voto_portiere_casa ? 
+                                        `<span style="color: #FFD700; font-weight: bold;"> (Voto: ${finaleData.voto_portiere_casa}/10)</span>` : 
+                                        ''
+                                    }
+                                </div>
+                            ` : ''}
                         </div>
                         
-                        <div class="squadra-finale">
-                            <div class="squadra-titolo">${finale.squadraOspite}</div>
+                        <div class="squadra-finale ${classeVincitoreOspite}">
+                            <div class="squadra-titolo">${finaleData.squadra_ospite}</div>
                             <div class="eventi-squadra">
                                 <div class="evento-item"><span>⚽ Gol</span><span class="icona-gol">${golOspite}</span></div>
                                 <div class="evento-item"><span>🟨 Ammonizioni</span><span class="icona-amm">${ammonizioniOspite}</span></div>
                                 <div class="evento-item"><span>🟥 Espulsioni</span><span class="icona-esp">${espulsioniOspite}</span></div>
                             </div>
+                            ${portiereOspite ? `
+                                <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;">
+                                    <strong>🥅 Portiere:</strong> ${portiereOspiteNome}
+                                    ${finaleData.voto_portiere_ospite ? 
+                                        `<span style="color: #FFD700; font-weight: bold;"> (Voto: ${finaleData.voto_portiere_ospite}/10)</span>` : 
+                                        ''
+                                    }
+                                </div>
+                            ` : ''}
                         </div>
                     </div>
                     
                     <div class="migliori-finale">
                         <div class="migliori-titolo">🎖️ PREMI DELLA FINALE</div>
                         <div class="migliori-dettagli">
-                            <div class="miglior-item">
+                            <div class="miglior-item ${migliorGiocatore ? 'winner' : ''}">
                                 <div style="font-weight: bold; color: #1976D2;">🏆 MIGLIOR GIOCATORE</div>
                                 <div style="font-size: 1.2em; margin: 10px 0;">${migliorGiocatoreNome}</div>
-                                <div style="color: #FFD700; font-weight: bold;">Voto: ${finale.votoMigliorGiocatore}/10</div>
+                                ${finaleData.voto_miglior_giocatore ? 
+                                    `<div style="color: #FFD700; font-weight: bold;">Voto: ${finaleData.voto_miglior_giocatore}/10</div>` : 
+                                    `<div style="color: #666; font-style: italic;">Nessun voto assegnato</div>`
+                                }
+                                ${migliorGiocatore ? `
+                                    <div style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                                        ${migliorGiocatore.squadra ? `Squadra: ${migliorGiocatore.squadra}` : ''}
+                                        ${migliorGiocatore.numero ? ` | #${migliorGiocatore.numero}` : ''}
+                                    </div>
+                                ` : ''}
                             </div>
                             
                             <div class="miglior-item">
-                                <div style="font-weight: bold; color: #1976D2;">🥅 MIGLIOR PORTIERE</div>
-                                <div style="font-size: 1.2em; margin: 10px 0;">${migliorPortiereNome}</div>
-                                ${finale.votoMigliorPortiere > 0 ? 
-                                    `<div style="color: #FFD700; font-weight: bold;">Voto: ${finale.votoMigliorPortiere}/10</div>` : 
-                                    `<div style="color: #666; font-style: italic;">Nessun voto assegnato</div>`
-                                }
+                                <div style="font-weight: bold; color: #1976D2;">🥅 PORTIERI DELLA FINALE</div>
+                                <div style="margin: 10px 0;">
+                                    <div><strong>Casa:</strong> ${portiereCasaNome}</div>
+                                    ${finaleData.voto_portiere_casa ? 
+                                        `<div style="color: #FFD700;">Voto: ${finaleData.voto_portiere_casa}/10</div>` : 
+                                        `<div style="color: #666; font-style: italic;">Nessun voto</div>`
+                                    }
+                                </div>
+                                <div style="margin: 10px 0;">
+                                    <div><strong>Ospite:</strong> ${portiereOspiteNome}</div>
+                                    ${finaleData.voto_portiere_ospite ? 
+                                        `<div style="color: #FFD700;">Voto: ${finaleData.voto_portiere_ospite}/10</div>` : 
+                                        `<div style="color: #666; font-style: italic;">Nessun voto</div>`
+                                    }
+                                </div>
                             </div>
                         </div>
+                        
+                        ${eventi.length > 0 ? `
+                            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #b3d9ff;">
+                                <h4 style="color: #1976D2; margin-bottom: 10px;">📝 Eventi della Finale</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div>
+                                        <strong>${finaleData.squadra_casa}:</strong>
+                                        ${eventiCasa.map(evento => {
+                                            let icona = '📝';
+                                            if (evento.tipo === 'gol') icona = '⚽';
+                                            else if (evento.tipo === 'amm') icona = '🟨';
+                                            else if (evento.tipo === 'esp') icona = '🟥';
+                                            
+                                            return `<div style="padding: 5px; font-size: 0.9em;">${icona} ${evento.giocatoreNome || 'Giocatore'}</div>`;
+                                        }).join('')}
+                                        ${eventiCasa.length === 0 ? '<div style="padding: 5px; color: #666; font-style: italic;">Nessun evento</div>' : ''}
+                                    </div>
+                                    <div>
+                                        <strong>${finaleData.squadra_ospite}:</strong>
+                                        ${eventiOspite.map(evento => {
+                                            let icona = '📝';
+                                            if (evento.tipo === 'gol') icona = '⚽';
+                                            else if (evento.tipo === 'amm') icona = '🟨';
+                                            else if (evento.tipo === 'esp') icona = '🟥';
+                                            
+                                            return `<div style="padding: 5px; font-size: 0.9em;">${icona} ${evento.giocatoreNome || 'Giocatore'}</div>`;
+                                        }).join('')}
+                                        ${eventiOspite.length === 0 ? '<div style="padding: 5px; color: #666; font-style: italic;">Nessun evento</div>' : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
             `;
         }
         
+        // FUNZIONI AUSILIARIE
+        function aggiornaStatoConnessione(stato) {
+            const statusElement = document.getElementById('connessioneStatus');
+            
+            switch(stato) {
+                case 'caricamento':
+                    statusElement.className = 'connessione-status connessione-caricamento';
+                    statusElement.innerHTML = '<div class="loading"></div> Caricamento finale...';
+                    break;
+                    
+                case 'ok':
+                    statusElement.className = 'connessione-status connessione-ok';
+                    statusElement.innerHTML = '✓ Connesso in tempo reale';
+                    break;
+                    
+                case 'ko':
+                    statusElement.className = 'connessione-status connessione-ko';
+                    statusElement.innerHTML = '✗ Disconnesso';
+                    break;
+            }
+        }
+        
+        function aggiornaInfoAggiornamento() {
+            const elemento = document.getElementById('infoAggiornamento');
+            if (contatoreAggiornamenti > 0) {
+                elemento.textContent = `Aggiornata ${contatoreAggiornamenti} volte in tempo reale`;
+                elemento.style.animation = 'pulse 2s infinite';
+            }
+        }
+        
+        function mostraNotificaAggiornamento() {
+            const notifica = document.getElementById('notificaAggiornamento');
+            notifica.textContent = `🔄 Finale aggiornata! (${++contatoreAggiornamenti} aggiornamenti)`;
+            notifica.style.display = 'block';
+            
+            setTimeout(() => {
+                notifica.style.display = 'none';
+            }, 3000);
+        }
+        
+        function mostraErrore(messaggio) {
+            const container = document.getElementById('contenutoFinale');
+            container.innerHTML = `
+                <div class="empty-state" style="color: #f44336;">
+                    <h2>⚠️ Errore di connessione</h2>
+                    <p>${messaggio}</p>
+                    <button onclick="location.reload()" style="margin-top: 15px; padding: 8px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Riprova
+                    </button>
+                </div>
+            `;
+        }
+        
+        // NAVIGAZIONE
         function tornaIndietro() {
             window.location.href = 'main.html';
         }
         
-        // Controllo accesso
-        if(localStorage.getItem('rovigoal_entrato') !== 'true') {
+        // CONTROLLO ACCESSO
+        if (localStorage.getItem('rovigoal_entrato') !== 'true') {
             window.location.href = 'index.html';
         }
         
-        // Carica la finale all'avvio
-        caricaFinale();
+        // CONTROLLO PERIODICO CONNESSIONE
+        setInterval(async () => {
+            try {
+                const test = await database.getFinale();
+                aggiornaStatoConnessione('ok');
+            } catch (error) {
+                aggiornaStatoConnessione('ko');
+            }
+        }, 30000);
         
-        // Aggiorna ogni 30 secondi
-        setInterval(caricaFinale, 30000);
+        // ESPORTA FUNZIONI
+        window.tornaIndietro = tornaIndietro;
+        
     </script>
 </body>
 </html>

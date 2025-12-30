@@ -465,9 +465,15 @@
         <button class="btn btn-back" onclick="tornaMenu()">← TORNA AL MENU</button>
     </div>
 
+    <!-- QUI SOSTITUISCO IL VECCHIO SCRIPT CON IL NUOVO -->
     <script type="module">
-        // Importa il gestore del database Supabase
-        import database from './database-supabase.js';
+        // Importa Supabase direttamente (PRIMA MODIFICA CRITICA)
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
+        
+        // Configurazione Supabase (SECONDA MODIFICA CRITICA)
+        const supabaseUrl = 'https://jgcjhawtmwfsovuegryz.supabase.co'
+        const supabaseAnonKey = 'sb_publishable_X6PIatMpCblUcS487cOMfQ_HfP2GpUq'
+        const supabase = createClient(supabaseUrl, supabaseAnonKey)
         
         // DATABASE IN MEMORIA (sincronizzato con Supabase in tempo reale)
         let databaseData = {
@@ -502,7 +508,13 @@
         document.addEventListener('DOMContentLoaded', async function() {
             inizializzaVoti();
             
-            // Ascolta aggiornamenti dal database
+            // Carica dati iniziali
+            await caricaDatiIniziali();
+            
+            // Setup listener realtime
+            setupRealtimeListeners();
+            
+            // Ascolta aggiornamenti dal database (per compatibilità con altri file)
             window.onDatabaseUpdate = function(type, data) {
                 databaseData[type] = data;
                 
@@ -526,6 +538,108 @@
             setInterval(controllaConnessione, 10000);
         });
         
+        // FUNZIONE PER CARICARE DATI INIZIALI (NUOVA)
+        async function caricaDatiIniziali() {
+            try {
+                // Carica squadre
+                const { data: squadre, error: errSquadre } = await supabase
+                    .from('squadre')
+                    .select('*')
+                    .order('punti', { ascending: false });
+                
+                if (errSquadre) throw errSquadre;
+                databaseData.squadre = squadre || [];
+                
+                // Carica giocatori
+                const { data: giocatori, error: errGiocatori } = await supabase
+                    .from('giocatori')
+                    .select('*');
+                
+                if (errGiocatori) throw errGiocatori;
+                databaseData.giocatori = giocatori || [];
+                
+                // Carica partite
+                const { data: partite, error: errPartite } = await supabase
+                    .from('partite')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (errPartite) throw errPartite;
+                databaseData.partite = partite || [];
+                
+                // Carica finale
+                const { data: finale, error: errFinale } = await supabase
+                    .from('finale')
+                    .select('*')
+                    .limit(1)
+                    .single();
+                
+                if (errFinale && errFinale.code !== 'PGRST116') {
+                    throw errFinale;
+                }
+                databaseData.finale = finale || null;
+                
+                console.log("Dati caricati:", {
+                    squadre: databaseData.squadre.length,
+                    giocatori: databaseData.giocatori.length,
+                    partite: databaseData.partite.length,
+                    finale: !!databaseData.finale
+                });
+                
+                // Aggiorna select
+                caricaSquadreSelect();
+                
+            } catch (error) {
+                console.error("Errore caricamento dati:", error);
+                alert("Errore nel caricamento dei dati dal database");
+            }
+        }
+        
+        // SETUP REALTIME LISTENERS (NUOVA)
+        function setupRealtimeListeners() {
+            // Squadre
+            supabase.channel('squadre-channel')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'squadre' }, 
+                    async () => {
+                        const { data } = await supabase.from('squadre').select('*');
+                        databaseData.squadre = data || [];
+                        if (typeof window.onDatabaseUpdate === 'function') {
+                            window.onDatabaseUpdate('squadre', databaseData.squadre);
+                        }
+                    }
+                )
+                .subscribe();
+            
+            // Giocatori
+            supabase.channel('giocatori-channel')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'giocatori' }, 
+                    async () => {
+                        const { data } = await supabase.from('giocatori').select('*');
+                        databaseData.giocatori = data || [];
+                        if (typeof window.onDatabaseUpdate === 'function') {
+                            window.onDatabaseUpdate('giocatori', databaseData.giocatori);
+                        }
+                    }
+                )
+                .subscribe();
+            
+            // Partite
+            supabase.channel('partite-channel')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'partite' }, 
+                    async () => {
+                        const { data } = await supabase.from('partite').select('*');
+                        databaseData.partite = data || [];
+                        if (typeof window.onDatabaseUpdate === 'function') {
+                            window.onDatabaseUpdate('partite', databaseData.partite);
+                        }
+                    }
+                )
+                .subscribe();
+        }
+        
         function aggiornaStatoConnessione(connesso) {
             const statusElement = document.getElementById('connessioneStatus');
             if(connesso) {
@@ -539,7 +653,7 @@
         
         function controllaConnessione() {
             // Controllo semplice: se non abbiamo dati recenti, forse siamo disconnessi
-            if(databaseData.squadre.length === 0 && database.getSquadre().length > 0) {
+            if(databaseData.squadre.length === 0) {
                 aggiornaStatoConnessione(false);
             }
         }
@@ -701,6 +815,7 @@
             document.getElementById('gestionePartite').classList.remove('attiva');
         }
         
+        // AGGIUNGI SQUADRA - VERSIONE CORRETTA CON SUPABASE DIRETTO
         async function aggiungiSquadra() {
             const nome = document.getElementById('nomeSquadra').value.trim();
             const allenatore = document.getElementById('allenatore').value.trim();
@@ -719,32 +834,45 @@
             }
             
             try {
-                await database.aggiungiSquadra({
-                    nome: nome,
-                    allenatore: allenatore || "Non specificato",
-                    colori: colori || "Non specificati",
-                    punti: 0,
-                    partite_giocate: 0,
-                    vittorie: 0,
-                    pareggi: 0,
-                    sconfitte: 0,
-                    gol_fatti: 0,
-                    gol_subiti: 0
-                });
+                const { data, error } = await supabase
+                    .from('squadre')
+                    .insert([{
+                        nome: nome,
+                        allenatore: allenatore || "Non specificato",
+                        colori: colori || "Non specificati",
+                        punti: 0,
+                        partite_giocate: 0,
+                        vittorie: 0,
+                        pareggi: 0,
+                        sconfitte: 0,
+                        gol_fatti: 0,
+                        gol_subiti: 0
+                    }])
+                    .select()
+                    .single();
+                
+                if (error) throw error;
+                
+                // Aggiorna dati locali
+                databaseData.squadre.push(data);
                 
                 // Pulisci i campi
                 document.getElementById('nomeSquadra').value = '';
                 document.getElementById('allenatore').value = '';
                 document.getElementById('colori').value = '';
                 
-                alert(`Squadra "${nome}" aggiunta!`);
+                alert(`✅ Squadra "${nome}" aggiunta con successo!`);
+                
+                // Aggiorna select
+                caricaSquadreSelect();
                 
             } catch (error) {
                 console.error("Errore:", error);
-                alert("Errore nell'aggiunta della squadra: " + error.message);
+                alert("❌ Errore nell'aggiunta della squadra: " + error.message);
             }
         }
         
+        // AGGIUNGI GIOCATORE - VERSIONE CORRETTA CON SUPABASE DIRETTO
         async function aggiungiGiocatore() {
             const squadra = document.getElementById('squadraGiocatore').value;
             const nome = document.getElementById('nomeGiocatore').value.trim();
@@ -752,7 +880,7 @@
             const ruolo = document.getElementById('ruolo').value;
             
             if(!squadra || !nome) { 
-                alert("Compila tutti i campi!"); 
+                alert("Compila tutti i campi obbligatori!"); 
                 return; 
             }
             
@@ -766,28 +894,37 @@
             }
             
             try {
-                await database.aggiungiGiocatore({
-                    nome: nome,
-                    numero: numero ? parseInt(numero) : null,
-                    ruolo: ruolo,
-                    squadra: squadra,
-                    gol: 0,
-                    ammonizioni: 0,
-                    espulsioni: 0,
-                    punteggio_totale: 0,
-                    premi_miglior_giocatore: 0,
-                    premi_miglior_portiere: 0
-                });
+                const { data, error } = await supabase
+                    .from('giocatori')
+                    .insert([{
+                        nome: nome,
+                        numero: numero ? parseInt(numero) : null,
+                        ruolo: ruolo,
+                        squadra: squadra,
+                        gol: 0,
+                        ammonizioni: 0,
+                        espulsioni: 0,
+                        punteggio_totale: 0,
+                        premi_miglior_giocatore: 0,
+                        premi_miglior_portiere: 0
+                    }])
+                    .select()
+                    .single();
+                
+                if (error) throw error;
+                
+                // Aggiorna dati locali
+                databaseData.giocatori.push(data);
                 
                 // Pulisci i campi
                 document.getElementById('nomeGiocatore').value = '';
                 document.getElementById('numeroMaglia').value = '';
                 
-                alert(`Giocatore "${nome}" aggiunto alla squadra ${squadra}!`);
+                alert(`✅ Giocatore "${nome}" aggiunto alla squadra ${squadra}!`);
                 
             } catch (error) {
                 console.error("Errore:", error);
-                alert("Errore nell'aggiunta del giocatore: " + error.message);
+                alert("❌ Errore nell'aggiunta del giocatore: " + error.message);
             }
         }
         
@@ -1258,33 +1395,55 @@
                     voto_portiere_ospite: oggetto.votoPortiereOspite
                 };
                 
-                // 4. Salva partita/finale
+                // 4. Salva partita/finale con Supabase diretto
                 if(modalita === 'normale') {
-                    await database.aggiungiPartita(partitaData);
+                    const { data, error } = await supabase
+                        .from('partite')
+                        .insert([partitaData])
+                        .select()
+                        .single();
+                    
+                    if (error) throw error;
                 } else {
-                    await database.salvaFinale(partitaData);
+                    // Elimina finale esistente
+                    await supabase.from('finale').delete().neq('id', 0);
+                    
+                    // Aggiungi nuova finale
+                    const { data, error } = await supabase
+                        .from('finale')
+                        .insert([partitaData])
+                        .select()
+                        .single();
+                    
+                    if (error) throw error;
                 }
                 
                 // 5. Aggiorna statistiche squadre
-                await database.aggiornaSquadra(squadraCasaData.id, {
-                    punti: (squadraCasaData.punti || 0) + puntiCasa,
-                    partite_giocate: (squadraCasaData.partite_giocate || 0) + 1,
-                    gol_fatti: (squadraCasaData.gol_fatti || 0) + golCasa,
-                    gol_subiti: (squadraCasaData.gol_subiti || 0) + golOspite,
-                    vittorie: (squadraCasaData.vittorie || 0) + (puntiCasa === 3 ? 1 : 0),
-                    pareggi: (squadraCasaData.pareggi || 0) + (puntiCasa === 1 ? 1 : 0),
-                    sconfitte: (squadraCasaData.sconfitte || 0) + (puntiCasa === 0 ? 1 : 0)
-                });
+                await supabase
+                    .from('squadre')
+                    .update({
+                        punti: (squadraCasaData.punti || 0) + puntiCasa,
+                        partite_giocate: (squadraCasaData.partite_giocate || 0) + 1,
+                        gol_fatti: (squadraCasaData.gol_fatti || 0) + golCasa,
+                        gol_subiti: (squadraCasaData.gol_subiti || 0) + golOspite,
+                        vittorie: (squadraCasaData.vittorie || 0) + (puntiCasa === 3 ? 1 : 0),
+                        pareggi: (squadraCasaData.pareggi || 0) + (puntiCasa === 1 ? 1 : 0),
+                        sconfitte: (squadraCasaData.sconfitte || 0) + (puntiCasa === 0 ? 1 : 0)
+                    })
+                    .eq('id', squadraCasaData.id);
                 
-                await database.aggiornaSquadra(squadraOspiteData.id, {
-                    punti: (squadraOspiteData.punti || 0) + puntiOspite,
-                    partite_giocate: (squadraOspiteData.partite_giocate || 0) + 1,
-                    gol_fatti: (squadraOspiteData.gol_fatti || 0) + golOspite,
-                    gol_subiti: (squadraOspiteData.gol_subiti || 0) + golCasa,
-                    vittorie: (squadraOspiteData.vittorie || 0) + (puntiOspite === 3 ? 1 : 0),
-                    pareggi: (squadraOspiteData.pareggi || 0) + (puntiOspite === 1 ? 1 : 0),
-                    sconfitte: (squadraOspiteData.sconfitte || 0) + (puntiOspite === 0 ? 1 : 0)
-                });
+                await supabase
+                    .from('squadre')
+                    .update({
+                        punti: (squadraOspiteData.punti || 0) + puntiOspite,
+                        partite_giocate: (squadraOspiteData.partite_giocate || 0) + 1,
+                        gol_fatti: (squadraOspiteData.gol_fatti || 0) + golOspite,
+                        gol_subiti: (squadraOspiteData.gol_subiti || 0) + golCasa,
+                        vittorie: (squadraOspiteData.vittorie || 0) + (puntiOspite === 3 ? 1 : 0),
+                        pareggi: (squadraOspiteData.pareggi || 0) + (puntiOspite === 1 ? 1 : 0),
+                        sconfitte: (squadraOspiteData.sconfitte || 0) + (puntiOspite === 0 ? 1 : 0)
+                    })
+                    .eq('id', squadraOspiteData.id);
                 
                 // 6. Aggiorna statistiche giocatori (gol, ammonizioni, espulsioni)
                 for(const evento of oggetto.eventi) {
@@ -1296,7 +1455,10 @@
                         else if(evento.tipo === 'esp') updates.espulsioni = (giocatore.espulsioni || 0) + 1;
                         
                         if(Object.keys(updates).length > 0) {
-                            await database.aggiornaGiocatore(giocatore.id, updates);
+                            await supabase
+                                .from('giocatori')
+                                .update(updates)
+                                .eq('id', giocatore.id);
                         }
                     }
                 }
@@ -1304,28 +1466,37 @@
                 // 7. Aggiorna miglior giocatore (campo)
                 const migliorGiocatore = databaseData.giocatori.find(g => g.id === oggetto.migliorGiocatore);
                 if(migliorGiocatore && migliorGiocatore.ruolo === 'Giocatore') {
-                    await database.aggiornaGiocatore(migliorGiocatore.id, {
-                        punteggio_totale: (migliorGiocatore.punteggio_totale || 0) + oggetto.votoGiocatore,
-                        premi_miglior_giocatore: (migliorGiocatore.premi_miglior_giocatore || 0) + 1
-                    });
+                    await supabase
+                        .from('giocatori')
+                        .update({
+                            punteggio_totale: (migliorGiocatore.punteggio_totale || 0) + oggetto.votoGiocatore,
+                            premi_miglior_giocatore: (migliorGiocatore.premi_miglior_giocatore || 0) + 1
+                        })
+                        .eq('id', migliorGiocatore.id);
                 }
                 
                 // 8. Aggiorna portiere casa
                 const portiereCasa = databaseData.giocatori.find(g => g.id === oggetto.portiereCasa);
                 if(portiereCasa && portiereCasa.ruolo === 'Portiere') {
-                    await database.aggiornaGiocatore(portiereCasa.id, {
-                        punteggio_totale: (portiereCasa.punteggio_totale || 0) + oggetto.votoPortiereCasa,
-                        premi_miglior_portiere: (portiereCasa.premi_miglior_portiere || 0) + 1
-                    });
+                    await supabase
+                        .from('giocatori')
+                        .update({
+                            punteggio_totale: (portiereCasa.punteggio_totale || 0) + oggetto.votoPortiereCasa,
+                            premi_miglior_portiere: (portiereCasa.premi_miglior_portiere || 0) + 1
+                        })
+                        .eq('id', portiereCasa.id);
                 }
                 
                 // 9. Aggiorna portiere ospite
                 const portiereOspite = databaseData.giocatori.find(g => g.id === oggetto.portiereOspite);
                 if(portiereOspite && portiereOspite.ruolo === 'Portiere') {
-                    await database.aggiornaGiocatore(portiereOspite.id, {
-                        punteggio_totale: (portiereOspite.punteggio_totale || 0) + oggetto.votoPortiereOspite,
-                        premi_miglior_portiere: (portiereOspite.premi_miglior_portiere || 0) + 1
-                    });
+                    await supabase
+                        .from('giocatori')
+                        .update({
+                            punteggio_totale: (portiereOspite.punteggio_totale || 0) + oggetto.votoPortiereOspite,
+                            premi_miglior_portiere: (portiereOspite.premi_miglior_portiere || 0) + 1
+                        })
+                        .eq('id', portiereOspite.id);
                 }
                 
                 // 10. Messaggio di successo
@@ -1385,6 +1556,9 @@
                 // Ricarica i giocatori per mostrare contatori azzerati
                 caricaGiocatoriPartita(modalita);
                 aggiornaRiepilogoEventi(modalita);
+                
+                // Ricarica dati
+                await caricaDatiIniziali();
                 
             } catch (error) {
                 console.error("Errore nel salvataggio:", error);
@@ -1470,25 +1644,31 @@
                 else { puntiCasa = 1; puntiOspite = 1; }
                 
                 // 3. Aggiorna squadre (rimuovi punti)
-                await database.aggiornaSquadra(squadraCasa.id, {
-                    punti: Math.max(0, (squadraCasa.punti || 0) - puntiCasa),
-                    partite_giocate: Math.max(0, (squadraCasa.partite_giocate || 0) - 1),
-                    gol_fatti: Math.max(0, (squadraCasa.gol_fatti || 0) - partita.gol_casa),
-                    gol_subiti: Math.max(0, (squadraCasa.gol_subiti || 0) - partita.gol_ospite),
-                    vittorie: Math.max(0, (squadraCasa.vittorie || 0) - (puntiCasa === 3 ? 1 : 0)),
-                    pareggi: Math.max(0, (squadraCasa.pareggi || 0) - (puntiCasa === 1 ? 1 : 0)),
-                    sconfitte: Math.max(0, (squadraCasa.sconfitte || 0) - (puntiCasa === 0 ? 1 : 0))
-                });
+                await supabase
+                    .from('squadre')
+                    .update({
+                        punti: Math.max(0, (squadraCasa.punti || 0) - puntiCasa),
+                        partite_giocate: Math.max(0, (squadraCasa.partite_giocate || 0) - 1),
+                        gol_fatti: Math.max(0, (squadraCasa.gol_fatti || 0) - partita.gol_casa),
+                        gol_subiti: Math.max(0, (squadraCasa.gol_subiti || 0) - partita.gol_ospite),
+                        vittorie: Math.max(0, (squadraCasa.vittorie || 0) - (puntiCasa === 3 ? 1 : 0)),
+                        pareggi: Math.max(0, (squadraCasa.pareggi || 0) - (puntiCasa === 1 ? 1 : 0)),
+                        sconfitte: Math.max(0, (squadraCasa.sconfitte || 0) - (puntiCasa === 0 ? 1 : 0))
+                    })
+                    .eq('id', squadraCasa.id);
                 
-                await database.aggiornaSquadra(squadraOspite.id, {
-                    punti: Math.max(0, (squadraOspite.punti || 0) - puntiOspite),
-                    partite_giocate: Math.max(0, (squadraOspite.partite_giocate || 0) - 1),
-                    gol_fatti: Math.max(0, (squadraOspite.gol_fatti || 0) - partita.gol_ospite),
-                    gol_subiti: Math.max(0, (squadraOspite.gol_subiti || 0) - partita.gol_casa),
-                    vittorie: Math.max(0, (squadraOspite.vittorie || 0) - (puntiOspite === 3 ? 1 : 0)),
-                    pareggi: Math.max(0, (squadraOspite.pareggi || 0) - (puntiOspite === 1 ? 1 : 0)),
-                    sconfitte: Math.max(0, (squadraOspite.sconfitte || 0) - (puntiOspite === 0 ? 1 : 0))
-                });
+                await supabase
+                    .from('squadre')
+                    .update({
+                        punti: Math.max(0, (squadraOspite.punti || 0) - puntiOspite),
+                        partite_giocate: Math.max(0, (squadraOspite.partite_giocate || 0) - 1),
+                        gol_fatti: Math.max(0, (squadraOspite.gol_fatti || 0) - partita.gol_ospite),
+                        gol_subiti: Math.max(0, (squadraOspite.gol_subiti || 0) - partita.gol_casa),
+                        vittorie: Math.max(0, (squadraOspite.vittorie || 0) - (puntiOspite === 3 ? 1 : 0)),
+                        pareggi: Math.max(0, (squadraOspite.pareggi || 0) - (puntiOspite === 1 ? 1 : 0)),
+                        sconfitte: Math.max(0, (squadraOspite.sconfitte || 0) - (puntiOspite === 0 ? 1 : 0))
+                    })
+                    .eq('id', squadraOspite.id);
                 
                 // 4. Rimuovi statistiche giocatori
                 const eventi = partita.eventi || [];
@@ -1501,7 +1681,10 @@
                         else if(evento.tipo === 'esp') updates.espulsioni = Math.max(0, (giocatore.espulsioni || 0) - 1);
                         
                         if(Object.keys(updates).length > 0) {
-                            await database.aggiornaGiocatore(giocatore.id, updates);
+                            await supabase
+                                .from('giocatori')
+                                .update(updates)
+                                .eq('id', giocatore.id);
                         }
                     }
                 }
@@ -1510,10 +1693,13 @@
                 if(partita.miglior_giocatore) {
                     const mg = databaseData.giocatori.find(g => g.id === partita.miglior_giocatore);
                     if(mg && mg.ruolo === 'Giocatore') {
-                        await database.aggiornaGiocatore(mg.id, {
-                            punteggio_totale: Math.max(0, (mg.punteggio_totale || 0) - (partita.voto_miglior_giocatore || 0)),
-                            premi_miglior_giocatore: Math.max(0, (mg.premi_miglior_giocatore || 0) - 1)
-                        });
+                        await supabase
+                            .from('giocatori')
+                            .update({
+                                punteggio_totale: Math.max(0, (mg.punteggio_totale || 0) - (partita.voto_miglior_giocatore || 0)),
+                                premi_miglior_giocatore: Math.max(0, (mg.premi_miglior_giocatore || 0) - 1)
+                            })
+                            .eq('id', mg.id);
                     }
                 }
                 
@@ -1521,10 +1707,13 @@
                 if(partita.portiere_casa) {
                     const pc = databaseData.giocatori.find(g => g.id === partita.portiere_casa);
                     if(pc && pc.ruolo === 'Portiere') {
-                        await database.aggiornaGiocatore(pc.id, {
-                            punteggio_totale: Math.max(0, (pc.punteggio_totale || 0) - (partita.voto_portiere_casa || 0)),
-                            premi_miglior_portiere: Math.max(0, (pc.premi_miglior_portiere || 0) - 1)
-                        });
+                        await supabase
+                            .from('giocatori')
+                            .update({
+                                punteggio_totale: Math.max(0, (pc.punteggio_totale || 0) - (partita.voto_portiere_casa || 0)),
+                                premi_miglior_portiere: Math.max(0, (pc.premi_miglior_portiere || 0) - 1)
+                            })
+                            .eq('id', pc.id);
                     }
                 }
                 
@@ -1532,17 +1721,27 @@
                 if(partita.portiere_ospite) {
                     const po = databaseData.giocatori.find(g => g.id === partita.portiere_ospite);
                     if(po && po.ruolo === 'Portiere') {
-                        await database.aggiornaGiocatore(po.id, {
-                            punteggio_totale: Math.max(0, (po.punteggio_totale || 0) - (partita.voto_portiere_ospite || 0)),
-                            premi_miglior_portiere: Math.max(0, (po.premi_miglior_portiere || 0) - 1)
-                        });
+                        await supabase
+                            .from('giocatori')
+                            .update({
+                                punteggio_totale: Math.max(0, (po.punteggio_totale || 0) - (partita.voto_portiere_ospite || 0)),
+                                premi_miglior_portiere: Math.max(0, (po.premi_miglior_portiere || 0) - 1)
+                            })
+                            .eq('id', po.id);
                     }
                 }
                 
                 // 8. Elimina la partita dal database
-                await database.eliminaPartita(partitaId);
+                await supabase
+                    .from('partite')
+                    .delete()
+                    .eq('id', partitaId);
                 
                 alert("Partita eliminata!");
+                
+                // Ricarica dati
+                await caricaDatiIniziali();
+                caricaPartiteSalvate();
                 
             } catch (error) {
                 console.error("Errore eliminazione partita:", error);
@@ -1606,9 +1805,14 @@
                 
                 if(confirm(`Eliminare il giocatore "${giocatore.nome}" dalla squadra ${giocatore.squadra}?`)) {
                     try {
-                        await database.eliminaGiocatore(parseInt(giocatoreId));
+                        await supabase
+                            .from('giocatori')
+                            .delete()
+                            .eq('id', parseInt(giocatoreId));
+                        
                         alert("Giocatore eliminato!");
                         mostraOpzioniElimina();
+                        await caricaDatiIniziali();
                     } catch (error) {
                         alert("Errore nell'eliminazione: " + error.message);
                     }
@@ -1634,14 +1838,21 @@
                     try {
                         // Prima elimina tutti i giocatori della squadra
                         for(const giocatore of giocatoriSquadra) {
-                            await database.eliminaGiocatore(giocatore.id);
+                            await supabase
+                                .from('giocatori')
+                                .delete()
+                                .eq('id', giocatore.id);
                         }
                         
                         // Poi elimina la squadra
-                        await database.eliminaSquadra(parseInt(squadraId));
+                        await supabase
+                            .from('squadre')
+                            .delete()
+                            .eq('id', parseInt(squadraId));
                         
                         alert("Squadra eliminata!");
                         mostraOpzioniElimina();
+                        await caricaDatiIniziali();
                     } catch (error) {
                         alert("Errore nell'eliminazione: " + error.message);
                     }
@@ -1656,7 +1867,12 @@
                 
                 if(confirm("⚠️ SEI SICURO? ⚠️\nTutti i dati verranno cancellati!\nQuesta operazione è IRREVERSIBILE!")) {
                     try {
-                        await database.eliminaTutto();
+                        // Elimina in ordine per evitare errori di foreign key
+                        await supabase.from('partite').delete().neq('id', 0);
+                        await supabase.from('finale').delete().neq('id', 0);
+                        await supabase.from('giocatori').delete().neq('id', 0);
+                        await supabase.from('squadre').delete().neq('id', 0);
+                        
                         alert("Tutti i dati eliminati!");
                         
                         // Reset interfaccia
@@ -1664,6 +1880,16 @@
                         document.getElementById('opzioniElimina').innerHTML = '';
                         document.getElementById('opzioniElimina').classList.add('hidden');
                         document.getElementById('btnElimina').classList.add('hidden');
+                        
+                        // Reset dati locali
+                        databaseData = {
+                            squadre: [],
+                            giocatori: [],
+                            partite: [],
+                            finale: null
+                        };
+                        
+                        caricaSquadreSelect();
                         
                     } catch (error) {
                         alert("Errore nell'eliminazione totale: " + error.message);

@@ -502,25 +502,52 @@
         document.addEventListener('DOMContentLoaded', async function() {
             inizializzaVoti();
             
-            // Ascolta aggiornamenti dal database
-            window.onDatabaseUpdate = function(type, data) {
-                databaseData[type] = data;
-                
-                console.log(`Aggiornamento ${type}:`, data.length || data);
-                
-                // Aggiorna i select delle squadre se necessario
-                if(type === 'squadre') {
-                    caricaSquadreSelect();
-                }
-                
-                // Se siamo in gestione partite, aggiorna la lista
-                if(type === 'partite' && document.getElementById('gestionePartite').classList.contains('attiva')) {
-                    caricaPartiteSalvate();
-                }
-                
-                // Aggiorna stato connessione
-                aggiornaStatoConnessione(true);
-            };
+           // Ascolta aggiornamenti dal database in tempo reale
+window.onDatabaseUpdate = function(type, data) {
+    console.log(`📡 Aggiornamento ${type} ricevuto:`, data.length || data);
+    
+    // Aggiorna i dati in memoria
+    databaseData[type] = data;
+    
+    // Gestisci aggiornamenti specifici per tipo
+    switch(type) {
+        case 'squadre':
+            caricaSquadreSelect();
+            break;
+        case 'giocatori':
+            // Se stiamo visualizzando una partita, ricarica i giocatori
+            const partitaVisibile = document.getElementById('partite').classList.contains('attiva');
+            const finaleVisibile = document.getElementById('finale').classList.contains('attiva');
+            
+            if(partitaVisibile) {
+                caricaGiocatoriPartita('normale');
+            }
+            if(finaleVisibile) {
+                caricaGiocatoriPartita('finale');
+            }
+            
+            // Aggiorna opzioni di eliminazione se visibili
+            if(document.getElementById('gestione').classList.contains('attiva')) {
+                mostraOpzioniElimina();
+            }
+            break;
+        case 'partite':
+            // Se siamo in gestione partite, aggiorna la lista
+            if(document.getElementById('gestionePartite').classList.contains('attiva')) {
+                caricaPartiteSalvate();
+            }
+            break;
+        case 'finale':
+            // Se stiamo visualizzando la sezione finale, potremmo voler aggiornare qualcosa
+            if(document.getElementById('finale').classList.contains('attiva')) {
+                console.log('Finale aggiornata:', data);
+            }
+            break;
+    }
+    
+    // Aggiorna stato connessione
+    aggiornaStatoConnessione(true);
+};
             
             // Imposta timer per controllare connessione
             setInterval(controllaConnessione, 10000);
@@ -1701,3 +1728,4 @@
     </script>
 </body>
 </html>
+

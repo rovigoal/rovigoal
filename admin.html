@@ -1410,22 +1410,22 @@ function caricaSelezioneMigliori(squadraCasa, squadraOspite, modalita) {
                 else if(golCasa < golOspite) puntiOspite = 3;
                 else { puntiCasa = 1; puntiOspite = 1; }
                 
-                // 3. Prepara dati partita per il salvataggio
-                const partitaData = {
-                    data: new Date().toLocaleDateString('it-IT'),
-                    ora: new Date().toLocaleTimeString('it-IT'),
-                    squadra_casa: squadraCasa,
-                    squadra_ospite: squadraOspite,
-                    gol_casa: golCasa,
-                    gol_ospite: golOspite,
-                    eventi: oggetto.eventi,
-                    miglior_giocatore: oggetto.migliorGiocatore,
-                    voto_miglior_giocatore: oggetto.votoGiocatore,
-                    portiere_casa: oggetto.portiereCasa,
-                    portiere_ospite: oggetto.portiereOspite,
-                    voto_portiere_casa: oggetto.votoPortiereCasa,
-                    voto_portiere_ospite: oggetto.votoPortiereOspite
-                };
+               // 3. Prepara dati partita per il salvataggio
+const partitaData = {
+    data: new Date().toLocaleDateString('it-IT'),
+    ora: new Date().toLocaleTimeString('it-IT'),
+    squadra_casa: squadraCasa,
+    squadra_ospite: squadraOspite,
+    gol_casa: golCasa,
+    gol_ospite: golOspite,
+    eventi: JSON.stringify(oggetto.eventi),  // CONVERTI IN JSON
+    miglior_giocatore: oggetto.migliorGiocatore,
+    voto_miglior_giocatore: oggetto.votoGiocatore,
+    portiere_casa: oggetto.portiereCasa,
+    portiere_ospite: oggetto.portiereOspite,
+    voto_portiere_casa: oggetto.votoPortiereCasa,
+    voto_portiere_ospite: oggetto.votoPortiereOspite
+};
                 
                 // 4. Salva partita/finale con Supabase diretto
                 if(modalita === 'normale') {
@@ -1959,4 +1959,5 @@ function caricaSelezioneMigliori(squadraCasa, squadraOspite, modalita) {
     </script>
 </body>
 </html>
+
 

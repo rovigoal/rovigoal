@@ -1620,7 +1620,18 @@ const partitaData = {
                 const portiereCasaNome = databaseData.giocatori.find(g => g.id === partita.portiere_casa)?.nome || 'N/A';
                 const portiereOspiteNome = databaseData.giocatori.find(g => g.id === partita.portiere_ospite)?.nome || 'N/A';
                 
-                const eventi = partita.eventi || [];
+               // Controlla se eventi è una stringa JSON e parsala
+let eventi = [];
+try {
+    if (typeof partita.eventi === 'string') {
+        eventi = JSON.parse(partita.eventi);
+    } else if (Array.isArray(partita.eventi)) {
+        eventi = partita.eventi;
+    }
+} catch (error) {
+    console.error("Errore nel parsing degli eventi:", error);
+    eventi = [];
+}
                 const gol = eventi.filter(e => e.tipo === 'gol').length;
                 const ammonizioni = eventi.filter(e => e.tipo === 'amm').length;
                 const espulsioni = eventi.filter(e => e.tipo === 'esp').length;
@@ -1959,5 +1970,6 @@ const partitaData = {
     </script>
 </body>
 </html>
+
 
 

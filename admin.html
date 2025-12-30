@@ -34,11 +34,12 @@
         .menu-btn:nth-child(1) { background: linear-gradient(135deg, #1E90FF 0%, #4169E1 100%); color: white; }
         .menu-btn:nth-child(2) { background: linear-gradient(135deg, #32CD32 0%, #228B22 100%); color: white; }
         .menu-btn:nth-child(3) { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #333; }
+        .menu-btn:nth-child(4) { background: linear-gradient(135deg, #9370DB 0%, #8A2BE2 100%); color: white; }
         .icona { font-size: 3em; display: block; margin-bottom: 15px; }
         
         .sezione {
             background: white; padding: 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-bottom: 20px; display: none;
+            margin-bottom: 20px; display: none; max-width: 1200px; margin: 0 auto 30px;
         }
         .sezione.attiva { display: block; }
         
@@ -129,7 +130,7 @@
             color: #333;
         }
         
-        /* NUOVO: Stile per sezione portieri */
+        /* Stile per sezione portieri */
         .portieri-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -463,6 +464,7 @@
         <div id="listaPartite" class="gestione-partite"></div>
         <button class="btn btn-back" onclick="tornaMenu()">← TORNA AL MENU</button>
     </div>
+
     <script type="module">
         // Importa il gestore del database Supabase
         import database from './database-supabase.js';
@@ -480,7 +482,6 @@
             eventi: [],
             migliorGiocatore: null,
             votoGiocatore: 0,
-            // NUOVO: Voti portieri separati
             portiereCasa: null,
             portiereOspite: null,
             votoPortiereCasa: 0,
@@ -491,7 +492,6 @@
             eventi: [],
             migliorGiocatore: null,
             votoGiocatore: 0,
-            // NUOVO: Voti portieri separati per finale
             portiereCasa: null,
             portiereOspite: null,
             votoPortiereCasa: 0,
@@ -999,16 +999,6 @@
             });
         }
         
-        // Gestione selezione migliori normale
-        document.getElementById('migliorGiocatore').addEventListener('change', function() {
-            partitaInCorso.migliorGiocatore = this.value ? parseInt(this.value) : null;
-        });
-        
-        // Gestione selezione migliori finale
-        document.getElementById('finaleMigliorGiocatore').addEventListener('change', function() {
-            finaleInCorso.migliorGiocatore = this.value ? parseInt(this.value) : null;
-        });
-        
         function modificaEvento(giocatoreId, tipo, squadra, modifica, modalita) {
             const giocatore = databaseData.giocatori.find(g => g.id === giocatoreId);
             if(!giocatore) {
@@ -1162,8 +1152,6 @@
             alert("Eventi cancellati!");
         }
         
-        // Continua nella prossima parte...
-    </script>
         async function salvaPartita(modalita) {
             let squadraCasa, squadraOspite, golCasa, golOspite, oggetto;
             
@@ -1562,8 +1550,6 @@
             }
         }
         
-        // Continua con le funzioni di eliminazione...
-    </script>
         // Funzioni eliminazione (solo per gestione)
         function mostraOpzioniElimina() {
             const tipo = document.getElementById('tipoElimina').value;
@@ -1686,25 +1672,6 @@
             }
         }
         
-        // Aggiungi event listener per le selezione migliori
-        document.addEventListener('DOMContentLoaded', function() {
-            // Gestione selezione migliori normale
-            const migliorGiocatoreSelect = document.getElementById('migliorGiocatore');
-            if(migliorGiocatoreSelect) {
-                migliorGiocatoreSelect.addEventListener('change', function() {
-                    partitaInCorso.migliorGiocatore = this.value ? parseInt(this.value) : null;
-                });
-            }
-            
-            // Gestione selezione migliori finale
-            const finaleMigliorGiocatoreSelect = document.getElementById('finaleMigliorGiocatore');
-            if(finaleMigliorGiocatoreSelect) {
-                finaleMigliorGiocatoreSelect.addEventListener('change', function() {
-                    finaleInCorso.migliorGiocatore = this.value ? parseInt(this.value) : null;
-                });
-            }
-        });
-        
         // Controllo password (solo se non è già stato fatto)
         if(!localStorage.getItem('admin_accesso') || localStorage.getItem('admin_accesso') !== 'true') {
             const password = prompt("Password ADMIN:");
@@ -1731,7 +1698,6 @@
         window.eliminaPartita = eliminaPartita;
         window.mostraOpzioniElimina = mostraOpzioniElimina;
         window.eseguiEliminazione = eseguiEliminazione;
-        
     </script>
 </body>
 </html>

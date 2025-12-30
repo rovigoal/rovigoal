@@ -124,6 +124,54 @@
         .stat-number { font-size: 1.5em; font-weight: bold; color: #1e3c72; }
         .stat-label { font-size: 0.8em; color: #666; margin-top: 5px; }
         
+        /* STATO CONNESSIONE */
+        .connessione-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            z-index: 1000;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .connessione-ok {
+            background: #4CAF50;
+            color: white;
+            border: 2px solid #45a049;
+        }
+        
+        .connessione-caricamento {
+            background: #FFA500;
+            color: white;
+            border: 2px solid #FF8C00;
+        }
+        
+        .connessione-ko {
+            background: #f44336;
+            color: white;
+            border: 2px solid #d32f2f;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
         /* MEDIA QUERY PER MOBILE */
         @media (max-width: 1024px) {
             .menu { 
@@ -186,6 +234,13 @@
             .stat-number {
                 font-size: 1.3em;
             }
+            
+            .connessione-status {
+                top: 5px;
+                right: 5px;
+                padding: 6px 12px;
+                font-size: 0.8em;
+            }
         }
         
         @media (max-width: 480px) {
@@ -214,10 +269,20 @@
     </style>
 </head>
 <body>
+    <!-- STATO CONNESSIONE SUPABASE -->
+    <div id="connessioneStatus" class="connessione-status connessione-caricamento">
+        <div class="loading"></div> Caricamento...
+    </div>
+    
     <div class="header">
         <h1>ROVIGOAL</h1>
         <p>Gestione Torneo Calcio</p>
-        <div class="stats-summary" id="statsSummary"></div>
+        <div class="stats-summary" id="statsSummary">
+            <div class="stat-box"><div class="stat-number">0</div><div class="stat-label">Squadre</div></div>
+            <div class="stat-box"><div class="stat-number">0</div><div class="stat-label">Giocatori</div></div>
+            <div class="stat-box"><div class="stat-number">0</div><div class="stat-label">Partite</div></div>
+            <div class="stat-box"><div class="stat-number">0</div><div class="stat-label">Gol Totali</div></div>
+        </div>
     </div>
     
     <div class="menu">
@@ -238,53 +303,190 @@
     <button class="logout" onclick="logout()">ESCI</button>
     <div class="info-footer">
         <p>Il tuo torneo di calcio a Rovigo e dintorni</p>
-        <p>Data ultimo aggiornamento: <span id="ultimoAggiornamento"></span></p>
+        <p>Data ultimo aggiornamento: <span id="ultimoAggiornamento">--/--/---- --:--:--</span></p>
+        <p id="contatoreDispositivi" style="font-size: 0.8em; color: #888; margin-top: 5px;">Caricamento dati in tempo reale...</p>
     </div>
     
-    <script>
+    <script type="module">
+        // Importa il gestore database Supabase
+        import database from './database-supabase.js';
+        
+        // VARIABILI GLOBALI
+        let datiTorneo = {
+            squadre: [],
+            giocatori: [],
+            partite: [],
+            finale: null
+        };
+        
+        let ultimoAggiornamento = null;
+        let contatoreAggiornamenti = 0;
+        
+        // INIZIALIZZAZIONE
+        document.addEventListener('DOMContentLoaded', async function() {
+            aggiornaStatoConnessione('caricamento');
+            
+            try {
+                // Carica dati iniziali
+                await caricaDatiIniziali();
+                
+                // Setup listener in tempo reale
+                setupRealtimeListeners();
+                
+                aggiornaStatoConnessione('ok');
+                
+                // Mostra statistiche
+                caricaStatistiche();
+                
+            } catch (error) {
+                console.error('Errore caricamento dati:', error);
+                aggiornaStatoConnessione('ko');
+                alert('Errore nel caricamento dei dati. Riprova più tardi.');
+            }
+        });
+        
+        // CARICA DATI INIZIALI
+        async function caricaDatiIniziali() {
+            try {
+                // Carica tutti i dati in parallelo
+                const [squadre, giocatori, partite, finale] = await Promise.all([
+                    database.getSquadre(),
+                    database.getGiocatori(),
+                    database.getPartite(),
+                    database.getFinale()
+                ]);
+                
+                datiTorneo.squadre = squadre || [];
+                datiTorneo.giocatori = giocatori || [];
+                datiTorneo.partite = partite || [];
+                datiTorneo.finale = finale || null;
+                
+                ultimoAggiornamento = new Date();
+                
+                console.log('Dati caricati:', {
+                    squadre: datiTorneo.squadre.length,
+                    giocatori: datiTorneo.giocatori.length,
+                    partite: datiTorneo.partite.length,
+                    finale: !!datiTorneo.finale
+                });
+                
+            } catch (error) {
+                console.error('Errore nel caricamento iniziale:', error);
+                throw error;
+            }
+        }
+        
+        // SETUP LISTENER TEMPO REALE
+        function setupRealtimeListeners() {
+            // Ascolta aggiornamenti dal database Supabase
+            if (typeof window.onDatabaseUpdate === 'function') {
+                // Il listener è già stato configurato da database-supabase.js
+                console.log('Listener Supabase già attivo');
+            } else {
+                // Configura listener custom
+                window.onDatabaseUpdate = function(type, data) {
+                    console.log(`Aggiornamento in tempo reale: ${type}`, data);
+                    
+                    // Aggiorna i dati locali
+                    if (type === 'squadre') datiTorneo.squadre = data || [];
+                    else if (type === 'giocatori') datiTorneo.giocatori = data || [];
+                    else if (type === 'partite') datiTorneo.partite = data || [];
+                    else if (type === 'finale') datiTorneo.finale = data || null;
+                    
+                    ultimoAggiornamento = new Date();
+                    contatoreAggiornamenti++;
+                    
+                    // Aggiorna l'interfaccia
+                    caricaStatistiche();
+                    aggiornaContatore();
+                    aggiornaStatoConnessione('ok');
+                    
+                    // Mostra notifica visiva
+                    mostraNotificaAggiornamento(type);
+                };
+            }
+        }
+        
+        // FUNZIONE PRINCIPALE PER CARICARE STATISTICHE
         function caricaStatistiche() {
-            const squadre = JSON.parse(localStorage.getItem('rovigoal_squadre')) || [];
-            const giocatori = JSON.parse(localStorage.getItem('rovigoal_giocatori')) || [];
-            const partite = JSON.parse(localStorage.getItem('rovigoal_partite')) || [];
-            const finale = JSON.parse(localStorage.getItem('rovigoal_finale')) || null;
             const container = document.getElementById('statsSummary');
             
-            if(squadre.length > 0) {
-                let html = `
-                    <div class="stat-box"><div class="stat-number">${squadre.length}</div><div class="stat-label">Squadre</div></div>
-                    <div class="stat-box"><div class="stat-number">${giocatori.length}</div><div class="stat-label">Giocatori</div></div>
-                    <div class="stat-box"><div class="stat-number">${partite.length}</div><div class="stat-label">Partite</div></div>
-                    <div class="stat-box"><div class="stat-number">${partite.reduce((t,p) => t + p.golCasa + p.golOspite, 0)}</div><div class="stat-label">Gol Totali</div></div>
-                `;
-                
-                // Aggiungi se c'è una finale
-                if(finale) {
-                    html += `<div class="stat-box" style="background: gold; border: 2px solid orange;">
-                        <div class="stat-number">🏆</div>
-                        <div class="stat-label">Finale Giocata</div>
-                    </div>`;
-                }
-                
-                container.innerHTML = html;
-            } else {
+            if (!datiTorneo.squadre || datiTorneo.squadre.length === 0) {
                 container.innerHTML = `
                     <div class="stat-box"><div class="stat-number">0</div><div class="stat-label">Squadre registrate</div></div>
                     <div class="stat-box"><div class="stat-number">0</div><div class="stat-label">Partite giocate</div></div>
+                    <div class="stat-box"><div class="stat-number">0</div><div class="stat-label">Giocatori</div></div>
+                    <div class="stat-box"><div class="stat-number">0</div><div class="stat-label">Gol Totali</div></div>
+                `;
+                
+                // Aggiorna timestamp
+                if (ultimoAggiornamento) {
+                    document.getElementById('ultimoAggiornamento').textContent = 
+                        ultimoAggiornamento.toLocaleDateString('it-IT') + ' ' + 
+                        ultimoAggiornamento.toLocaleTimeString('it-IT');
+                }
+                
+                return;
+            }
+            
+            // Calcola statistiche
+            const totGol = datiTorneo.partite.reduce((totale, partita) => 
+                totale + (partita.gol_casa || 0) + (partita.gol_ospite || 0), 0);
+            
+            let html = `
+                <div class="stat-box"><div class="stat-number">${datiTorneo.squadre.length}</div><div class="stat-label">Squadre</div></div>
+                <div class="stat-box"><div class="stat-number">${datiTorneo.giocatori.length}</div><div class="stat-label">Giocatori</div></div>
+                <div class="stat-box"><div class="stat-number">${datiTorneo.partite.length}</div><div class="stat-label">Partite</div></div>
+                <div class="stat-box"><div class="stat-number">${totGol}</div><div class="stat-label">Gol Totali</div></div>
+            `;
+            
+            // Aggiungi se c'è una finale
+            if(datiTorneo.finale) {
+                html += `
+                    <div class="stat-box" style="background: gold; border: 2px solid orange;">
+                        <div class="stat-number">🏆</div>
+                        <div class="stat-label">Finale Giocata</div>
+                    </div>
                 `;
             }
             
-            const now = new Date();
-            document.getElementById('ultimoAggiornamento').textContent = now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT');
+            container.innerHTML = html;
+            
+            // Aggiorna timestamp
+            document.getElementById('ultimoAggiornamento').textContent = 
+                ultimoAggiornamento.toLocaleDateString('it-IT') + ' ' + 
+                ultimoAggiornamento.toLocaleTimeString('it-IT');
         }
         
-        function apriClassifica() { window.location.href = 'classifica.html'; }
-        function apriSquadra() { window.location.href = 'squadra.html'; }
-        function apriStatistiche() { window.location.href = 'statistiche.html'; }
-        function apriFinale() { window.location.href = 'finale.html'; }
+        // FUNZIONI DI NAVIGAZIONE (rimangono uguali)
+        function apriClassifica() { 
+            // Salva i dati attuali per un caricamento più veloce
+            sessionStorage.setItem('cache_squadre', JSON.stringify(datiTorneo.squadre));
+            sessionStorage.setItem('cache_partite', JSON.stringify(datiTorneo.partite));
+            window.location.href = 'classifica.html'; 
+        }
+        
+        function apriSquadra() { 
+            sessionStorage.setItem('cache_squadre', JSON.stringify(datiTorneo.squadre));
+            sessionStorage.setItem('cache_giocatori', JSON.stringify(datiTorneo.giocatori));
+            window.location.href = 'squadra.html'; 
+        }
+        
+        function apriStatistiche() { 
+            sessionStorage.setItem('cache_giocatori', JSON.stringify(datiTorneo.giocatori));
+            sessionStorage.setItem('cache_partite', JSON.stringify(datiTorneo.partite));
+            window.location.href = 'statistiche.html'; 
+        }
+        
+        function apriFinale() { 
+            sessionStorage.setItem('cache_finale', JSON.stringify(datiTorneo.finale));
+            window.location.href = 'finale.html'; 
+        }
+        
         function apriAdmin() {
             const password = prompt("Inserisci la password ADMIN:");
             if(password === "1246912.!!") {
-                localStorage.setItem('admin_accesso', 'true');
+                sessionStorage.setItem('admin_accesso', 'true');
                 window.location.href = 'admin.html';
             } else {
                 alert("Password errata! Accesso negato.");
@@ -293,18 +495,128 @@
         
         function logout() {
             if(confirm("Sei sicuro di voler uscire?")) {
+                // Pulisci tutte le sessioni
+                sessionStorage.clear();
                 localStorage.removeItem('rovigoal_entrato');
                 localStorage.removeItem('admin_accesso');
                 window.location.href = 'index.html';
             }
         }
         
+        // FUNZIONI AUSILIARIE
+        function aggiornaStatoConnessione(stato) {
+            const statusElement = document.getElementById('connessioneStatus');
+            const loadingElement = statusElement.querySelector('.loading');
+            
+            switch(stato) {
+                case 'caricamento':
+                    statusElement.className = 'connessione-status connessione-caricamento';
+                    statusElement.innerHTML = '<div class="loading"></div> Caricamento dati...';
+                    break;
+                    
+                case 'ok':
+                    statusElement.className = 'connessione-status connessione-ok';
+                    statusElement.innerHTML = '✓ Connesso in tempo reale';
+                    break;
+                    
+                case 'ko':
+                    statusElement.className = 'connessione-status connessione-ko';
+                    statusElement.innerHTML = '✗ Disconnesso - Riprova';
+                    break;
+            }
+        }
+        
+        function aggiornaContatore() {
+            const contatore = document.getElementById('contatoreDispositivi');
+            if (contatore) {
+                if (contatoreAggiornamenti > 0) {
+                    contatore.textContent = `Dati aggiornati ${contatoreAggiornamenti} volte in tempo reale`;
+                    contatore.style.color = '#4CAF50';
+                    contatore.style.fontWeight = 'bold';
+                } else {
+                    contatore.textContent = 'In attesa di aggiornamenti...';
+                }
+            }
+        }
+        
+        function mostraNotificaAggiornamento(tipo) {
+            // Crea una notifica temporanea
+            const notifica = document.createElement('div');
+            notifica.style.cssText = `
+                position: fixed;
+                top: 60px;
+                right: 20px;
+                background: #4CAF50;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                z-index: 9999;
+                animation: slideIn 0.3s ease, fadeOut 0.3s ease 2s forwards;
+                font-weight: bold;
+            `;
+            
+            const tipiTraduzione = {
+                'squadre': 'Squadre',
+                'giocatori': 'Giocatori',
+                'partite': 'Partite',
+                'finale': 'Finale'
+            };
+            
+            notifica.textContent = `🔄 ${tipiTraduzione[tipo] || 'Dati'} aggiornati in tempo reale!`;
+            document.body.appendChild(notifica);
+            
+            // Rimuovi dopo 2.5 secondi
+            setTimeout(() => {
+                if (notifica.parentNode) {
+                    notifica.parentNode.removeChild(notifica);
+                }
+            }, 2500);
+        }
+        
+        // Aggiungi stili CSS per le animazioni
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; transform: translateX(100%); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // CONTROLLO ACCESSO
         if(localStorage.getItem('rovigoal_entrato') !== 'true') {
             window.location.href = 'index.html';
         }
         
-        caricaStatistiche();
-        setInterval(caricaStatistiche, 30000);
+        // CONTROLLO PERIODICO CONNESSIONE
+        setInterval(async () => {
+            try {
+                // Prova a fare una semplice query per testare la connessione
+                const test = await database.getSquadre();
+                if (Array.isArray(test)) {
+                    aggiornaStatoConnessione('ok');
+                } else {
+                    aggiornaStatoConnessione('ko');
+                }
+            } catch (error) {
+                aggiornaStatoConnessione('ko');
+            }
+        }, 30000); // Ogni 30 secondi
+        
+        // ESPORTA FUNZIONI PER HTML
+        window.apriClassifica = apriClassifica;
+        window.apriSquadra = apriSquadra;
+        window.apriStatistiche = apriStatistiche;
+        window.apriFinale = apriFinale;
+        window.apriAdmin = apriAdmin;
+        window.logout = logout;
+        window.caricaStatistiche = caricaStatistiche;
+        
     </script>
 </body>
 </html>

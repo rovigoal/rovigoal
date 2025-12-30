@@ -1427,28 +1427,68 @@ const partitaData = {
     voto_portiere_ospite: oggetto.votoPortiereOspite
 };
                 
-                // 4. Salva partita/finale con Supabase diretto
-                if(modalita === 'normale') {
-                    const { data, error } = await supabase
-                        .from('partite')
-                        .insert([partitaData])
-                        .select()
-                        .single();
-                    
-                    if (error) throw error;
-                } else {
-                    // Elimina finale esistente
-                    await supabase.from('finale').delete().neq('id', 0);
-                    
-                    // Aggiungi nuova finale
-                    const { data, error } = await supabase
-                        .from('finale')
-                        .insert([partitaData])
-                        .select()
-                        .single();
-                    
-                    if (error) throw error;
-                }
+               // 4. Salva partita/finale con Supabase diretto
+if(modalita === 'normale') {
+    // DEBUG: Visualizza cosa stiamo inviando
+    console.log("Dati partita da salvare:", partitaData);
+    
+    const { data, error } = await supabase
+        .from('partite')
+        .insert([{
+            data: partitaData.data,
+            ora: partitaData.ora,
+            squadra_casa: partitaData.squadra_casa,
+            squadra_ospite: partitaData.squadra_ospite,
+            gol_casa: partitaData.gol_casa,
+            gol_ospite: partitaData.gol_ospite,
+            eventi: partitaData.eventi,  // Questo è l'array che causa problemi
+            miglior_giocatore: partitaData.miglior_giocatore,
+            voto_miglior_giocatore: partitaData.voto_miglior_giocatore,
+            portiere_casa: partitaData.portiere_casa,
+            portiere_ospite: partitaData.portiere_ospite,
+            voto_portiere_casa: partitaData.voto_portiere_casa,
+            voto_portiere_ospite: partitaData.voto_portiere_ospite
+        }])
+        .select()
+        .single();
+    
+    if (error) {
+        console.error("Errore dettagliato Supabase:", error);
+        throw error;
+    }
+} else {
+    // Elimina finale esistente
+    await supabase.from('finale').delete().neq('id', 0);
+    
+    // DEBUG: Visualizza cosa stiamo inviando
+    console.log("Dati finale da salvare:", partitaData);
+    
+    // Aggiungi nuova finale
+    const { data, error } = await supabase
+        .from('finale')
+        .insert([{
+            data: partitaData.data,
+            ora: partitaData.ora,
+            squadra_casa: partitaData.squadra_casa,
+            squadra_ospite: partitaData.squadra_ospite,
+            gol_casa: partitaData.gol_casa,
+            gol_ospite: partitaData.gol_ospite,
+            eventi: partitaData.eventi,  // Questo è l'array che causa problemi
+            miglior_giocatore: partitaData.miglior_giocatore,
+            voto_miglior_giocatore: partitaData.voto_miglior_giocatore,
+            portiere_casa: partitaData.portiere_casa,
+            portiere_ospite: partitaData.portiere_ospite,
+            voto_portiere_casa: partitaData.voto_portiere_casa,
+            voto_portiere_ospite: partitaData.voto_portiere_ospite
+        }])
+        .select()
+        .single();
+    
+    if (error) {
+        console.error("Errore dettagliato Supabase:", error);
+        throw error;
+    }
+}
                 
                 // 5. Aggiorna statistiche squadre
                 await supabase
@@ -1981,6 +2021,7 @@ try {
     </script>
 </body>
 </html>
+
 
 
 

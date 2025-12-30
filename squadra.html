@@ -24,6 +24,7 @@
             border-radius: 10px;
             margin-bottom: 30px;
             text-align: center;
+            position: relative;
         }
         
         .container {
@@ -78,6 +79,11 @@
             align-items: center;
             padding: 10px;
             border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+        
+        .giocatore-item:hover {
+            background-color: #f9f9f9;
         }
         
         .giocatore-item:last-child {
@@ -110,6 +116,11 @@
             font-size: 0.8em;
             display: inline-block;
             margin-right: 5px;
+            transition: transform 0.2s;
+        }
+        
+        .stat-badge:hover {
+            transform: scale(1.1);
         }
         
         .gol { background: #90EE90; color: #006400; }
@@ -128,10 +139,12 @@
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
+            transition: all 0.3s ease;
         }
         
         .btn-back:hover {
             opacity: 0.9;
+            transform: translateY(-2px);
         }
         
         .empty-state {
@@ -163,58 +176,375 @@
             font-weight: bold;
             color: #8A2BE2;
         }
+        
+        /* STATO CONNESSIONE */
+        .connessione-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .connessione-ok {
+            background: #4CAF50;
+            color: white;
+            border: 2px solid #45a049;
+        }
+        
+        .connessione-caricamento {
+            background: #FFA500;
+            color: white;
+            border: 2px solid #FF8C00;
+        }
+        
+        .connessione-ko {
+            background: #f44336;
+            color: white;
+            border: 2px solid #d32f2f;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* NOTIFICA AGGIORNAMENTO */
+        .notifica-aggiornamento {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 9999;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2s forwards;
+            font-weight: bold;
+            display: none;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; transform: translateX(100%); }
+        }
+        
+        /* RUOLI COLORATI */
+        .ruolo-portiere {
+            color: #4169E1;
+            font-weight: bold;
+        }
+        
+        .ruolo-giocatore {
+            color: #32CD32;
+        }
+        
+        /* MEDIA QUERY MOBILE */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .squadre-container {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 15px;
+            }
+            
+            .squadra-card {
+                font-size: 0.9em;
+            }
+            
+            .giocatore-item {
+                padding: 8px;
+            }
+            
+            .giocatore-stats {
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+            
+            .stat-badge {
+                font-size: 0.7em;
+                padding: 2px 6px;
+            }
+            
+            .connessione-status {
+                top: 5px;
+                right: 5px;
+                padding: 4px 8px;
+                font-size: 0.7em;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .squadre-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .squadra-stats {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+        
+        /* SCROLLBAR PERSONALIZZATA */
+        .giocatori-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .giocatori-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        
+        .giocatori-list::-webkit-scrollbar-thumb {
+            background: #1e3c72;
+            border-radius: 3px;
+        }
+        
+        .giocatori-list::-webkit-scrollbar-thumb:hover {
+            background: #2a5298;
+        }
     </style>
 </head>
 <body>
+    <!-- NOTIFICA AGGIORNAMENTO -->
+    <div id="notificaAggiornamento" class="notifica-aggiornamento">
+        🔄 Squadre aggiornate in tempo reale!
+    </div>
+    
     <div class="header">
         <h1>👥 SQUADRE ROVIGOAL</h1>
         <p>Tutte le squadre e i giocatori registrati</p>
+        
+        <!-- STATO CONNESSIONE -->
+        <div id="connessioneStatus" class="connessione-status connessione-caricamento">
+            <div class="loading"></div> Caricamento...
+        </div>
     </div>
     
     <div class="container">
-        <div id="squadreList" class="squadre-container"></div>
+        <div id="squadreList" class="squadre-container">
+            <!-- Le squadre verranno caricate qui -->
+            <div class="empty-state">
+                <h3>Caricamento squadre...</h3>
+                <p>Attendere il caricamento dei dati</p>
+            </div>
+        </div>
         
         <button class="btn-back" onclick="tornaIndietro()">← TORNA ALLA HOME</button>
     </div>
     
-    <script>
-        // Carica squadre e giocatori
-        function caricaSquadre() {
-            const squadre = JSON.parse(localStorage.getItem('rovigoal_squadre')) || [];
-            const giocatori = JSON.parse(localStorage.getItem('rovigoal_giocatori')) || [];
+    <script type="module">
+        // Importa il gestore database Supabase
+        import database from './database-supabase.js';
+        
+        // VARIABILI GLOBALI
+        let datiTorneo = {
+            squadre: [],
+            giocatori: []
+        };
+        
+        let ultimoAggiornamento = null;
+        let contatoreAggiornamenti = 0;
+        
+        // INIZIALIZZAZIONE
+        document.addEventListener('DOMContentLoaded', async function() {
+            aggiornaStatoConnessione('caricamento');
             
+            try {
+                // Prima controlla se ci sono dati in cache
+                await caricaDaCache();
+                
+                // Poi carica dati freschi da Supabase
+                await caricaDatiIniziali();
+                
+                // Setup listener in tempo reale
+                setupRealtimeListeners();
+                
+                aggiornaStatoConnessione('ok');
+                
+            } catch (error) {
+                console.error('Errore caricamento squadre:', error);
+                aggiornaStatoConnessione('ko');
+                mostraErrore('Errore nel caricamento delle squadre. Riprova più tardi.');
+            }
+        });
+        
+        // CARICA DATI DA CACHE
+        async function caricaDaCache() {
+            try {
+                const cacheSquadre = sessionStorage.getItem('cache_squadre');
+                const cacheGiocatori = sessionStorage.getItem('cache_giocatori');
+                
+                if (cacheSquadre && cacheGiocatori) {
+                    datiTorneo.squadre = JSON.parse(cacheSquadre);
+                    datiTorneo.giocatori = JSON.parse(cacheGiocatori);
+                    
+                    console.log('Dati caricati dalla cache:', {
+                        squadre: datiTorneo.squadre.length,
+                        giocatori: datiTorneo.giocatori.length
+                    });
+                    
+                    // Mostra subito i dati dalla cache
+                    generaListaSquadre();
+                    
+                    // Poi aggiorna con i dati freschi
+                    return true;
+                }
+            } catch (error) {
+                console.warn('Errore caricamento cache:', error);
+            }
+            return false;
+        }
+        
+        // CARICA DATI INIZIALI DA SUPABASE
+        async function caricaDatiIniziali() {
+            try {
+                // Carica dati in parallelo
+                const [squadre, giocatori] = await Promise.all([
+                    database.getSquadre(),
+                    database.getGiocatori()
+                ]);
+                
+                // Aggiorna dati
+                datiTorneo.squadre = squadre || [];
+                datiTorneo.giocatori = giocatori || [];
+                
+                ultimoAggiornamento = new Date();
+                
+                console.log('Dati Supabase caricati:', {
+                    squadre: datiTorneo.squadre.length,
+                    giocatori: datiTorneo.giocatori.length
+                });
+                
+                // Aggiorna cache
+                sessionStorage.setItem('cache_squadre', JSON.stringify(datiTorneo.squadre));
+                sessionStorage.setItem('cache_giocatori', JSON.stringify(datiTorneo.giocatori));
+                
+                // Genera lista squadre
+                generaListaSquadre();
+                
+            } catch (error) {
+                console.error('Errore nel caricamento iniziale:', error);
+                throw error;
+            }
+        }
+        
+        // SETUP LISTENER TEMPO REALE
+        function setupRealtimeListeners() {
+            // Ascolta aggiornamenti dal database Supabase
+            window.onDatabaseUpdate = function(type, data) {
+                console.log(`Aggiornamento squadre: ${type}`);
+                
+                // Aggiorna i dati locali
+                if (type === 'squadre') {
+                    datiTorneo.squadre = data || [];
+                    sessionStorage.setItem('cache_squadre', JSON.stringify(data));
+                } else if (type === 'giocatori') {
+                    datiTorneo.giocatori = data || [];
+                    sessionStorage.setItem('cache_giocatori', JSON.stringify(data));
+                }
+                
+                ultimoAggiornamento = new Date();
+                contatoreAggiornamenti++;
+                
+                // Aggiorna l'interfaccia
+                generaListaSquadre();
+                aggiornaStatoConnessione('ok');
+                
+                // Mostra notifica
+                if (type === 'squadre' || type === 'giocatori') {
+                    mostraNotificaAggiornamento(type);
+                }
+            };
+        }
+        
+        // GENERA LISTA SQUADRE
+        function generaListaSquadre() {
             const container = document.getElementById('squadreList');
             
-            if(squadre.length === 0) {
+            if (!datiTorneo.squadre || datiTorneo.squadre.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <h3>Nessuna squadra registrata</h3>
-                        <p>Vai nell'area Admin per aggiungere squadre e giocatori</p>
+                        <h3>📋 Nessuna squadra registrata</h3>
+                        <p>Vai in Area Admin per aggiungere squadre e giocatori</p>
+                        <button onclick="location.reload()" style="margin-top: 15px; padding: 8px 20px; background: #1E90FF; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            Ricarica
+                        </button>
                     </div>
                 `;
                 return;
             }
             
-            container.innerHTML = '';
+            let html = '';
+            
+            // Ordina squadre per nome
+            const squadreOrdinate = [...datiTorneo.squadre].sort((a, b) => 
+                a.nome.localeCompare(b.nome, 'it', { sensitivity: 'base' })
+            );
             
             // Per ogni squadra
-            squadre.forEach(squadra => {
+            squadreOrdinate.forEach(squadra => {
                 // Filtra giocatori della squadra
-                const giocatoriSquadra = giocatori.filter(g => g.squadra === squadra.nome);
+                const giocatoriSquadra = datiTorneo.giocatori.filter(g => 
+                    g.squadra === squadra.nome
+                );
                 
-                // Ordina giocatori per numero di maglia
-                giocatoriSquadra.sort((a, b) => (a.numero || 99) - (b.numero || 99));
+                // Ordina giocatori: prima portieri, poi per numero
+                giocatoriSquadra.sort((a, b) => {
+                    // Portieri prima
+                    if (a.ruolo === 'Portiere' && b.ruolo !== 'Portiere') return -1;
+                    if (a.ruolo !== 'Portiere' && b.ruolo === 'Portiere') return 1;
+                    
+                    // Poi per numero
+                    return (a.numero || 99) - (b.numero || 99);
+                });
                 
                 let giocatoriHTML = '';
                 
-                if(giocatoriSquadra.length === 0) {
+                if (giocatoriSquadra.length === 0) {
                     giocatoriHTML = `
-                        <div class="empty-state">
-                            <p>Nessun giocatore registrato per questa squadra</p>
+                        <div class="empty-state" style="padding: 20px;">
+                            <p>Nessun giocatore registrato</p>
                         </div>
                     `;
                 } else {
                     giocatoriSquadra.forEach(giocatore => {
+                        // Determina classe ruolo
+                        const classeRuolo = giocatore.ruolo === 'Portiere' ? 'ruolo-portiere' : 'ruolo-giocatore';
+                        
                         giocatoriHTML += `
                             <div class="giocatore-item">
                                 <div class="giocatore-info">
@@ -223,15 +553,17 @@
                                         ${giocatore.numero ? `<small>#${giocatore.numero}</small>` : ''}
                                     </div>
                                     <div class="giocatore-dettagli">
-                                        ${giocatore.ruolo || 'Giocatore'}
-                                        ${giocatore.punteggioTotale > 0 ? 
-                                            `<span class="punteggio-totale"> | Punti: ${giocatore.punteggioTotale}</span>` : ''}
+                                        <span class="${classeRuolo}">${giocatore.ruolo || 'Giocatore'}</span>
+                                        ${giocatore.punteggio_totale > 0 ? 
+                                            `<span class="punteggio-totale"> | Punti: ${giocatore.punteggio_totale}</span>` : ''}
                                     </div>
                                 </div>
                                 <div class="giocatore-stats">
-                                    ${giocatore.gol > 0 ? `<span class="stat-badge gol">⚽ ${giocatore.gol}</span>` : ''}
-                                    ${giocatore.ammonizioni > 0 ? `<span class="stat-badge amm">🟨 ${giocatore.ammonizioni}</span>` : ''}
-                                    ${giocatore.espulsioni > 0 ? `<span class="stat-badge esp">🟥 ${giocatore.espulsioni}</span>` : ''}
+                                    ${giocatore.gol > 0 ? `<span class="stat-badge gol" title="Gol">⚽ ${giocatore.gol}</span>` : ''}
+                                    ${giocatore.ammonizioni > 0 ? `<span class="stat-badge amm" title="Ammonizioni">🟨 ${giocatore.ammonizioni}</span>` : ''}
+                                    ${giocatore.espulsioni > 0 ? `<span class="stat-badge esp" title="Espulsioni">🟥 ${giocatore.espulsioni}</span>` : ''}
+                                    ${giocatore.premi_miglior_giocatore > 0 ? `<span class="stat-badge voto" title="Premi miglior giocatore">⭐ ${giocatore.premi_miglior_giocatore}</span>` : ''}
+                                    ${giocatore.premi_miglior_portiere > 0 ? `<span class="stat-badge voto" title="Premi miglior portiere">🏅 ${giocatore.premi_miglior_portiere}</span>` : ''}
                                 </div>
                             </div>
                         `;
@@ -242,7 +574,7 @@
                 const totGol = giocatoriSquadra.reduce((sum, g) => sum + (g.gol || 0), 0);
                 const totAmm = giocatoriSquadra.reduce((sum, g) => sum + (g.ammonizioni || 0), 0);
                 const totEsp = giocatoriSquadra.reduce((sum, g) => sum + (g.espulsioni || 0), 0);
-                const totPunti = giocatoriSquadra.reduce((sum, g) => sum + (g.punteggioTotale || 0), 0);
+                const totPunti = giocatoriSquadra.reduce((sum, g) => sum + (g.punteggio_totale || 0), 0);
                 
                 const squadraCard = `
                     <div class="squadra-card">
@@ -250,16 +582,16 @@
                             <div class="stats-header">
                                 <div class="squadra-nome">${squadra.nome}</div>
                                 <div class="squadra-stats">
-                                    ${totGol > 0 ? `<div class="stat">⚽ ${totGol}</div>` : ''}
-                                    ${totAmm > 0 ? `<div class="stat">🟨 ${totAmm}</div>` : ''}
-                                    ${totEsp > 0 ? `<div class="stat">🟥 ${totEsp}</div>` : ''}
-                                    ${totPunti > 0 ? `<div class="stat">⭐ ${totPunti}</div>` : ''}
+                                    ${totGol > 0 ? `<div class="stat" title="Gol totali squadra">⚽ ${totGol}</div>` : ''}
+                                    ${totAmm > 0 ? `<div class="stat" title="Ammonizioni totali">🟨 ${totAmm}</div>` : ''}
+                                    ${totEsp > 0 ? `<div class="stat" title="Espulsioni totali">🟥 ${totEsp}</div>` : ''}
+                                    ${totPunti > 0 ? `<div class="stat" title="Punti totali giocatori">⭐ ${totPunti}</div>` : ''}
                                 </div>
                             </div>
                             <div class="squadra-info">
-                                Allenatore: ${squadra.allenatore || 'Non specificato'} | 
-                                Colori: ${squadra.colori || 'Non specificati'} |
-                                Punti Classifica: <strong>${squadra.punti || 0}</strong>
+                                <span title="Allenatore">👨‍🏫 ${squadra.allenatore || 'Non specificato'}</span> | 
+                                <span title="Colori">🎨 ${squadra.colori || 'Non specificati'}</span> |
+                                <span title="Punti classifica"><strong>🏆 ${squadra.punti || 0} pt</strong></span>
                             </div>
                         </div>
                         <div class="giocatori-list">
@@ -268,24 +600,91 @@
                     </div>
                 `;
                 
-                container.innerHTML += squadraCard;
+                html += squadraCard;
             });
+            
+            container.innerHTML = html;
         }
         
+        // FUNZIONI AUSILIARIE
+        function aggiornaStatoConnessione(stato) {
+            const statusElement = document.getElementById('connessioneStatus');
+            
+            switch(stato) {
+                case 'caricamento':
+                    statusElement.className = 'connessione-status connessione-caricamento';
+                    statusElement.innerHTML = '<div class="loading"></div> Caricamento squadre...';
+                    break;
+                    
+                case 'ok':
+                    statusElement.className = 'connessione-status connessione-ok';
+                    statusElement.innerHTML = '✓ Connesso in tempo reale';
+                    break;
+                    
+                case 'ko':
+                    statusElement.className = 'connessione-status connessione-ko';
+                    statusElement.innerHTML = '✗ Disconnesso';
+                    break;
+            }
+        }
+        
+        function mostraNotificaAggiornamento(tipo) {
+            const notifica = document.getElementById('notificaAggiornamento');
+            
+            const messaggi = {
+                'squadre': 'Squadre aggiornate!',
+                'giocatori': 'Giocatori aggiornati!'
+            };
+            
+            notifica.textContent = `🔄 ${messaggi[tipo] || 'Dati aggiornati!'} (${++contatoreAggiornamenti} aggiornamenti)`;
+            notifica.style.display = 'block';
+            
+            // Nascondi dopo 3 secondi
+            setTimeout(() => {
+                notifica.style.display = 'none';
+            }, 3000);
+        }
+        
+        function mostraErrore(messaggio) {
+            const container = document.getElementById('squadreList');
+            container.innerHTML = `
+                <div class="empty-state" style="color: #f44336;">
+                    <h3>⚠️ Errore di connessione</h3>
+                    <p>${messaggio}</p>
+                    <button onclick="location.reload()" style="margin-top: 15px; padding: 8px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Riprova
+                    </button>
+                </div>
+            `;
+        }
+        
+        // NAVIGAZIONE
         function tornaIndietro() {
             window.location.href = 'main.html';
         }
         
-        // Controllo accesso
+        // CONTROLLO ACCESSO
         if(localStorage.getItem('rovigoal_entrato') !== 'true') {
             window.location.href = 'index.html';
         }
         
-        // Carica i dati all'avvio
-        caricaSquadre();
+        // CONTROLLO PERIODICO CONNESSIONE
+        setInterval(async () => {
+            try {
+                const test = await database.getSquadre();
+                if (Array.isArray(test)) {
+                    aggiornaStatoConnessione('ok');
+                } else {
+                    aggiornaStatoConnessione('ko');
+                }
+            } catch (error) {
+                aggiornaStatoConnessione('ko');
+            }
+        }, 30000);
         
-        // Aggiorna ogni 30 secondi
-        setInterval(caricaSquadre, 30000);
+        // ESPORTA FUNZIONI
+        window.tornaIndietro = tornaIndietro;
+        
     </script>
 </body>
 </html>

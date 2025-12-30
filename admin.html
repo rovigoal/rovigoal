@@ -1714,7 +1714,18 @@ try {
                     .eq('id', squadraOspite.id);
                 
                 // 4. Rimuovi statistiche giocatori
-                const eventi = partita.eventi || [];
+                // Controlla se eventi è una stringa JSON e parsala
+let eventi = [];
+try {
+    if (typeof partita.eventi === 'string') {
+        eventi = JSON.parse(partita.eventi);
+    } else if (Array.isArray(partita.eventi)) {
+        eventi = partita.eventi;
+    }
+} catch (error) {
+    console.error("Errore nel parsing degli eventi:", error);
+    eventi = [];
+}
                 for(const evento of eventi) {
                     const giocatore = databaseData.giocatori.find(g => g.id === evento.giocatoreId);
                     if(giocatore) {
@@ -1970,6 +1981,7 @@ try {
     </script>
 </body>
 </html>
+
 
 
 

@@ -981,7 +981,7 @@ window.onDatabaseUpdate = function(type, data) {
                 document.getElementById('nome-portiere-casa').textContent = '';
                 document.getElementById('nome-portiere-ospite').textContent = '';
                 
-            } else if(modalita === 'finale') {
+                       } else if(modalita === 'finale') {
                 // Popola miglior giocatore per finale
                 const selectGiocatore = document.getElementById('finaleMigliorGiocatore');
                 selectGiocatore.innerHTML = '<option value="">-- Seleziona --</option>';
@@ -994,6 +994,16 @@ window.onDatabaseUpdate = function(type, data) {
                         selectGiocatore.appendChild(option);
                     }
                 });
+                
+                // Aggiungi listener per salvare la selezione (finale)
+                selectGiocatore.onchange = function() {
+                    if(this.value) {
+                        finaleInCorso.migliorGiocatore = parseInt(this.value);
+                        console.log(`Miglior giocatore finale selezionato: ID ${finaleInCorso.migliorGiocatore}`);
+                    } else {
+                        finaleInCorso.migliorGiocatore = null;
+                    }
+                };
                 
                 // Popola selezioni portieri finale
                 popolaPortieri('finalePortiereCasa', squadraCasa);
@@ -1738,5 +1748,6 @@ window.onDatabaseUpdate = function(type, data) {
     </script>
 </body>
 </html>
+
 
 

@@ -1,3 +1,17 @@
+Certamente! Creiamo insieme il file admin.html per il pannello di amministrazione di Rovigoal. Ti aiuterò a costruirlo passo dopo passo.
+
+Iniziamo con una struttura base che include:
+
+1. Header con titolo e stato connessione
+2. Menu admin con schede per le diverse funzioni
+3. Controlli CRUD per gestire squadre, giocatori, partite e finale
+4. Statistiche admin e funzioni avanzate
+
+Ecco il file iniziale:
+
+```html
+[file name]: admin.html
+[file content begin]
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -5,184 +19,1721 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rovigoal - Area Admin</title>
     <style>
-        /* Stili mantenuti e ottimizzati per mobile */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Arial', sans-serif; background: #f0f2f5; padding: 20px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
-        .btn-home {
-            position: fixed; top: 20px; right: 20px; background: #1e3c72; color: white; border: none;
-            padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; z-index: 1000;
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
         }
         
         .header {
-            background: linear-gradient(135deg, #FF4500 0%, #DC143C 100%); color: white; padding: 20px;
-            border-radius: 10px; margin-bottom: 30px; text-align: center;
+            background: linear-gradient(135deg, #FF4500 0%, #DC143C 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 3px solid #FF6347;
+            position: relative;
         }
         
-        .menu-admin {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;
-            max-width: 1000px; margin: 0 auto 40px;
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
         
-        .menu-btn {
-            background: white; padding: 40px 20px; border-radius: 15px; text-align: center; 
-            font-weight: bold; cursor: pointer; transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
         }
-        .menu-btn:hover { transform: translateY(-5px); }
         
-        .sezione { background: white; padding: 25px; border-radius: 10px; display: none; max-width: 1000px; margin: 0 auto; }
-        .sezione.attiva { display: block; }
+        /* MENU ADMIN */
+        .admin-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
         
-        .form-group { margin-bottom: 15px; }
-        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; }
+        .admin-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+            text-align: center;
+        }
         
-        .btn { padding: 12px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; border: none; margin-top: 10px; }
-        .btn-green { background: #2ecc71; color: white; }
-        .btn-blue { background: #3498db; color: white; }
-        .btn-red { background: #e74c3c; color: white; }
+        .admin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
         
-        .stella { font-size: 24px; cursor: pointer; color: #ddd; }
-        .stella.selezionata { color: #FFD700; }
-        .hidden { display: none; }
+        .admin-card h3 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        .admin-card p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+        
+        .admin-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        /* CONTENUTI ADMIN */
+        .admin-content {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s ease;
+        }
+        
+        .admin-content.active {
+            display: block;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .content-header h2 {
+            color: #1e3c72;
+            font-size: 1.8em;
+        }
+        
+        /* FORMS */
+        .admin-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.2s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #1e3c72;
+            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+        }
+        
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        /* BUTTONS */
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #333;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #DC143C 0%, #FF4500 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* TABLES */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .data-table th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .data-table tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 0.85em;
+        }
+        
+        /* ALERTS */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* STATO CONNESSIONE */
+        .connessione-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .connessione-ok {
+            background: #4CAF50;
+            color: white;
+            border: 2px solid #45a049;
+        }
+        
+        .connessione-caricamento {
+            background: #FFA500;
+            color: white;
+            border: 2px solid #FF8C00;
+        }
+        
+        .connessione-ko {
+            background: #f44336;
+            color: white;
+            border: 2px solid #d32f2f;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* NAVIGATION */
+        .back-button {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* DANGER ZONE */
+        .danger-zone {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
+            border: 2px solid #ff6b6b;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+        
+        .danger-zone h3 {
+            color: #dc143c;
+            margin-bottom: 15px;
+        }
+        
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalSlide 0.3s ease;
+        }
+        
+        @keyframes modalSlide {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .modal-header h3 {
+            color: #1e3c72;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        /* MEDIA QUERIES */
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .admin-menu {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .admin-card {
+                padding: 20px;
+            }
+            
+            .admin-content {
+                padding: 20px;
+            }
+            
+            .content-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-table {
+                font-size: 0.9em;
+            }
+            
+            .data-table th, .data-table td {
+                padding: 10px 8px;
+            }
+            
+            .connessione-status {
+                top: 5px;
+                right: 5px;
+                padding: 4px 8px;
+                font-size: 0.7em;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .form-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
     </style>
 </head>
 <body>
-    <button class="btn-home" onclick="location.href='main.html'">🏠 HOME</button>
+    <!-- MODAL CONFERMA -->
+    <div id="modalConferma" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitolo">Conferma Azione</h3>
+                <button class="close-modal" onclick="chiudiModal()">×</button>
+            </div>
+            <div id="modalMessaggio">
+                Sei sicuro di voler procedere?
+            </div>
+            <div class="form-buttons" style="margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="chiudiModal()">Annulla</button>
+                <button class="btn btn-danger" id="modalConfermaBtn">Conferma</button>
+            </div>
+        </div>
+    </div>
     
     <div class="header">
         <h1>🔧 AREA ADMIN ROVIGOAL</h1>
-        <p>Gestione Database Supabase</p>
-    </div>
-
-    <div class="menu-admin" id="menuPrincipale">
-        <div class="menu-btn" onclick="mostraSezione('gestione')">👥 SQUADRE & GIOCATORI</div>
-        <div class="menu-btn" onclick="mostraSezione('partite')">⚽ INSERISCI PARTITA</div>
-        <div class="menu-btn" onclick="mostraSezione('elencoPartite')">📋 ELENCO PARTITE</div>
-    </div>
-
-    <div id="gestione" class="sezione">
-        <h2>Aggiungi Squadra</h2>
-        <div class="form-group">
-            <input type="text" id="nomeSquadra" placeholder="Nome Squadra">
-            <button class="btn btn-green" onclick="aggiungiSquadra()">Aggiungi</button>
+        <p>Gestione completa del torneo</p>
+        
+        <!-- STATO CONNESSIONE -->
+        <div id="connessioneStatus" class="connessione-status connessione-caricamento">
+            <div class="loading"></div> Caricamento...
         </div>
-
-        <hr>
-
-        <h2>Aggiungi Giocatore</h2>
-        <div class="form-group">
-            <select id="squadraSelezionata"></select>
-            <input type="text" id="nomeGiocatore" placeholder="Nome Giocatore">
-            <select id="ruoloGiocatore">
-                <option value="Giocatore">Giocatore</option>
-                <option value="Portiere">Portiere</option>
-            </select>
-            <button class="btn btn-blue" onclick="aggiungiGiocatore()">Aggiungi</button>
-        </div>
-        <button class="btn btn-red" onclick="tornaMenu()">Indietro</button>
     </div>
-
-    <div id="partite" class="sezione">
-        <h2>Inserimento Partita</h2>
-        <div class="form-group">
-            <label>Casa</label>
-            <select id="casaSelect"></select>
-            <label>Ospite</label>
-            <select id="ospiteSelect"></select>
-        </div>
-        <div class="form-group">
-            <input type="number" id="golCasa" placeholder="Gol Casa" value="0">
-            <input type="number" id="golOspite" placeholder="Gol Ospite" value="0">
-        </div>
-        <button class="btn btn-green" onclick="salvaPartita()">Salva Partita</button>
-        <button class="btn btn-red" onclick="tornaMenu()">Indietro</button>
-    </div>
-
-    <script type="module">
-        import database from './database-supabase.js';
-
-        // Inizializzazione dati
-        async function init() {
-            aggiornaDropdowns();
-        }
-
-        window.mostraSezione = function(id) {
-            document.querySelectorAll('.sezione').forEach(s => s.classList.remove('attiva'));
-            document.getElementById('menuPrincipale').style.display = 'none';
-            document.getElementById(id).classList.add('attiva');
-        }
-
-        window.tornaMenu = function() {
-            document.querySelectorAll('.sezione').forEach(s => s.classList.remove('attiva'));
-            document.getElementById('menuPrincipale').style.display = 'grid';
-        }
-
-        async function aggiornaDropdowns() {
-            const squadre = await database.getSquadre();
-            const selects = ['squadraSelezionata', 'casaSelect', 'ospiteSelect'];
+    
+    <div class="container">
+        <!-- ALERT MESSAGES -->
+        <div id="alertSuccess" class="alert alert-success" style="display: none;"></div>
+        <div id="alertError" class="alert alert-error" style="display: none;"></div>
+        <div id="alertInfo" class="alert alert-info" style="display: none;"></div>
+        
+        <!-- MENU PRINCIPALE -->
+        <div class="admin-menu">
+            <div class="admin-card" onclick="mostraSezione('squadre')">
+                <span class="admin-icon">👥</span>
+                <h3>GESTIONE SQUADRE</h3>
+                <p>Aggiungi, modifica o elimina squadre. Gestisci allenatori e colori.</p>
+            </div>
             
-            selects.forEach(id => {
-                const el = document.getElementById(id);
-                if(el) {
-                    el.innerHTML = squadre.map(s => `<option value="${s.id}">${s.nome}</option>`).join('');
+            <div class="admin-card" onclick="mostraSezione('giocatori')">
+                <span class="admin-icon">⚽</span>
+                <h3>GESTIONE GIOCATORI</h3>
+                <p>Gestisci tutti i giocatori: aggiungi, modifica, assegna a squadre.</p>
+            </div>
+            
+            <div class="admin-card" onclick="mostraSezione('partite')">
+                <span class="admin-icon">📅</span>
+                <h3>GESTIONE PARTITE</h3>
+                <p>Crea nuove partite, registra risultati, assegna premi.</p>
+            </div>
+            
+            <div class="admin-card" onclick="mostraSezione('finale')">
+                <span class="admin-icon">🏆</span>
+                <h3>GESTIONE FINALE</h3>
+                <p>Configura e gestisci la partita finale del torneo.</p>
+            </div>
+            
+            <div class="admin-card" onclick="mostraSezione('import-export')">
+                <span class="admin-icon">💾</span>
+                <h3>IMPORT/EXPORT DATI</h3>
+                <p>Backup e ripristino dati. Importa dati da file.</p>
+            </div>
+            
+            <div class="admin-card" onclick="mostraSezione('statistiche-admin')">
+                <span class="admin-icon">📊</span>
+                <h3>STATISTICHE AVANZATE</h3>
+                <p>Statistiche dettagliate e report del torneo.</p>
+            </div>
+        </div>
+        
+        <!-- SEZIONI CONTENUTO -->
+        
+        <!-- 1. GESTIONE SQUADRE -->
+        <div id="sezione-squadre" class="admin-content">
+            <div class="content-header">
+                <h2>👥 GESTIONE SQUADRE</h2>
+                <button class="btn btn-primary" onclick="mostraFormSquadra()">
+                    <span>➕</span> Nuova Squadra
+                </button>
+            </div>
+            
+            <!-- FORM AGGIUNGI/MODIFICA SQUADRA -->
+            <div id="formSquadra" class="admin-form" style="display: none;">
+                <h3 id="formSquadraTitolo">Aggiungi Nuova Squadra</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nomeSquadra">Nome Squadra *</label>
+                        <input type="text" id="nomeSquadra" placeholder="Es: Milan FC">
+                    </div>
+                    <div class="form-group">
+                        <label for="allenatoreSquadra">Allenatore</label>
+                        <input type="text" id="allenatoreSquadra" placeholder="Nome allenatore">
+                    </div>
+                    <div class="form-group">
+                        <label for="coloriSquadra">Colori</label>
+                        <input type="text" id="coloriSquadra" placeholder="Es: Rosso-Nero">
+                    </div>
+                </div>
+                <div class="form-buttons">
+                    <button class="btn btn-success" onclick="salvaSquadra()">
+                        <span>💾</span> Salva Squadra
+                    </button>
+                    <button class="btn btn-secondary" onclick="annullaFormSquadra()">
+                        <span>✖️</span> Annulla
+                    </button>
+                </div>
+            </div>
+            
+            <!-- TABELLA SQUADRE -->
+            <h3>Elenco Squadre Registrate</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Allenatore</th>
+                        <th>Colori</th>
+                        <th>Punti</th>
+                        <th>Partite</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody id="tabellaSquadre">
+                    <tr><td colspan="7" style="text-align: center; padding: 20px;">Caricamento squadre...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 2. GESTIONE GIOCATORI -->
+        <div id="sezione-giocatori" class="admin-content">
+            <div class="content-header">
+                <h2>⚽ GESTIONE GIOCATORI</h2>
+                <button class="btn btn-primary" onclick="mostraFormGiocatore()">
+                    <span>➕</span> Nuovo Giocatore
+                </button>
+            </div>
+            
+            <!-- FILTRI GIOCATORI -->
+            <div class="admin-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="filtroSquadraGiocatori">Filtra per Squadra</label>
+                        <select id="filtroSquadraGiocatori" onchange="filtraGiocatori()">
+                            <option value="">Tutte le squadre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filtroRuoloGiocatori">Filtra per Ruolo</label>
+                        <select id="filtroRuoloGiocatori" onchange="filtraGiocatori()">
+                            <option value="">Tutti i ruoli</option>
+                            <option value="Portiere">Portiere</option>
+                            <option value="Giocatore">Giocatore</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- FORM AGGIUNGI/MODIFICA GIOCATORE -->
+            <div id="formGiocatore" class="admin-form" style="display: none;">
+                <h3 id="formGiocatoreTitolo">Aggiungi Nuovo Giocatore</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nomeGiocatore">Nome Giocatore *</label>
+                        <input type="text" id="nomeGiocatore" placeholder="Es: Mario Rossi">
+                    </div>
+                    <div class="form-group">
+                        <label for="numeroGiocatore">Numero Maglia</label>
+                        <input type="number" id="numeroGiocatore" placeholder="Es: 10" min="1" max="99">
+                    </div>
+                    <div class="form-group">
+                        <label for="squadraGiocatore">Squadra *</label>
+                        <select id="squadraGiocatore">
+                            <option value="">Seleziona squadra...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ruoloGiocatore">Ruolo *</label>
+                        <select id="ruoloGiocatore">
+                            <option value="">Seleziona ruolo...</option>
+                            <option value="Portiere">Portiere</option>
+                            <option value="Giocatore">Giocatore</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-buttons">
+                    <button class="btn btn-success" onclick="salvaGiocatore()">
+                        <span>💾</span> Salva Giocatore
+                    </button>
+                    <button class="btn btn-secondary" onclick="annullaFormGiocatore()">
+                        <span>✖️</span> Annulla
+                    </button>
+                </div>
+            </div>
+            
+            <!-- TABELLA GIOCATORI -->
+            <h3>Elenco Giocatori Registrati</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Numero</th>
+                        <th>Squadra</th>
+                        <th>Ruolo</th>
+                        <th>Gol</th>
+                        <th>Punti</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody id="tabellaGiocatori">
+                    <tr><td colspan="8" style="text-align: center; padding: 20px;">Caricamento giocatori...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 3. GESTIONE PARTITE -->
+        <div id="sezione-partite" class="admin-content">
+            <div class="content-header">
+                <h2>📅 GESTIONE PARTITE</h2>
+                <button class="btn btn-primary" onclick="mostraFormPartita()">
+                    <span>➕</span> Nuova Partita
+                </button>
+            </div>
+            
+            <!-- FORM NUOVA PARTITA -->
+            <div id="formPartita" class="admin-form" style="display: none;">
+                <h3 id="formPartitaTitolo">Registra Nuova Partita</h3>
+                
+                <!-- INFO BASE PARTITA -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="dataPartita">Data *</label>
+                        <input type="date" id="dataPartita">
+                    </div>
+                    <div class="form-group">
+                        <label for="oraPartita">Ora</label>
+                        <input type="time" id="oraPartita">
+                    </div>
+                </div>
+                
+                <!-- SQUADRE -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="squadraCasa">Squadra Casa *</label>
+                        <select id="squadraCasa">
+                            <option value="">Seleziona squadra casa...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="squadraOspite">Squadra Ospite *</label>
+                        <select id="squadraOspite">
+                            <option value="">Seleziona squadra ospite...</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- RISULTATO -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="golCasa">Gol Squadra Casa</label>
+                        <input type="number" id="golCasa" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="golOspite">Gol Squadra Ospite</label>
+                        <input type="number" id="golOspite" min="0" value="0">
+                    </div>
+                </div>
+                
+                <!-- EVENTI PARTITA (sarà espanso dinamicamente) -->
+                <div id="eventiPartitaContainer" style="margin-top: 20px;">
+                    <h4>Eventi Partita (Gol, Ammonizioni, Espulsioni)</h4>
+                    <div id="listaEventi">
+                        <!-- Eventi verranno aggiunti qui dinamicamente -->
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="aggiungiEvento()" style="margin-top: 10px;">
+                        <span>➕</span> Aggiungi Evento
+                    </button>
+                </div>
+                
+                <!-- PREMI PARTITA -->
+                <div style="margin-top: 20px; padding: 15px; background: #e7f5ff; border-radius: 8px;">
+                    <h4>🏆 Premi Partita</h4>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="migliorGiocatore">Miglior Giocatore</label>
+                            <select id="migliorGiocatore">
+                                <option value="">Seleziona giocatore...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="votoMigliorGiocatore">Voto (1-10)</label>
+                            <input type="number" id="votoMigliorGiocatore" min="1" max="10">
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="portiereCasa">Portiere Casa</label>
+                            <select id="portiereCasa">
+                                <option value="">Seleziona portiere...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="votoPortiereCasa">Voto Portiere Casa (1-10)</label>
+                            <input type="number" id="votoPortiereCasa" min="1" max="10">
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="portiereOspite">Portiere Ospite</label>
+                            <select id="portiereOspite">
+                                <option value="">Seleziona portiere...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="votoPortiereOspite">Voto Portiere Ospite (1-10)</label>
+                            <input type="number" id="votoPortiereOspite" min="1" max="10">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-buttons">
+                    <button class="btn btn-success" onclick="salvaPartita()">
+                        <span>💾</span> Salva Partita
+                    </button>
+                    <button class="btn btn-secondary" onclick="annullaFormPartita()">
+                        <span>✖️</span> Annulla
+                    </button>
+                </div>
+            </div>
+            
+            <!-- TABELLA PARTITE -->
+            <h3>Partite Registrate</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Data</th>
+                        <th>Partita</th>
+                        <th>Risultato</th>
+                        <th>Eventi</th>
+                        <th>Premi</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody id="tabellaPartite">
+                    <tr><td colspan="7" style="text-align: center; padding: 20px;">Caricamento partite...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 4. GESTIONE FINALE -->
+        <div id="sezione-finale" class="admin-content">
+            <div class="content-header">
+                <h2>🏆 GESTIONE PARTITA FINALE</h2>
+                <button class="btn btn-primary" onclick="mostraFormFinale()">
+                    <span>➕</span> Configura Finale
+                </button>
+            </div>
+            
+            <!-- FORM FINALE -->
+            <div id="formFinale" class="admin-form" style="display: none;">
+                <h3 id="formFinaleTitolo">Configura Partita Finale</h3>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="finaleData">Data Finale *</label>
+                        <input type="date" id="finaleData">
+                    </div>
+                    <div class="form-group">
+                        <label for="finaleOra">Ora</label>
+                        <input type="time" id="finaleOra">
+                    </div>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="finaleSquadraCasa">Squadra Casa *</label>
+                        <select id="finaleSquadraCasa">
+                            <option value="">Seleziona squadra...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="finaleSquadraOspite">Squadra Ospite *</label>
+                        <select id="finaleSquadraOspite">
+                            <option value="">Seleziona squadra...</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="finaleGolCasa">Gol Squadra Casa</label>
+                        <input type="number" id="finaleGolCasa" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="finaleGolOspite">Gol Squadra Ospite</label>
+                        <input type="number" id="finaleGolOspite" min="0" value="0">
+                    </div>
+                </div>
+                
+                <!-- EVENTI FINALE -->
+                <div id="eventiFinaleContainer" style="margin-top: 20px;">
+                    <h4>Eventi Finale</h4>
+                    <div id="listaEventiFinale">
+                        <!-- Eventi verranno aggiunti qui -->
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="aggiungiEventoFinale()" style="margin-top: 10px;">
+                        <span>➕</span> Aggiungi Evento
+                    </button>
+                </div>
+                
+                <!-- PREMI FINALE -->
+                <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px;">
+                    <h4>🎖️ Premi Finale</h4>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="finaleMigliorGiocatore">Miglior Giocatore</label>
+                            <select id="finaleMigliorGiocatore">
+                                <option value="">Seleziona giocatore...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="finaleVotoMigliorGiocatore">Voto (1-10)</label>
+                            <input type="number" id="finaleVotoMigliorGiocatore" min="1" max="10">
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="finalePortiereCasa">Portiere Casa</label>
+                            <select id="finalePortiereCasa">
+                                <option value="">Seleziona portiere...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="finaleVotoPortiereCasa">Voto (1-10)</label>
+                            <input type="number" id="finaleVotoPortiereCasa" min="1" max="10">
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="finalePortiereOspite">Portiere Ospite</label>
+                            <select id="finalePortiereOspite">
+                                <option value="">Seleziona portiere...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="finaleVotoPortiereOspite">Voto (1-10)</label>
+                            <input type="number" id="finaleVotoPortiereOspite" min="1" max="10">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-buttons">
+                    <button class="btn btn-success" onclick="salvaFinale()">
+                        <span>💾</span> Salva Finale
+                    </button>
+                    <button class="btn btn-secondary" onclick="annullaFormFinale()">
+                        <span>✖️</span> Annulla
+                    </button>
+                </div>
+            </div>
+            
+            <!-- INFO FINALE ATTUALE -->
+            <div id="infoFinale" style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <h3>Nessuna finale configurata</h3>
+                <p>Configura la partita finale usando il pulsante sopra.</p>
+            </div>
+        </div>
+        
+        <!-- 5. IMPORT/EXPORT DATI -->
+        <div id="sezione-import-export" class="admin-content">
+            <div class="content-header">
+                <h2>💾 IMPORT/EXPORT DATI</h2>
+            </div>
+            
+            <div class="admin-form">
+                <h3>Backup Dati</h3>
+                <p>Esporta tutti i dati del torneo in un file JSON per backup.</p>
+                <button class="btn btn-primary" onclick="esportaDati()">
+                    <span>⬇️</span> Esporta Dati Completi
+                </button>
+                
+                <h3 style="margin-top: 30px;">Importa Dati</h3>
+                <p>Importa dati da un file JSON precedente (sostituirà i dati attuali).</p>
+                <div class="form-group">
+                    <label for="fileImport">Seleziona file JSON</label>
+                    <input type="file" id="fileImport" accept=".json">
+                </div>
+                <button class="btn btn-warning" onclick="importaDati()">
+                    <span>⬆️</span> Importa Dati
+                </button>
+                
+                <h3 style="margin-top: 30px;">Ripristino Dati</h3>
+                <p>Ripristina i dati alle impostazioni di default (ATTENZIONE: cancella tutti i dati attuali).</p>
+                <button class="btn btn-danger" onclick="mostraConfermaReset()">
+                    <span>⚠️</span> Ripristina Dati di Default
+                </button>
+            </div>
+        </div>
+        
+        <!-- 6. STATISTICHE AVANZATE -->
+        <div id="sezione-statistiche-admin" class="admin-content">
+            <div class="content-header">
+                <h2>📊 STATISTICHE AVANZATE</h2>
+            </div>
+            
+            <!-- STATISTICHE RAPIDE -->
+            <div class="admin-form">
+                <h3>Panoramica Torneo</h3>
+                <div id="statsAdmin" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <!-- Statistiche verranno caricate qui -->
+                </div>
+            </div>
+            
+            <!-- REPORT -->
+            <div style="margin-top: 30px;">
+                <h3>Report Dettagliati</h3>
+                <div class="form-buttons">
+                    <button class="btn btn-primary" onclick="generaReport('classifica')">
+                        <span>📈</span> Report Classifica
+                    </button>
+                    <button class="btn btn-primary" onclick="generaReport('giocatori')">
+                        <span>⚽</span> Report Giocatori
+                    </button>
+                    <button class="btn btn-primary" onclick="generaReport('partite')">
+                        <span>📅</span> Report Partite
+                    </button>
+                    <button class="btn btn-primary" onclick="generaReport('finale')">
+                        <span>🏆</span> Report Finale
+                    </button>
+                </div>
+                <div id="reportContainer" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px; min-height: 200px;">
+                    <!-- Report verranno mostrati qui -->
+                    <p style="text-align: center; color: #666;">Seleziona un tipo di report qui sopra</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ZONA PERICOLOSA -->
+        <div class="danger-zone">
+            <h3>⚠️ ZONA PERICOLOSA</h3>
+            <p>Queste operazioni sono irreversibili. Usa con cautela!</p>
+            <div class="form-buttons">
+                <button class="btn btn-danger" onclick="mostraConfermaEliminaTutto()">
+                    <span>🗑️</span> Elimina TUTTI i Dati
+                </button>
+                <button class="btn btn-danger" onclick="mostraConfermaResetClassifica()">
+                    <span>🔄</span> Reset Classifica
+                </button>
+                <button class="btn btn-danger" onclick="mostraConfermaResetStatistiche()">
+                    <span>📊</span> Reset Statistiche
+                </button>
+            </div>
+        </div>
+        
+        <!-- PULSANTE TORNA INDIETRO -->
+        <button class="back-button" onclick="tornaIndietro()">
+            ← TORNA ALLA HOME
+        </button>
+    </div>
+    
+    <script type="module">
+        // Importa il gestore database Supabase
+        import database from './database-supabase.js';
+        
+        // VARIABILI GLOBALI
+        let datiTorneo = {
+            squadre: [],
+            giocatori: [],
+            partite: [],
+            finale: null
+        };
+        
+        let sezioneAttiva = 'squadre';
+        let modalAzione = null;
+        let modalParametri = null;
+        let editingId = null; // ID dell'elemento in modifica
+        let contatoreEventi = 0;
+        let contatoreEventiFinale = 0;
+        
+        // INIZIALIZZAZIONE
+        document.addEventListener('DOMContentLoaded', async function() {
+            aggiornaStatoConnessione('caricamento');
+            
+            // Controlla accesso admin
+            if (sessionStorage.getItem('admin_accesso') !== 'true') {
+                alert('Accesso non autorizzato!');
+                window.location.href = 'main.html';
+                return;
+            }
+            
+            try {
+                // Carica dati iniziali
+                await caricaDatiIniziali();
+                
+                // Setup listener in tempo reale
+                setupRealtimeListeners();
+                
+                aggiornaStatoConnessione('ok');
+                
+                // Mostra sezione iniziale
+                mostraSezione('squadre');
+                
+            } catch (error) {
+                console.error('Errore caricamento admin:', error);
+                aggiornaStatoConnessione('ko');
+                mostraAlert('Errore nel caricamento dei dati. Riprova più tardi.', 'error');
+            }
+        });
+        
+        // CARICA DATI INIZIALI
+        async function caricaDatiIniziali() {
+            try {
+                // Carica tutti i dati in parallelo
+                const [squadre, giocatori, partite, finale] = await Promise.all([
+                    database.getSquadre(),
+                    database.getGiocatori(),
+                    database.getPartite(),
+                    database.getFinale()
+                ]);
+                
+                datiTorneo.squadre = squadre || [];
+                datiTorneo.giocatori = giocatori || [];
+                datiTorneo.partite = partite || [];
+                datiTorneo.finale = finale || null;
+                
+                console.log('Dati admin caricati:', {
+                    squadre: datiTorneo.squadre.length,
+                    giocatori: datiTorneo.giocatori.length,
+                    partite: datiTorneo.partite.length,
+                    finale: !!datiTorneo.finale
+                });
+                
+                // Aggiorna sezione attiva
+                aggiornaSezione();
+                
+            } catch (error) {
+                console.error('Errore nel caricamento iniziale:', error);
+                throw error;
+            }
+        }
+        
+        // SETUP LISTENER TEMPO REALE
+        function setupRealtimeListeners() {
+            // Ascolta aggiornamenti dal database Supabase
+            window.onDatabaseUpdate = function(type, data) {
+                console.log(`Aggiornamento admin: ${type}`);
+                
+                // Aggiorna i dati locali
+                if (type === 'squadre') datiTorneo.squadre = data || [];
+                else if (type === 'giocatori') datiTorneo.giocatori = data || [];
+                else if (type === 'partite') datiTorneo.partite = data || [];
+                else if (type === 'finale') datiTorneo.finale = data || null;
+                
+                // Aggiorna l'interfaccia della sezione attiva
+                aggiornaSezione();
+                aggiornaStatoConnessione('ok');
+            };
+        }
+        
+        // FUNZIONI DI NAVIGAZIONE E UI
+        
+        function mostraSezione(sezione) {
+            // Nascondi tutte le sezioni
+            document.querySelectorAll('.admin-content').forEach(div => {
+                div.classList.remove('active');
+            });
+            
+            // Mostra la sezione selezionata
+            document.getElementById(`sezione-${sezione}`).classList.add('active');
+            sezioneAttiva = sezione;
+            
+            // Aggiorna il contenuto della sezione
+            aggiornaSezione();
+        }
+        
+        function aggiornaSezione() {
+            switch(sezioneAttiva) {
+                case 'squadre':
+                    aggiornaListaSquadre();
+                    aggiornaSelectSquadre();
+                    break;
+                    
+                case 'giocatori':
+                    aggiornaListaGiocatori();
+                    aggiornaSelectSquadreGiocatori();
+                    aggiornaFiltroSquadreGiocatori();
+                    break;
+                    
+                case 'partite':
+                    aggiornaListaPartite();
+                    aggiornaSelectSquadrePartite();
+                    aggiornaSelectGiocatoriPartite();
+                    break;
+                    
+                case 'finale':
+                    aggiornaInfoFinale();
+                    aggiornaSelectSquadreFinale();
+                    aggiornaSelectGiocatoriFinale();
+                    break;
+                    
+                case 'import-export':
+                    // Nessun aggiornamento necessario
+                    break;
+                    
+                case 'statistiche-admin':
+                    aggiornaStatisticheAdmin();
+                    break;
+            }
+        }
+        
+        // MODAL FUNCTIONS
+        
+        function mostraModal(titolo, messaggio, azione, parametri = null) {
+            modalAzione = azione;
+            modalParametri = parametri;
+            
+            document.getElementById('modalTitolo').textContent = titolo;
+            document.getElementById('modalMessaggio').innerHTML = messaggio;
+            document.getElementById('modalConferma').style.display = 'flex';
+        }
+        
+        function chiudiModal() {
+            document.getElementById('modalConferma').style.display = 'none';
+            modalAzione = null;
+            modalParametri = null;
+        }
+        
+        document.getElementById('modalConfermaBtn').onclick = function() {
+            if (modalAzione && typeof window[modalAzione] === 'function') {
+                if (modalParametri) {
+                    window[modalAzione](modalParametri);
+                } else {
+                    window[modalAzione]();
+                }
+            }
+            chiudiModal();
+        };
+        
+        // ALERT FUNCTIONS
+        
+        function mostraAlert(messaggio, tipo = 'success') {
+            const alertId = `alert${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`;
+            const alertEl = document.getElementById(alertId);
+            
+            alertEl.innerHTML = messaggio;
+            alertEl.style.display = 'block';
+            
+            // Scrolla all'alert
+            alertEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Nascondi dopo 5 secondi
+            setTimeout(() => {
+                alertEl.style.display = 'none';
+            }, 5000);
+        }
+        
+        function aggiornaStatoConnessione(stato) {
+            const statusElement = document.getElementById('connessioneStatus');
+            
+            switch(stato) {
+                case 'caricamento':
+                    statusElement.className = 'connessione-status connessione-caricamento';
+                    statusElement.innerHTML = '<div class="loading"></div> Caricamento...';
+                    break;
+                    
+                case 'ok':
+                    statusElement.className = 'connessione-status connessione-ok';
+                    statusElement.innerHTML = '✓ Connesso in tempo reale';
+                    break;
+                    
+                case 'ko':
+                    statusElement.className = 'connessione-status connessione-ko';
+                    statusElement.innerHTML = '✗ Disconnesso';
+                    break;
+            }
+        }
+        
+        // 1. FUNZIONI GESTIONE SQUADRE
+        
+        function mostraFormSquadra(squadraId = null) {
+            const form = document.getElementById('formSquadra');
+            const titolo = document.getElementById('formSquadraTitolo');
+            
+            // Pulisci form
+            document.getElementById('nomeSquadra').value = '';
+            document.getElementById('allenatoreSquadra').value = '';
+            document.getElementById('coloriSquadra').value = '';
+            editingId = null;
+            
+            if (squadraId) {
+                // Modifica squadra esistente
+                const squadra = datiTorneo.squadre.find(s => s.id === squadraId);
+                if (squadra) {
+                    document.getElementById('nomeSquadra').value = squadra.nome || '';
+                    document.getElementById('allenatoreSquadra').value = squadra.allenatore || '';
+                    document.getElementById('coloriSquadra').value = squadra.colori || '';
+                    editingId = squadraId;
+                    titolo.textContent = 'Modifica Squadra';
+                }
+            } else {
+                titolo.textContent = 'Aggiungi Nuova Squadra';
+            }
+            
+            form.style.display = 'block';
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        function annullaFormSquadra() {
+            document.getElementById('formSquadra').style.display = 'none';
+            editingId = null;
+        }
+        
+        async function salvaSquadra() {
+            const nome = document.getElementById('nomeSquadra').value.trim();
+            const allenatore = document.getElementById('allenatoreSquadra').value.trim();
+            const colori = document.getElementById('coloriSquadra').value.trim();
+            
+            if (!nome) {
+                mostraAlert('Il nome della squadra è obbligatorio!', 'error');
+                return;
+            }
+            
+            try {
+                const squadraData = {
+                    nome: nome,
+                    allenatore: allenatore || null,
+                    colori: colori || null,
+                    punti: 0,
+                    partite_giocate: 0,
+                    vittorie: 0,
+                    pareggi: 0,
+                    sconfitte: 0,
+                    gol_fatti: 0,
+                    gol_subiti: 0
+                };
+                
+                if (editingId) {
+                    // Aggiorna squadra esistente
+                    await database.aggiornaSquadra(editingId, squadraData);
+                    mostraAlert('Squadra aggiornata con successo!', 'success');
+                } else {
+                    // Aggiungi nuova squadra
+                    await database.aggiungiSquadra(squadraData);
+                    mostraAlert('Squadra aggiunta con successo!', 'success');
+                }
+                
+                annullaFormSquadra();
+                
+            } catch (error) {
+                console.error('Errore salvataggio squadra:', error);
+                mostraAlert('Errore nel salvataggio della squadra: ' + error.message, 'error');
+            }
+        }
+        
+        function aggiornaListaSquadre() {
+            const tbody = document.getElementById('tabellaSquadre');
+            
+            if (datiTorneo.squadre.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 20px;">
+                            Nessuna squadra registrata
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            datiTorneo.squadre.forEach(squadra => {
+                html += `
+                    <tr>
+                        <td>${squadra.id}</td>
+                        <td><strong>${squadra.nome}</strong></td>
+                        <td>${squadra.allenatore || '-'}</td>
+                        <td>${squadra.colori || '-'}</td>
+                        <td><strong>${squadra.punti || 0}</strong></td>
+                        <td>${squadra.partite_giocate || 0}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-warning btn-small" onclick="mostraFormSquadra('${squadra.id}')">
+                                ✏️ Modifica
+                            </button>
+                            <button class="btn btn-danger btn-small" onclick="eliminaSquadra('${squadra.id}', '${squadra.nome}')">
+                                🗑️ Elimina
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        function aggiornaSelectSquadre() {
+            // Aggiorna tutte le select delle squadre
+            const selectIds = ['squadraGiocatore', 'squadraCasa', 'squadraOspite', 
+                              'finaleSquadraCasa', 'finaleSquadraOspite'];
+            
+            selectIds.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    // Salva valore selezionato
+                    const selectedValue = select.value;
+                    
+                    // Pulisci opzioni (mantieni la prima)
+                    while (select.options.length > 1) {
+                        select.remove(1);
+                    }
+                    
+                    // Aggiungi squadre
+                    datiTorneo.squadre.forEach(squadra => {
+                        const option = document.createElement('option');
+                        option.value = squadra.nome;
+                        option.textContent = squadra.nome;
+                        select.appendChild(option);
+                    });
+                    
+                    // Ripristina selezione se possibile
+                    if (selectedValue) {
+                        select.value = selectedValue;
+                    }
                 }
             });
         }
-
-        window.aggiungiSquadra = async function() {
-            const nome = document.getElementById('nomeSquadra').value;
-            if(!nome) return alert("Inserisci un nome");
-            
-            try {
-                await database.aggiungiSquadra({ nome: nome, punti: 0, giocate: 0, vinte: 0, pareggiate: 0, perse: 0, gol_fatti: 0, gol_subiti: 0 });
-                alert("Squadra aggiunta!");
-                document.getElementById('nomeSquadra').value = '';
-                aggiornaDropdowns();
-            } catch (e) { alert("Errore: " + e.message); }
+        
+        function eliminaSquadra(squadraId, nomeSquadra) {
+            mostraModal(
+                'Elimina Squadra',
+                `Sei sicuro di voler eliminare la squadra <strong>${nomeSquadra}</strong>?<br>
+                 <span style="color: #dc143c;">ATTENZIONE: Verranno eliminati anche tutti i giocatori di questa squadra!</span>`,
+                'confermaEliminaSquadra',
+                { id: squadraId, nome: nomeSquadra }
+            );
         }
-
-        window.aggiungiGiocatore = async function() {
-            const nome = document.getElementById('nomeGiocatore').value;
-            const squadraId = document.getElementById('squadraSelezionata').value;
+        
+        async function confermaEliminaSquadra(params) {
+            try {
+                // Prima elimina tutti i giocatori della squadra
+                const giocatoriSquadra = datiTorneo.giocatori.filter(g => {
+                    const squadra = datiTorneo.squadre.find(s => s.id === params.id);
+                    return squadra && g.squadra === squadra.nome;
+                });
+                
+                for (const giocatore of giocatoriSquadra) {
+                    await database.eliminaGiocatore(giocatore.id);
+                }
+                
+                // Poi elimina la squadra
+                await database.eliminaSquadra(params.id);
+                
+                mostraAlert(`Squadra "${params.nome}" eliminata con successo!`, 'success');
+                
+            } catch (error) {
+                console.error('Errore eliminazione squadra:', error);
+                mostraAlert('Errore nell\'eliminazione della squadra: ' + error.message, 'error');
+            }
+        }
+        
+        // 2. FUNZIONI GESTIONE GIOCATORI
+        
+        function mostraFormGiocatore(giocatoreId = null) {
+            const form = document.getElementById('formGiocatore');
+            const titolo = document.getElementById('formGiocatoreTitolo');
+            
+            // Pulisci form
+            document.getElementById('nomeGiocatore').value = '';
+            document.getElementById('numeroGiocatore').value = '';
+            document.getElementById('squadraGiocatore').value = '';
+            document.getElementById('ruoloGiocatore').value = '';
+            editingId = null;
+            
+            if (giocatoreId) {
+                // Modifica giocatore esistente
+                const giocatore = datiTorneo.giocatori.find(g => g.id === giocatoreId);
+                if (giocatore) {
+                    document.getElementById('nomeGiocatore').value = giocatore.nome || '';
+                    document.getElementById('numeroGiocatore').value = giocatore.numero || '';
+                    document.getElementById('squadraGiocatore').value = giocatore.squadra || '';
+                    document.getElementById('ruoloGiocatore').value = giocatore.ruolo || '';
+                    editingId = giocatoreId;
+                    titolo.textContent = 'Modifica Giocatore';
+                }
+            } else {
+                titolo.textContent = 'Aggiungi Nuovo Giocatore';
+            }
+            
+            form.style.display = 'block';
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        function annullaFormGiocatore() {
+            document.getElementById('formGiocatore').style.display = 'none';
+            editingId = null;
+        }
+        
+        async function salvaGiocatore() {
+            const nome = document.getElementById('nomeGiocatore').value.trim();
+            const numero = document.getElementById('numeroGiocatore').value;
+            const squadra = document.getElementById('squadraGiocatore').value;
             const ruolo = document.getElementById('ruoloGiocatore').value;
             
-            if(!nome) return alert("Inserisci nome");
-
+            if (!nome) {
+                mostraAlert('Il nome del giocatore è obbligatorio!', 'error');
+                return;
+            }
+            
+            if (!squadra) {
+                mostraAlert('La squadra è obbligatoria!', 'error');
+                return;
+            }
+            
+            if (!ruolo) {
+                mostraAlert('Il ruolo è obbligatorio!', 'error');
+                return;
+            }
+            
             try {
-                await database.aggiungiGiocatore({ 
-                    nome: nome, 
-                    squadra_id: parseInt(squadraId), 
+                const giocatoreData = {
+                    nome: nome,
+                    numero: numero ? parseInt(numero) : null,
+                    squadra: squadra,
                     ruolo: ruolo,
-                    gol: 0, ammonizioni: 0, espulsioni: 0, mvp: 0, voto_medio: 0 
-                });
-                alert("Giocatore aggiunto!");
-                document.getElementById('nomeGiocatore').value = '';
-            } catch (e) { alert("Errore: " + e.message); }
+                    gol: 0,
+                    ammonizioni: 0,
+                    espulsioni: 0,
+                    punteggio_totale: 0,
+                    premi_miglior_giocatore: 0,
+                    premi_miglior_portiere: 0
+                };
+                
+                if (editingId) {
+                    // Aggiorna giocatore esistente
+                    await database.aggiornaGiocatore(editingId, giocatoreData);
+                    mostraAlert('Giocatore aggiornato con successo!', 'success');
+                } else {
+                    // Aggiungi nuovo giocatore
+                    await database.aggiungiGiocatore(giocatoreData);
+                    mostraAlert('Giocatore aggiunto con successo!', 'success');
+                }
+                
+                annullaFormGiocatore();
+                
+            } catch (error) {
+                console.error('Errore salvataggio giocatore:', error);
+                mostraAlert('Errore nel salvataggio del giocatore: ' + error.message, 'error');
+            }
         }
-
-        window.salvaPartita = async function() {
-            const casaId = document.getElementById('casaSelect').value;
-            const ospiteId = document.getElementById('ospiteSelect').value;
-            const gCasa = parseInt(document.getElementById('golCasa').value);
-            const gOspite = parseInt(document.getElementById('golOspite').value);
-
-            if(casaId === ospiteId) return alert("Le squadre devono essere diverse!");
-
+        
+        function aggiornaListaGiocatori() {
+            const tbody = document.getElementById('tabellaGiocatori');
+            
+            if (datiTorneo.giocatori.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 20px;">
+                            Nessun giocatore registrato
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Applica filtri
+            let giocatoriFiltrati = [...datiTorneo.giocatori];
+            const filtroSquadra = document.getElementById('filtroSquadraGiocatori').value;
+            const filtroRuolo = document.getElementById('filtroRuoloGiocatori').value;
+            
+            if (filtroSquadra) {
+                giocatoriFiltrati = giocatoriFiltrati.filter(g => g.squadra === filtroSquadra);
+            }
+            
+            if (filtroRuolo) {
+                giocatoriFiltrati = giocatoriFiltrati.filter(g => g.ruolo === filtroRuolo);
+            }
+            
+            if (giocatoriFiltrati.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 20px;">
+                            Nessun giocatore trovato con i filtri selezionati
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            giocatoriFiltrati.forEach(giocatore => {
+                html += `
+                    <tr>
+                        <td>${giocatore.id}</td>
+                        <td><strong>${giocatore.nome}</strong></td>
+                        <td>${giocatore.numero || '-'}</td>
+                        <td>${giocatore.squadra || '-'}</td>
+                        <td>${giocatore.ruolo || 'Giocatore'}</td>
+                        <td>${giocatore.gol || 0}</td>
+                        <td>${giocatore.punteggio_totale || 0}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-warning btn-small" onclick="mostraFormGiocatore('${giocatore.id}')">
+                                ✏️ Modifica
+                            </button>
+                            <button class="btn btn-danger btn-small" onclick="eliminaGiocatore('${giocatore.id}', '${giocatore.nome}')">
+                                🗑️ Elimina
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        function aggiornaSelectSquadreGiocatori() {
+            const select = document.getElementById('squadraGiocatore');
+            if (!select) return;
+            
+            const selectedValue = select.value;
+            
+            // Pulisci opzioni (mantieni la prima)
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+            
+            // Aggiungi squadre
+            datiTorneo.squadre.forEach(squadra => {
+                const option = document.createElement('option');
+                option.value = squadra.nome;
+                option.textContent = squadra.nome;
+                select.appendChild(option);
+            });
+            
+            // Ripristina selezione se possibile
+            if (selectedValue) {
+                select.value = selectedValue;
+            }
+        }
+        
+        function aggiornaFiltroSquadreGiocatori() {
+            const select = document.getElementById('filtroSquadraGiocatori');
+            if (!select) return;
+            
+            const selectedValue = select.value;
+            
+            // Pulisci opzioni (mantieni la prima)
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+            
+            // Aggiungi squadre
+            datiTorneo.squadre.forEach(squadra => {
+                const option = document.createElement('option');
+                option.value = squadra.nome;
+                option.textContent = squadra.nome;
+                select.appendChild(option);
+            });
+            
+            // Ripristina selezione se possibile
+            if (selectedValue) {
+                select.value = selectedValue;
+            }
+        }
+        
+        function filtraGiocatori() {
+            aggiornaListaGiocatori();
+        }
+        
+        function eliminaGiocatore(giocatoreId, nomeGiocatore) {
+            mostraModal(
+                'Elimina Giocatore',
+                `Sei sicuro di voler eliminare il giocatore <strong>${nomeGiocatore}</strong>?`,
+                'confermaEliminaGiocatore',
+                { id: giocatoreId, nome: nomeGiocatore }
+            );
+        }
+        
+        async function confermaEliminaGiocatore(params) {
             try {
-                await database.aggiungiPartita({
-                    squadra_casa_id: parseInt(casaId),
-                    squadra_ospite_id: parseInt(ospiteId),
-                    gol_casa: gCasa,
-                    gol_ospite: gOspite,
-                    data: new Date().toISOString()
-                });
-                alert("Partita salvata e classifica aggiornata!");
-                tornaMenu();
-            } catch (e) { alert("Errore: " + e.message); }
+                await database.eliminaGiocatore(params.id);
+                mostraAlert(`Giocatore "${params.nome}" eliminato con successo!`, 'success');
+                
+            } catch (error) {
+                console.error('Errore eliminazione giocatore:', error);
+                mostraAlert('Errore nell\'eliminazione del giocatore: ' + error.message, 'error');
+            }
         }
-
-        init();
+        
+        // 3. FUNZIONI GESTIONE PARTITE (continua nel prossimo messaggio...)
+        
+        // ... (continua con le funzioni per gestione partite, finale, import/export, etc.)
+        
+        // FUNZIONI DI NAVIGAZIONE
+        
+        function tornaIndietro() {
+            sessionStorage.removeItem('admin_accesso');
+            window.location.href = 'main.html';
+        }
+        
+        // CONTROLLO ACCESSO
+        if (sessionStorage.getItem('admin_accesso') !== 'true') {
+            window.location.href = 'main.html';
+        }
+        
+        // ESPORTA FUNZIONI
+        window.mostraSezione = mostraSezione;
+        window.mostraFormSquadra = mostraFormSquadra;
+        window.annullaFormSquadra = annullaFormSquadra;
+        window.salvaSquadra = salvaSquadra;
+        window.eliminaSquadra = eliminaSquadra;
+        window.mostraFormGiocatore = mostraFormGiocatore;
+        window.annullaFormGiocatore = annullaFormGiocatore;
+        window.salvaGiocatore = salvaGiocatore;
+        window.filtraGiocatori = filtraGiocatori;
+        window.eliminaGiocatore = eliminaGiocatore;
+        window.tornaIndietro = tornaIndietro;
+        window.chiudiModal = chiudiModal;
+        
     </script>
 </body>
 </html>
+[file content end]
+```
+
+Questo è l'inizio del file admin.html. Ho creato:
+
+1. Struttura completa con header, menu admin e sezioni di contenuto
+2. Sezione Squadre completa con CRUD (aggiungi, modifica, elimina)
+3. Sezione Giocatori con filtri e gestione
+4. Scheletro delle altre sezioni (partite, finale, import/export, statistiche)
+
+Cosa manca da completare nei prossimi passi:
+
+· Funzioni per gestione partite (aggiungi evento, calcola statistiche automatiche)
+· Funzioni per gestione finale
+· Funzioni import/export dati
+· Statistiche avanzate e report
+· Funzioni pericolose (elimina tutto, reset)
+
+Dimmi su quale sezione vuoi che mi concentri per primo per completarla!

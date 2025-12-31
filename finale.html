@@ -5,19 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rovigoal - Partita Finale</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: white;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Arial', sans-serif; background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); min-height: 100vh; padding: 20px; color: white; }
         
         .header {
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
@@ -28,64 +17,48 @@
             text-align: center;
             box-shadow: 0 8px 25px rgba(0,0,0,0.3);
             border: 3px solid gold;
-            position: relative;
         }
         
-        .header h1 {
-            font-size: 2em;
-            margin-bottom: 10px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-        }
+        .header h1 { font-size: 2em; margin-bottom: 10px; }
         
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+        .container { max-width: 800px; margin: 0 auto; }
         
-        .finale-container {
+        .finale-box {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
-            padding: 25px;
+            padding: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             color: #333;
             margin-bottom: 30px;
-            animation: slideUp 0.5s ease;
-        }
-        
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .risultato-grande {
             text-align: center;
-            font-size: 2.5em;
+        }
+        
+        .risultato-finale {
+            font-size: 3em;
             font-weight: bold;
             margin: 20px 0;
             padding: 20px;
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             border-radius: 10px;
             border: 3px solid gold;
-            animation: pulse 2s infinite;
         }
         
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
+        .vincitore {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #1e3c72;
+            margin: 20px 0;
+            padding: 15px;
+            background: #e7f5ff;
+            border-radius: 10px;
+            border: 2px solid #1c7ed6;
         }
         
-        .squadre-finale {
+        .squadre-info {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
             margin-top: 30px;
-        }
-        
-        @media (max-width: 768px) {
-            .squadre-finale {
-                grid-template-columns: 1fr;
-            }
         }
         
         .squadra-card {
@@ -93,21 +66,6 @@
             padding: 20px;
             border-radius: 10px;
             border: 2px solid #dee2e6;
-            transition: transform 0.3s ease;
-        }
-        
-        .squadra-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .squadra-titolo {
-            font-size: 1.3em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #1e3c72;
-            text-align: center;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #dee2e6;
         }
         
         .premi-section {
@@ -116,53 +74,13 @@
             border-radius: 10px;
             border: 2px solid #2196F3;
             margin-top: 20px;
-            animation: fadeIn 1s ease;
-        }
-        
-        .premi-titolo {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #1976D2;
-            text-align: center;
-        }
-        
-        .premi-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        
-        @media (max-width: 768px) {
-            .premi-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .premio-card {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-        
-        .premio-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .premio-card.winner {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            border: 2px solid gold;
         }
         
         .btn-back {
             display: block;
             margin: 30px auto;
             padding: 12px 30px;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: #1e3c72;
             color: white;
             border: none;
             border-radius: 5px;
@@ -175,7 +93,6 @@
         .btn-back:hover {
             opacity: 0.9;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         
         .empty-state {
@@ -185,129 +102,26 @@
             background: white;
             border-radius: 10px;
             border: 2px dashed #ddd;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .data-partita {
-            text-align: center;
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 20px;
-        }
-        
-        .vincitore-grande {
-            text-align: center;
-            margin: 20px 0;
-            padding: 15px;
-            background: gold;
-            color: #333;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 1.3em;
-            border: 3px solid orange;
-            animation: glow 2s infinite;
-        }
-        
-        @keyframes glow {
-            0% { box-shadow: 0 0 5px gold; }
-            50% { box-shadow: 0 0 20px gold; }
-            100% { box-shadow: 0 0 5px gold; }
-        }
-        
-        .eventi-finale {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px solid #dee2e6;
-        }
-        
-        .evento-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .evento-item:last-child {
-            border-bottom: none;
-        }
-        
-        .icona-gol { color: #28a745; font-size: 1.2em; }
-        .icona-amm { color: #ffc107; font-size: 1.2em; }
-        .icona-esp { color: #dc143c; font-size: 1.2em; }
-        
-        /* STATO CONNESSIONE */
-        .connessione-status {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: bold;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .connessione-ok {
-            background: #4CAF50;
-            color: white;
-            border: 2px solid #45a049;
-        }
-        
-        .connessione-caricamento {
-            background: #FFA500;
-            color: white;
-            border: 2px solid #FF8C00;
-        }
-        
-        .connessione-ko {
-            background: #f44336;
-            color: white;
-            border: 2px solid #d32f2f;
         }
         
         .loading {
             display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,.3);
+            width: 40px;
+            height: 40px;
+            border: 3px solid #ddd;
+            border-top-color: #1e3c72;
             border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
         
-        /* MOBILE */
         @media (max-width: 768px) {
-            .header {
-                padding: 20px 15px;
-            }
-            
-            .header h1 {
-                font-size: 1.8em;
-            }
-            
-            .risultato-grande {
-                font-size: 2em;
-                padding: 15px;
-            }
-            
-            .finale-container {
-                padding: 20px;
-            }
-            
-            .connessione-status {
-                top: 5px;
-                right: 5px;
-                padding: 4px 8px;
-                font-size: 0.7em;
-            }
+            .header { padding: 20px; }
+            .header h1 { font-size: 1.8em; }
+            .risultato-finale { font-size: 2.5em; }
+            .squadre-info { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -315,20 +129,14 @@
     <div class="header">
         <h1>🏆 PARTITA FINALE</h1>
         <p>La grande finale del torneo Rovigoal</p>
-        
-        <!-- STATO CONNESSIONE -->
-        <div id="connessioneStatus" class="connessione-status connessione-caricamento">
-            <div class="loading"></div> Caricamento...
-        </div>
     </div>
     
     <div class="container">
         <div id="contenutoFinale">
-            <!-- La finale verrà caricata qui -->
             <div class="empty-state">
                 <h2>🏆 Caricamento finale...</h2>
                 <p>Recupero dei dati della partita finale</p>
-                <div class="loading" style="margin: 20px auto; border: 3px solid #ddd; border-top-color: #1e3c72; width: 40px; height: 40px;"></div>
+                <div class="loading"></div>
             </div>
         </div>
         
@@ -336,206 +144,137 @@
     </div>
     
     <script type="module">
-        // Importa il gestore database
         import database from './database-supabase.js';
         
-        // VARIABILI
-        let finaleData = null;
-        let giocatoriData = [];
-        
-        // INIZIALIZZAZIONE
-        document.addEventListener('DOMContentLoaded', async function() {
-            aggiornaStatoConnessione('caricamento');
-            
+        // CARICA FINALE
+        async function caricaFinale() {
             try {
                 // Carica finale e giocatori
-                [finaleData, giocatoriData] = await Promise.all([
+                const [finale, giocatori] = await Promise.all([
                     database.getFinale(),
                     database.getGiocatori()
                 ]);
                 
-                aggiornaStatoConnessione('ok');
-                
-                // Mostra la finale
-                mostraFinale();
+                mostraFinale(finale, giocatori);
                 
             } catch (error) {
-                console.error('Errore caricamento finale:', error);
-                aggiornaStatoConnessione('ko');
-                mostraErrore('Errore nel caricamento della finale.');
+                console.error('Errore:', error);
+                mostraErrore();
             }
-        });
+        }
         
-        // MOSTRA LA FINALE
-        function mostraFinale() {
+        // MOSTRA FINALE
+        function mostraFinale(finale, giocatori) {
             const container = document.getElementById('contenutoFinale');
             
-            if (!finaleData) {
+            if (!finale) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <h2>🏆 FINALE NON ANCORA GIOCATA</h2>
                         <p>La partita finale non è stata ancora configurata.</p>
-                        <p style="margin-top: 20px; font-size: 0.9em;">
-                            L'amministratore deve configurare la finale dall'area Admin.
-                        </p>
-                        <div style="margin-top: 20px;">
-                            <button onclick="location.reload()" style="padding: 8px 20px; background: #1e3c72; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
-                                🔄 Ricarica
-                            </button>
-                        </div>
+                        <p>L'amministratore deve configurare la finale dall'area Admin.</p>
                     </div>
                 `;
                 return;
             }
             
-            // Trova nomi giocatori premi
-            const migliorGiocatore = giocatoriData.find(g => g.id === finaleData.miglior_giocatore);
-            const migliorPortiere = giocatoriData.find(g => g.id === finaleData.miglior_portiere);
-            
-            const migliorGiocatoreNome = migliorGiocatore ? migliorGiocatore.nome : 'N/A';
-            const migliorPortiereNome = migliorPortiere ? migliorPortiere.nome : 'N/A';
+            // Trova giocatori premiati
+            const migliorGiocatore = giocatori.find(g => g.id === finale.miglior_giocatore);
+            const migliorPortiere = giocatori.find(g => g.id === finale.miglior_portiere);
             
             // Determina vincitore
             let vincitore = '';
-            let classeVincitoreCasa = '';
-            let classeVincitoreOspite = '';
-            
-            if (finaleData.gol_casa > finaleData.gol_ospite) {
-                vincitore = finaleData.squadra_casa;
-                classeVincitoreCasa = 'winner';
-            } else if (finaleData.gol_ospite > finaleData.gol_casa) {
-                vincitore = finaleData.squadra_ospite;
-                classeVincitoreOspite = 'winner';
+            if (finale.gol_casa > finale.gol_ospite) {
+                vincitore = finale.squadra_casa;
+            } else if (finale.gol_ospite > finale.gol_casa) {
+                vincitore = finale.squadra_ospite;
             } else {
                 vincitore = 'PAREGGIO';
             }
             
-            // Calcola eventi per squadra (se presenti)
-            const eventi = finaleData.eventi || [];
-            const eventiCasa = eventi.filter(e => e.squadra === 'casa');
-            const eventiOspite = eventi.filter(e => e.squadra === 'ospite');
-            
             container.innerHTML = `
-                <div class="finale-container">
-                    <div class="data-partita">
-                        <strong>Data Finale:</strong> ${finaleData.data || 'N/D'} ${finaleData.ora || ''}
+                <div class="finale-box">
+                    <div style="color: #666; margin-bottom: 15px;">
+                        <strong>Data:</strong> ${finale.data || 'N/D'} ${finale.ora || ''}
                     </div>
                     
-                    <div class="risultato-grande">
-                        <div>${finaleData.squadra_casa}</div>
-                        <div>${finaleData.gol_casa || 0} - ${finaleData.gol_ospite || 0}</div>
-                        <div>${finaleData.squadra_ospite}</div>
+                    <div class="risultato-finale">
+                        ${finale.squadra_casa} ${finale.gol_casa || 0} - ${finale.gol_ospite || 0} ${finale.squadra_ospite}
                     </div>
                     
-                    ${vincitore !== 'PAREGGIO' ? `
-                        <div class="vincitore-grande">
-                            🏆 CAMPIONE: ${vincitore} 🏆
-                        </div>
-                    ` : `
-                        <div class="vincitore-grande" style="background: silver; border-color: #C0C0C0;">
-                            ⚖️ FINALE PAREGGIATA ⚖️
-                        </div>
-                    `}
+                    <div class="vincitore">
+                        ${vincitore !== 'PAREGGIO' ? `🏆 CAMPIONE: ${vincitore} 🏆` : '⚖️ FINALE PAREGGIATA'}
+                    </div>
                     
-                    <div class="squadre-finale">
-                        <div class="squadra-card ${classeVincitoreCasa}">
-                            <div class="squadra-titolo">${finaleData.squadra_casa}</div>
-                            <div>
-                                <p><strong>Gol:</strong> ${finaleData.gol_casa || 0}</p>
-                                ${eventiCasa.length > 0 ? `
-                                    <div style="margin-top: 10px;">
-                                        <strong>Eventi:</strong>
-                                        ${eventiCasa.map(evento => {
-                                            let icona = '📝';
-                                            if (evento.tipo === 'gol') icona = '<span class="icona-gol">⚽</span>';
-                                            else if (evento.tipo === 'amm') icona = '<span class="icona-amm">🟨</span>';
-                                            else if (evento.tipo === 'esp') icona = '<span class="icona-esp">🟥</span>';
-                                            
-                                            return `<div class="evento-item">${icona} ${evento.giocatoreNome || 'Giocatore'}</div>`;
-                                        }).join('')}
-                                    </div>
-                                ` : ''}
-                            </div>
+                    <div class="squadre-info">
+                        <div class="squadra-card">
+                            <h3>${finale.squadra_casa}</h3>
+                            <p><strong>Gol:</strong> ${finale.gol_casa || 0}</p>
                         </div>
                         
-                        <div class="squadra-card ${classeVincitoreOspite}">
-                            <div class="squadra-titolo">${finaleData.squadra_ospite}</div>
-                            <div>
-                                <p><strong>Gol:</strong> ${finaleData.gol_ospite || 0}</p>
-                                ${eventiOspite.length > 0 ? `
-                                    <div style="margin-top: 10px;">
-                                        <strong>Eventi:</strong>
-                                        ${eventiOspite.map(evento => {
-                                            let icona = '📝';
-                                            if (evento.tipo === 'gol') icona = '<span class="icona-gol">⚽</span>';
-                                            else if (evento.tipo === 'amm') icona = '<span class="icona-amm">🟨</span>';
-                                            else if (evento.tipo === 'esp') icona = '<span class="icona-esp">🟥</span>';
-                                            
-                                            return `<div class="evento-item">${icona} ${evento.giocatoreNome || 'Giocatore'}</div>`;
-                                        }).join('')}
-                                    </div>
-                                ` : ''}
-                            </div>
+                        <div class="squadra-card">
+                            <h3>${finale.squadra_ospite}</h3>
+                            <p><strong>Gol:</strong> ${finale.gol_ospite || 0}</p>
                         </div>
                     </div>
                     
                     <div class="premi-section">
-                        <div class="premi-titolo">🎖️ PREMI DELLA FINALE</div>
-                        <div class="premi-grid">
-                            <div class="premio-card ${migliorGiocatore ? 'winner' : ''}">
-                                <div style="font-weight: bold; color: #1976D2; margin-bottom: 10px;">🏆 MIGLIOR GIOCATORE</div>
-                                <div style="font-size: 1.2em; margin: 10px 0;">${migliorGiocatoreNome}</div>
-                                ${finaleData.voto_miglior_giocatore ? `
-                                    <div style="color: #FFD700; font-weight: bold;">Voto: ${finaleData.voto_miglior_giocatore}/10</div>
-                                ` : ''}
-                                ${migliorGiocatore ? `
-                                    <div style="margin-top: 10px; font-size: 0.9em; color: #666;">
-                                        ${migliorGiocatore.squadra ? `Squadra: ${migliorGiocatore.squadra}` : ''}
-                                    </div>
+                        <h3>🎖️ PREMI DELLA FINALE</h3>
+                        
+                        ${migliorGiocatore ? `
+                            <div style="margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+                                <div style="font-weight: bold; color: #1976D2;">🏆 MIGLIOR GIOCATORE</div>
+                                <div style="font-size: 1.2em; margin: 10px 0;">${migliorGiocatore.nome}</div>
+                                ${finale.voto_miglior_giocatore ? `
+                                    <div style="color: #FFD700; font-weight: bold;">Voto: ${finale.voto_miglior_giocatore}/10</div>
                                 ` : ''}
                             </div>
-                            
-                            <div class="premio-card ${migliorPortiere ? 'winner' : ''}">
-                                <div style="font-weight: bold; color: #1976D2; margin-bottom: 10px;">🥅 MIGLIOR PORTIERE</div>
-                                <div style="font-size: 1.2em; margin: 10px 0;">${migliorPortiereNome}</div>
-                                ${finaleData.voto_miglior_portiere ? `
-                                    <div style="color: #FFD700; font-weight: bold;">Voto: ${finaleData.voto_miglior_portiere}/10</div>
-                                ` : ''}
-                                ${migliorPortiere ? `
-                                    <div style="margin-top: 10px; font-size: 0.9em; color: #666;">
-                                        ${migliorPortiere.squadra ? `Squadra: ${migliorPortiere.squadra}` : ''}
-                                    </div>
+                        ` : ''}
+                        
+                        ${migliorPortiere ? `
+                            <div style="margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+                                <div style="font-weight: bold; color: #1976D2;">🥅 MIGLIOR PORTIERE</div>
+                                <div style="font-size: 1.2em; margin: 10px 0;">${migliorPortiere.nome}</div>
+                                ${finale.voto_miglior_portiere ? `
+                                    <div style="color: #FFD700; font-weight: bold;">Voto: ${finale.voto_miglior_portiere}/10</div>
                                 ` : ''}
                             </div>
-                        </div>
+                        ` : ''}
                     </div>
                 </div>
             `;
         }
         
-        // FUNZIONI AUSILIARIE
-        function aggiornaStatoConnessione(stato) {
-            const statusElement = document.getElementById('connessioneStatus');
-            
-            switch(stato) {
-                case 'caricamento':
-                    statusElement.className = 'connessione-status connessione-caricamento';
-                    statusElement.innerHTML = '<div class="loading"></div> Caricamento finale...';
-                    break;
-                    
-                case 'ok':
-                    statusElement.className = 'connessione-status connessione-ok';
-                    statusElement.innerHTML = '✓ Finale caricata';
-                    break;
-                    
-                case 'ko':
-                    statusElement.className = 'connessione-status connessione-ko';
-                    statusElement.innerHTML = '✗ Errore caricamento';
-                    break;
-            }
-        }
-        
-        function mostraErrore(messaggio) {
+        // ERRORE
+        function mostraErrore() {
             const container = document.getElementById('contenutoFinale');
             container.innerHTML = `
-                <di
+                <div class="empty-state" style="color: #f44336;">
+                    <h2>⚠️ Errore di connessione</h2>
+                    <p>Impossibile caricare la finale</p>
+                    <button onclick="location.reload()" style="margin-top: 15px; padding: 8px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Riprova
+                    </button>
+                </div>
+            `;
+        }
+        
+        // NAVIGAZIONE
+        function tornaIndietro() {
+            window.location.href = 'main.html';
+        }
+        
+        // CONTROLLO ACCESSO
+        if (localStorage.getItem('rovigoal_entrato') !== 'true') {
+            window.location.href = 'index.html';
+        }
+        
+        // ESPORTA FUNZIONI
+        window.tornaIndietro = tornaIndietro;
+        
+        // CARICA FINALE AL LOAD
+        document.addEventListener('DOMContentLoaded', caricaFinale);
+        
+    </script>
+</body>
+</html>

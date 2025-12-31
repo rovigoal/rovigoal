@@ -635,52 +635,65 @@ window.onDatabaseUpdate = function(type, data) {
         }
         
         function assegnaVoto(tipo, voto) {
-            let stelleId, attualeId, oggetto;
-            let campo;
-            
-            if(tipo === 'giocatore') {
-                stelleId = 'voto-miglior-giocatore';
-                attualeId = 'voto-miglior-giocatore-attuale';
-                oggetto = partitaInCorso;
-                campo = 'votoGiocatore';
-            } else if(tipo === 'portiere-casa') {
-                stelleId = 'voto-portiere-casa';
-                attualeId = 'voto-portiere-casa-attuale';
-                oggetto = partitaInCorso;
-                campo = 'votoPortiereCasa';
-            } else if(tipo === 'portiere-ospite') {
-                stelleId = 'voto-portiere-ospite';
-                attualeId = 'voto-portiere-ospite-attuale';
-                oggetto = partitaInCorso;
-                campo = 'votoPortiereOspite';
-            } else if(tipo === 'finale-giocatore') {
-                stelleId = 'finale-voto-miglior-giocatore';
-                attualeId = 'finale-voto-miglior-giocatore-attuale';
-                oggetto = finaleInCorso;
-                campo = 'votoGiocatore';
-            } else if(tipo === 'finale-portiere-casa') {
-                stelleId = 'finale-voto-portiere-casa';
-                attualeId = 'finale-voto-portiere-casa-attuale';
-                oggetto = finaleInCorso;
-                campo = 'votoPortiereCasa';
-            } else if(tipo === 'finale-portiere-ospite') {
-                stelleId = 'finale-voto-portiere-ospite';
-                attualeId = 'finale-voto-portiere-ospite-attuale';
-                oggetto = finaleInCorso;
-                campo = 'votoPortiereOspite';
-            }
-            
-            const stelle = document.querySelectorAll(`#${stelleId} .stella`);
-            stelle.forEach((stella, index) => {
-                stella.classList.toggle('selezionata', index < voto);
-            });
-            
-            if(document.getElementById(attualeId)) {
-                document.getElementById(attualeId).textContent = voto;
-            }
-            
-            oggetto[campo] = voto;
-        }
+    let stelleId, attualeId, oggetto;
+    let campo;
+    
+    // Partite normali
+    if(tipo === 'giocatore-casa') {
+        stelleId = 'voto-miglior-giocatore-casa';
+        attualeId = 'voto-miglior-giocatore-casa-attuale';
+        oggetto = partitaInCorso;
+        campo = 'votoGiocatoreCasa';
+    } else if(tipo === 'giocatore-ospite') {
+        stelleId = 'voto-miglior-giocatore-ospite';
+        attualeId = 'voto-miglior-giocatore-ospite-attuale';
+        oggetto = partitaInCorso;
+        campo = 'votoGiocatoreOspite';
+    } else if(tipo === 'portiere-casa') {
+        stelleId = 'voto-portiere-casa';
+        attualeId = 'voto-portiere-casa-attuale';
+        oggetto = partitaInCorso;
+        campo = 'votoPortiereCasa';
+    } else if(tipo === 'portiere-ospite') {
+        stelleId = 'voto-portiere-ospite';
+        attualeId = 'voto-portiere-ospite-attuale';
+        oggetto = partitaInCorso;
+        campo = 'votoPortiereOspite';
+    }
+    // Finale
+    else if(tipo === 'finale-giocatore-casa') {
+        stelleId = 'finale-voto-miglior-giocatore-casa';
+        attualeId = 'finale-voto-miglior-giocatore-casa-attuale';
+        oggetto = finaleInCorso;
+        campo = 'votoGiocatoreCasa';
+    } else if(tipo === 'finale-giocatore-ospite') {
+        stelleId = 'finale-voto-miglior-giocatore-ospite';
+        attualeId = 'finale-voto-miglior-giocatore-ospite-attuale';
+        oggetto = finaleInCorso;
+        campo = 'votoGiocatoreOspite';
+    } else if(tipo === 'finale-portiere-casa') {
+        stelleId = 'finale-voto-portiere-casa';
+        attualeId = 'finale-voto-portiere-casa-attuale';
+        oggetto = finaleInCorso;
+        campo = 'votoPortiereCasa';
+    } else if(tipo === 'finale-portiere-ospite') {
+        stelleId = 'finale-voto-portiere-ospite';
+        attualeId = 'finale-voto-portiere-ospite-attuale';
+        oggetto = finaleInCorso;
+        campo = 'votoPortiereOspite';
+    }
+    
+    const stelle = document.querySelectorAll(`#${stelleId} .stella`);
+    stelle.forEach((stella, index) => {
+        stella.classList.toggle('selezionata', index < voto);
+    });
+    
+    if(document.getElementById(attualeId)) {
+        document.getElementById(attualeId).textContent = voto;
+    }
+    
+    oggetto[campo] = voto;
+}
         
         function aggiornaNomePortiere(tipo) {
             let selectId, campoNome, oggetto;
@@ -1814,6 +1827,7 @@ if(modalita === 'normale') {
     </script>
 </body>
 </html>
+
 
 
 

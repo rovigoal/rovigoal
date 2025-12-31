@@ -607,16 +607,18 @@ window.onDatabaseUpdate = function(type, data) {
         }
         
         function inizializzaVoti() {
-            // Stelle per partite normali
-            inizializzaStelle('voto-miglior-giocatore', 'giocatore');
-            inizializzaStelle('voto-portiere-casa', 'portiere-casa');
-            inizializzaStelle('voto-portiere-ospite', 'portiere-ospite');
-            
-            // Stelle per finale
-            inizializzaStelle('finale-voto-miglior-giocatore', 'finale-giocatore');
-            inizializzaStelle('finale-voto-portiere-casa', 'finale-portiere-casa');
-            inizializzaStelle('finale-voto-portiere-ospite', 'finale-portiere-ospite');
-        }
+    // Stelle per partite normali - 2 migliori giocatori
+    inizializzaStelle('voto-miglior-giocatore-casa', 'giocatore-casa');
+    inizializzaStelle('voto-miglior-giocatore-ospite', 'giocatore-ospite');
+    inizializzaStelle('voto-portiere-casa', 'portiere-casa');
+    inizializzaStelle('voto-portiere-ospite', 'portiere-ospite');
+    
+    // Stelle per finale - 2 migliori giocatori
+    inizializzaStelle('finale-voto-miglior-giocatore-casa', 'finale-giocatore-casa');
+    inizializzaStelle('finale-voto-miglior-giocatore-ospite', 'finale-giocatore-ospite');
+    inizializzaStelle('finale-voto-portiere-casa', 'finale-portiere-casa');
+    inizializzaStelle('finale-voto-portiere-ospite', 'finale-portiere-ospite');
+}
         
         function inizializzaStelle(elementId, tipo) {
             const container = document.getElementById(elementId);
@@ -1787,6 +1789,7 @@ if(modalita === 'normale') {
     </script>
 </body>
 </html>
+
 
 
 

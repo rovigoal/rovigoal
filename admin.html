@@ -308,29 +308,18 @@
                 <strong>IMPORTANTE:</strong> Seleziona 1 miglior giocatore (campo) e vota entrambi i portieri
             </div>
             <div class="migliori-row">
-    <div>
-        <label>Miglior Giocatore Casa:</label>
-        <select id="migliorGiocatoreCasa">
-            <option value="">-- Seleziona giocatore casa --</option>
-        </select>
-        <div class="voto-container">
-            <label>Voto (1-10):</label>
-            <div class="voto-stelle" id="voto-miglior-giocatore-casa"></div>
-            <span>Voto: <span id="voto-miglior-giocatore-casa-attuale">N/A</span></span>
-        </div>
-    </div>
-    <div>
-        <label>Miglior Giocatore Ospite:</label>
-        <select id="migliorGiocatoreOspite">
-            <option value="">-- Seleziona giocatore ospite --</option>
-        </select>
-        <div class="voto-container">
-            <label>Voto (1-10):</label>
-            <div class="voto-stelle" id="voto-miglior-giocatore-ospite"></div>
-            <span>Voto: <span id="voto-miglior-giocatore-ospite-attuale">N/A</span></span>
-        </div>
-    </div>
-</div>
+                <div>
+                    <label>Miglior Giocatore (campo):</label>
+                    <select id="migliorGiocatore">
+                        <option value="">-- Seleziona --</option>
+                    </select>
+                    <div class="voto-container">
+                        <label>Voto (1-10):</label>
+                        <div class="voto-stelle" id="voto-miglior-giocatore"></div>
+                        <span>Voto: <span id="voto-miglior-giocatore-attuale">N/A</span></span>
+                    </div>
+                </div>
+            </div>
             
             <!-- NUOVA SEZIONE: VOTI PORTIERI -->
             <div class="portieri-row">
@@ -488,30 +477,26 @@
             finale: null
         };
         
-        // PARTITE IN CORSO - STRUTTURA AGGIORNATA (2 migliori giocatori)
-let partitaInCorso = {
-    eventi: [],
-    migliorGiocatoreCasa: null,
-    migliorGiocatoreOspite: null,
-    votoGiocatoreCasa: 0,
-    votoGiocatoreOspite: 0,
-    portiereCasa: null,
-    portiereOspite: null,
-    votoPortiereCasa: 0,
-    votoPortiereOspite: 0
-};
-
-let finaleInCorso = {
-    eventi: [],
-    migliorGiocatoreCasa: null,
-    migliorGiocatoreOspite: null,
-    votoGiocatoreCasa: 0,
-    votoGiocatoreOspite: 0,
-    portiereCasa: null,
-    portiereOspite: null,
-    votoPortiereCasa: 0,
-    votoPortiereOspite: 0
-};
+        // PARTITE IN CORSO - STRUTTURA MODIFICATA
+        let partitaInCorso = {
+            eventi: [],
+            migliorGiocatore: null,
+            votoGiocatore: 0,
+            portiereCasa: null,
+            portiereOspite: null,
+            votoPortiereCasa: 0,
+            votoPortiereOspite: 0
+        };
+        
+        let finaleInCorso = {
+            eventi: [],
+            migliorGiocatore: null,
+            votoGiocatore: 0,
+            portiereCasa: null,
+            portiereOspite: null,
+            votoPortiereCasa: 0,
+            votoPortiereOspite: 0
+        };
         
         // INIZIALIZZAZIONE
         document.addEventListener('DOMContentLoaded', async function() {
@@ -607,18 +592,16 @@ window.onDatabaseUpdate = function(type, data) {
         }
         
         function inizializzaVoti() {
-    // Stelle per partite normali - 2 migliori giocatori
-    inizializzaStelle('voto-miglior-giocatore-casa', 'giocatore-casa');
-    inizializzaStelle('voto-miglior-giocatore-ospite', 'giocatore-ospite');
-    inizializzaStelle('voto-portiere-casa', 'portiere-casa');
-    inizializzaStelle('voto-portiere-ospite', 'portiere-ospite');
-    
-    // Stelle per finale - 2 migliori giocatori
-    inizializzaStelle('finale-voto-miglior-giocatore-casa', 'finale-giocatore-casa');
-    inizializzaStelle('finale-voto-miglior-giocatore-ospite', 'finale-giocatore-ospite');
-    inizializzaStelle('finale-voto-portiere-casa', 'finale-portiere-casa');
-    inizializzaStelle('finale-voto-portiere-ospite', 'finale-portiere-ospite');
-}
+            // Stelle per partite normali
+            inizializzaStelle('voto-miglior-giocatore', 'giocatore');
+            inizializzaStelle('voto-portiere-casa', 'portiere-casa');
+            inizializzaStelle('voto-portiere-ospite', 'portiere-ospite');
+            
+            // Stelle per finale
+            inizializzaStelle('finale-voto-miglior-giocatore', 'finale-giocatore');
+            inizializzaStelle('finale-voto-portiere-casa', 'finale-portiere-casa');
+            inizializzaStelle('finale-voto-portiere-ospite', 'finale-portiere-ospite');
+        }
         
         function inizializzaStelle(elementId, tipo) {
             const container = document.getElementById(elementId);
@@ -635,65 +618,52 @@ window.onDatabaseUpdate = function(type, data) {
         }
         
         function assegnaVoto(tipo, voto) {
-    let stelleId, attualeId, oggetto;
-    let campo;
-    
-    // Partite normali
-    if(tipo === 'giocatore-casa') {
-        stelleId = 'voto-miglior-giocatore-casa';
-        attualeId = 'voto-miglior-giocatore-casa-attuale';
-        oggetto = partitaInCorso;
-        campo = 'votoGiocatoreCasa';
-    } else if(tipo === 'giocatore-ospite') {
-        stelleId = 'voto-miglior-giocatore-ospite';
-        attualeId = 'voto-miglior-giocatore-ospite-attuale';
-        oggetto = partitaInCorso;
-        campo = 'votoGiocatoreOspite';
-    } else if(tipo === 'portiere-casa') {
-        stelleId = 'voto-portiere-casa';
-        attualeId = 'voto-portiere-casa-attuale';
-        oggetto = partitaInCorso;
-        campo = 'votoPortiereCasa';
-    } else if(tipo === 'portiere-ospite') {
-        stelleId = 'voto-portiere-ospite';
-        attualeId = 'voto-portiere-ospite-attuale';
-        oggetto = partitaInCorso;
-        campo = 'votoPortiereOspite';
-    }
-    // Finale
-    else if(tipo === 'finale-giocatore-casa') {
-        stelleId = 'finale-voto-miglior-giocatore-casa';
-        attualeId = 'finale-voto-miglior-giocatore-casa-attuale';
-        oggetto = finaleInCorso;
-        campo = 'votoGiocatoreCasa';
-    } else if(tipo === 'finale-giocatore-ospite') {
-        stelleId = 'finale-voto-miglior-giocatore-ospite';
-        attualeId = 'finale-voto-miglior-giocatore-ospite-attuale';
-        oggetto = finaleInCorso;
-        campo = 'votoGiocatoreOspite';
-    } else if(tipo === 'finale-portiere-casa') {
-        stelleId = 'finale-voto-portiere-casa';
-        attualeId = 'finale-voto-portiere-casa-attuale';
-        oggetto = finaleInCorso;
-        campo = 'votoPortiereCasa';
-    } else if(tipo === 'finale-portiere-ospite') {
-        stelleId = 'finale-voto-portiere-ospite';
-        attualeId = 'finale-voto-portiere-ospite-attuale';
-        oggetto = finaleInCorso;
-        campo = 'votoPortiereOspite';
-    }
-    
-    const stelle = document.querySelectorAll(`#${stelleId} .stella`);
-    stelle.forEach((stella, index) => {
-        stella.classList.toggle('selezionata', index < voto);
-    });
-    
-    if(document.getElementById(attualeId)) {
-        document.getElementById(attualeId).textContent = voto;
-    }
-    
-    oggetto[campo] = voto;
-}
+            let stelleId, attualeId, oggetto;
+            let campo;
+            
+            if(tipo === 'giocatore') {
+                stelleId = 'voto-miglior-giocatore';
+                attualeId = 'voto-miglior-giocatore-attuale';
+                oggetto = partitaInCorso;
+                campo = 'votoGiocatore';
+            } else if(tipo === 'portiere-casa') {
+                stelleId = 'voto-portiere-casa';
+                attualeId = 'voto-portiere-casa-attuale';
+                oggetto = partitaInCorso;
+                campo = 'votoPortiereCasa';
+            } else if(tipo === 'portiere-ospite') {
+                stelleId = 'voto-portiere-ospite';
+                attualeId = 'voto-portiere-ospite-attuale';
+                oggetto = partitaInCorso;
+                campo = 'votoPortiereOspite';
+            } else if(tipo === 'finale-giocatore') {
+                stelleId = 'finale-voto-miglior-giocatore';
+                attualeId = 'finale-voto-miglior-giocatore-attuale';
+                oggetto = finaleInCorso;
+                campo = 'votoGiocatore';
+            } else if(tipo === 'finale-portiere-casa') {
+                stelleId = 'finale-voto-portiere-casa';
+                attualeId = 'finale-voto-portiere-casa-attuale';
+                oggetto = finaleInCorso;
+                campo = 'votoPortiereCasa';
+            } else if(tipo === 'finale-portiere-ospite') {
+                stelleId = 'finale-voto-portiere-ospite';
+                attualeId = 'finale-voto-portiere-ospite-attuale';
+                oggetto = finaleInCorso;
+                campo = 'votoPortiereOspite';
+            }
+            
+            const stelle = document.querySelectorAll(`#${stelleId} .stella`);
+            stelle.forEach((stella, index) => {
+                stella.classList.toggle('selezionata', index < voto);
+            });
+            
+            if(document.getElementById(attualeId)) {
+                document.getElementById(attualeId).textContent = voto;
+            }
+            
+            oggetto[campo] = voto;
+        }
         
         function aggiornaNomePortiere(tipo) {
             let selectId, campoNome, oggetto;
@@ -969,139 +939,90 @@ window.onDatabaseUpdate = function(type, data) {
         g.squadra === squadraCasa || g.squadra === squadraOspite
     );
     
-if(modalita === 'normale') {
-    // Popola miglior giocatore per squadra casa
-    const selectMigliorCasa = document.getElementById('migliorGiocatoreCasa');
-    const selectMigliorOspite = document.getElementById('migliorGiocatoreOspite');
-    
-    selectMigliorCasa.innerHTML = '<option value="">-- Seleziona giocatore casa --</option>';
-    selectMigliorOspite.innerHTML = '<option value="">-- Seleziona giocatore ospite --</option>';
-    
-    giocatoriPartita.forEach(g => {
-        if(g.ruolo === 'Giocatore') {
-            const optionCasa = document.createElement('option');
-            const optionOspite = document.createElement('option');
-            
-            optionCasa.value = g.id;
-            optionCasa.textContent = `${g.nome} (${g.squadra})`;
-            
-            optionOspite.value = g.id;
-            optionOspite.textContent = `${g.nome} (${g.squadra})`;
-            
-            // Filtra per squadra
-            if(g.squadra === squadraCasa) {
-                selectMigliorCasa.appendChild(optionCasa);
+    if(modalita === 'normale') {
+        // Popola miglior giocatore (solo giocatori di campo)
+        const selectGiocatore = document.getElementById('migliorGiocatore');
+        selectGiocatore.innerHTML = '<option value="">-- Seleziona --</option>';
+        
+        giocatoriPartita.forEach(g => {
+            if(g.ruolo === 'Giocatore') {
+                const option = document.createElement('option');
+                option.value = g.id;
+                option.textContent = `${g.nome} (${g.squadra})`;
+                selectGiocatore.appendChild(option);
             }
-            if(g.squadra === squadraOspite) {
-                selectMigliorOspite.appendChild(optionOspite);
+        });
+        
+        // Aggiungi listener per salvare la selezione
+        selectGiocatore.onchange = function() {
+            if(this.value) {
+                partitaInCorso.migliorGiocatore = parseInt(this.value);
+                console.log(`Miglior giocatore selezionato: ID ${partitaInCorso.migliorGiocatore}`);
+            } else {
+                partitaInCorso.migliorGiocatore = null;
             }
-        }
-    });
-    
-    // Aggiungi listener per le selezioni
-    selectMigliorCasa.onchange = function() {
-        if(this.value) {
-            partitaInCorso.migliorGiocatoreCasa = parseInt(this.value);
-        } else {
-            partitaInCorso.migliorGiocatoreCasa = null;
-        }
-    };
-    
-    selectMigliorOspite.onchange = function() {
-        if(this.value) {
-            partitaInCorso.migliorGiocatoreOspite = parseInt(this.value);
-        } else {
-            partitaInCorso.migliorGiocatoreOspite = null;
-        }
-    };
-    
-    // Popola selezioni portieri
-    popolaPortieri('portiereCasa', squadraCasa);
-    popolaPortieri('portiereOspite', squadraOspite);
-    
-    // Reset
-    partitaInCorso.migliorGiocatoreCasa = null;
-    partitaInCorso.migliorGiocatoreOspite = null;
-    partitaInCorso.votoGiocatoreCasa = 0;
-    partitaInCorso.votoGiocatoreOspite = 0;
-    partitaInCorso.portiereCasa = null;
-    partitaInCorso.portiereOspite = null;
-    partitaInCorso.votoPortiereCasa = 0;
-    partitaInCorso.votoPortiereOspite = 0;
-    
-    document.getElementById('voto-miglior-giocatore-casa-attuale').textContent = 'N/A';
-    document.getElementById('voto-miglior-giocatore-ospite-attuale').textContent = 'N/A';
-    document.getElementById('voto-portiere-casa-attuale').textContent = 'N/A';
-    document.getElementById('voto-portiere-ospite-attuale').textContent = 'N/A';
-    document.getElementById('nome-portiere-casa').textContent = '';
-    document.getElementById('nome-portiere-ospite').textContent = '';
-} else if(modalita === 'finale') {
-    // Popola miglior giocatore per finale (2 giocatori)
-    const selectMigliorCasa = document.getElementById('finaleMigliorGiocatoreCasa');
-    const selectMigliorOspite = document.getElementById('finaleMigliorGiocatoreOspite');
-    
-    selectMigliorCasa.innerHTML = '<option value="">-- Seleziona giocatore finale 1 --</option>';
-    selectMigliorOspite.innerHTML = '<option value="">-- Seleziona giocatore finale 2 --</option>';
-    
-    giocatoriPartita.forEach(g => {
-        if(g.ruolo === 'Giocatore') {
-            const optionCasa = document.createElement('option');
-            const optionOspite = document.createElement('option');
-            
-            optionCasa.value = g.id;
-            optionCasa.textContent = `${g.nome} (${g.squadra})`;
-            
-            optionOspite.value = g.id;
-            optionOspite.textContent = `${g.nome} (${g.squadra})`;
-            
-            // Filtra per squadra
-            if(g.squadra === squadraCasa) {
-                selectMigliorCasa.appendChild(optionCasa);
+        };
+        
+        // Popola selezioni portieri
+        popolaPortieri('portiereCasa', squadraCasa);
+        popolaPortieri('portiereOspite', squadraOspite);
+        
+        // Reset
+        partitaInCorso.migliorGiocatore = null;
+        partitaInCorso.votoGiocatore = 0;
+        partitaInCorso.portiereCasa = null;
+        partitaInCorso.portiereOspite = null;
+        partitaInCorso.votoPortiereCasa = 0;
+        partitaInCorso.votoPortiereOspite = 0;
+                
+                document.getElementById('voto-miglior-giocatore-attuale').textContent = 'N/A';
+                document.getElementById('voto-portiere-casa-attuale').textContent = 'N/A';
+                document.getElementById('voto-portiere-ospite-attuale').textContent = 'N/A';
+                document.getElementById('nome-portiere-casa').textContent = '';
+                document.getElementById('nome-portiere-ospite').textContent = '';
+                
+                       } else if(modalita === 'finale') {
+                // Popola miglior giocatore per finale
+                const selectGiocatore = document.getElementById('finaleMigliorGiocatore');
+                selectGiocatore.innerHTML = '<option value="">-- Seleziona --</option>';
+                
+                giocatoriPartita.forEach(g => {
+                    if(g.ruolo === 'Giocatore') {
+                        const option = document.createElement('option');
+                        option.value = g.id;
+                        option.textContent = `${g.nome} (${g.squadra})`;
+                        selectGiocatore.appendChild(option);
+                    }
+                });
+                
+                // Aggiungi listener per salvare la selezione (finale)
+                selectGiocatore.onchange = function() {
+                    if(this.value) {
+                        finaleInCorso.migliorGiocatore = parseInt(this.value);
+                        console.log(`Miglior giocatore finale selezionato: ID ${finaleInCorso.migliorGiocatore}`);
+                    } else {
+                        finaleInCorso.migliorGiocatore = null;
+                    }
+                };
+                
+                // Popola selezioni portieri finale
+                popolaPortieri('finalePortiereCasa', squadraCasa);
+                popolaPortieri('finalePortiereOspite', squadraOspite);
+                
+                // Reset finale
+                finaleInCorso.migliorGiocatore = null;
+                finaleInCorso.votoGiocatore = 0;
+                finaleInCorso.portiereCasa = null;
+                finaleInCorso.portiereOspite = null;
+                finaleInCorso.votoPortiereCasa = 0;
+                finaleInCorso.votoPortiereOspite = 0;
+                
+                document.getElementById('finale-voto-miglior-giocatore-attuale').textContent = 'N/A';
+                document.getElementById('finale-voto-portiere-casa-attuale').textContent = 'N/A';
+                document.getElementById('finale-voto-portiere-ospite-attuale').textContent = 'N/A';
+                document.getElementById('finale-nome-portiere-casa').textContent = '';
+                document.getElementById('finale-nome-portiere-ospite').textContent = '';
             }
-            if(g.squadra === squadraOspite) {
-                selectMigliorOspite.appendChild(optionOspite);
-            }
-        }
-    });
-    
-    // Aggiungi listener per le selezioni (finale)
-    selectMigliorCasa.onchange = function() {
-        if(this.value) {
-            finaleInCorso.migliorGiocatoreCasa = parseInt(this.value);
-        } else {
-            finaleInCorso.migliorGiocatoreCasa = null;
-        }
-    };
-    
-    selectMigliorOspite.onchange = function() {
-        if(this.value) {
-            finaleInCorso.migliorGiocatoreOspite = parseInt(this.value);
-        } else {
-            finaleInCorso.migliorGiocatoreOspite = null;
-        }
-    };
-    
-    // Popola selezioni portieri finale
-    popolaPortieri('finalePortiereCasa', squadraCasa);
-    popolaPortieri('finalePortiereOspite', squadraOspite);
-    
-    // Reset finale
-    finaleInCorso.migliorGiocatoreCasa = null;
-    finaleInCorso.migliorGiocatoreOspite = null;
-    finaleInCorso.votoGiocatoreCasa = 0;
-    finaleInCorso.votoGiocatoreOspite = 0;
-    finaleInCorso.portiereCasa = null;
-    finaleInCorso.portiereOspite = null;
-    finaleInCorso.votoPortiereCasa = 0;
-    finaleInCorso.votoPortiereOspite = 0;
-    
-    document.getElementById('finale-voto-miglior-giocatore-casa-attuale').textContent = 'N/A';
-    document.getElementById('finale-voto-miglior-giocatore-ospite-attuale').textContent = 'N/A';
-    document.getElementById('finale-voto-portiere-casa-attuale').textContent = 'N/A';
-    document.getElementById('finale-voto-portiere-ospite-attuale').textContent = 'N/A';
-    document.getElementById('finale-nome-portiere-casa').textContent = '';
-    document.getElementById('finale-nome-portiere-ospite').textContent = '';
-}
             
             // Reset stelle
             document.querySelectorAll('.stella.selezionata').forEach(s => s.classList.remove('selezionata'));
@@ -1788,51 +1709,4 @@ if(modalita === 'normale') {
                         // Reset interfaccia
                         document.getElementById('tipoElimina').value = '';
                         document.getElementById('opzioniElimina').innerHTML = '';
-                        document.getElementById('opzioniElimina').classList.add('hidden');
-                        document.getElementById('btnElimina').classList.add('hidden');
-                        
-                    } catch (error) {
-                        alert("Errore nell'eliminazione totale: " + error.message);
-                    }
-                }
-            }
-        }
-        
-        // Controllo password (solo se non è già stato fatto)
-        if(!localStorage.getItem('admin_accesso') || localStorage.getItem('admin_accesso') !== 'true') {
-            const password = prompt("Password ADMIN:");
-            if(password !== "1246912.!!") {
-                alert("Accesso negato!");
-                window.location.href = 'main.html';
-            } else {
-                localStorage.setItem('admin_accesso', 'true');
-            }
-        }
-        
-        // Esporta funzioni per essere chiamate da HTML
-        window.tornaHome = tornaHome;
-        window.mostraSezione = mostraSezione;
-        window.tornaMenu = tornaMenu;
-        window.aggiungiSquadra = aggiungiSquadra;
-        window.aggiungiGiocatore = aggiungiGiocatore;
-        window.caricaGiocatoriPartita = caricaGiocatoriPartita;
-        window.aggiornaNomePortiere = aggiornaNomePortiere;
-        window.modificaEvento = modificaEvento;
-        window.cancellaEventi = cancellaEventi;
-        window.salvaPartita = salvaPartita;
-        window.caricaPartiteSalvate = caricaPartiteSalvate;
-        window.eliminaPartita = eliminaPartita;
-        window.mostraOpzioniElimina = mostraOpzioniElimina;
-        window.eseguiEliminazione = eseguiEliminazione;
-    </script>
-</body>
-</html>
-
-
-
-
-
-
-
-
-
+                        d

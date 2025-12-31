@@ -194,16 +194,10 @@ class SupabaseManager {
             // Elimina finale esistente se presente
             await supabase.from('finale').delete().neq('id', 0);
             
-            // Aggiungi nuova finale (partita asestante - non influenza classifiche)
-            const finaleData = {
-                ...finale,
-                // Flag per indicare che è una finale asestante
-                finale_asestante: true
-            };
-            
+            // Aggiungi nuova finale
             const { data, error } = await supabase
                 .from('finale')
-                .insert([finaleData])
+                .insert([finale])
                 .select()
                 .single();
             
@@ -276,18 +270,12 @@ class SupabaseManager {
         }
     }
     
-    // AGGIORNA STATISTICHE GIOCATORE (MODIFICA 2: rimossi premi_miglior_portiere)
+    // AGGIORNA STATISTICHE GIOCATORE
     async aggiornaGiocatore(giocatoreId, updates) {
         try {
-            // MODIFICA 2: Rimuove il campo premi_miglior_portiere se presente
-            const updatesSenzaPremi = { ...updates };
-            if ('premi_miglior_portiere' in updatesSenzaPremi) {
-                delete updatesSenzaPremi.premi_miglior_portiere;
-            }
-            
             const { error } = await supabase
                 .from('giocatori')
-                .update(updatesSenzaPremi)
+                .update(updates)
                 .eq('id', giocatoreId);
             
             if (error) throw error;

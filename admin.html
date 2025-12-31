@@ -308,18 +308,29 @@
                 <strong>IMPORTANTE:</strong> Seleziona 1 miglior giocatore (campo) e vota entrambi i portieri
             </div>
             <div class="migliori-row">
-                <div>
-                    <label>Miglior Giocatore (campo):</label>
-                    <select id="migliorGiocatore">
-                        <option value="">-- Seleziona --</option>
-                    </select>
-                    <div class="voto-container">
-                        <label>Voto (1-10):</label>
-                        <div class="voto-stelle" id="voto-miglior-giocatore"></div>
-                        <span>Voto: <span id="voto-miglior-giocatore-attuale">N/A</span></span>
-                    </div>
-                </div>
-            </div>
+    <div>
+        <label>Miglior Giocatore Casa:</label>
+        <select id="migliorGiocatoreCasa">
+            <option value="">-- Seleziona giocatore casa --</option>
+        </select>
+        <div class="voto-container">
+            <label>Voto (1-10):</label>
+            <div class="voto-stelle" id="voto-miglior-giocatore-casa"></div>
+            <span>Voto: <span id="voto-miglior-giocatore-casa-attuale">N/A</span></span>
+        </div>
+    </div>
+    <div>
+        <label>Miglior Giocatore Ospite:</label>
+        <select id="migliorGiocatoreOspite">
+            <option value="">-- Seleziona giocatore ospite --</option>
+        </select>
+        <div class="voto-container">
+            <label>Voto (1-10):</label>
+            <div class="voto-stelle" id="voto-miglior-giocatore-ospite"></div>
+            <span>Voto: <span id="voto-miglior-giocatore-ospite-attuale">N/A</span></span>
+        </div>
+    </div>
+</div>
             
             <!-- NUOVA SEZIONE: VOTI PORTIERI -->
             <div class="portieri-row">
@@ -1772,6 +1783,7 @@ if(modalita === 'normale') {
     </script>
 </body>
 </html>
+
 
 
 

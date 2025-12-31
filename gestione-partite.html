@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rovigoal - Gestione Partite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #333;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 3px solid gold;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        /* SECTION STYLES */
+        .section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 2px solid #dee2e6;
+        }
+        
+        .section h3 {
+            color: #1e3c72;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #1e3c72;
+            padding-bottom: 10px;
+        }
+        
+        /* FORMS */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ced4da;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #1e3c72;
+            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+        }
+        
+        /* BUTTONS */
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #DC143C 0%, #FF4500 100%);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #333;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.9em;
+        }
+        
+        /* EVENTI PARTITA */
+        .eventi-container {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        
+        .evento-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ced4da;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .evento-item:hover {
+            background: #f8f9fa;
+            transform: translateX(5px);
+        }
+        
+        .evento-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .evento-icon {
+            font-size: 1.5em;
+        }
+        
+        .evento-gol { color: #28a745; }
+        .evento-amm { color: #ffc107; }
+        .evento-esp { color: #dc143c; }
+        
+        /* VALUTAZIONI */
+        .valutazioni-container {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #2196F3;
+            margin-top: 20px;
+        }
+        
+        .valutazione-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #b3d9ff;
+        }
+        
+        /* RISULTATO */
+        .risultato-container {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            padding: 25px;
+            border-radius: 10px;
+            border: 2px solid #28a745;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .risultato-display {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #1e3c72;
+            margin: 15px 0;
+        }
+        
+        /* GOL COUNTER */
+        .gol-counter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .gol-totale {
+            font-weight: bold;
+            color: #28a745;
+            font-size: 1.2em;
+        }
+        
+        /* PARTITE REGISTRATE */
+        .partite-lista {
+            margin-top: 30px;
+        }
+        
+        .partita-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+        
+        .partita-item:hover {
+            border-color: #1e3c72;
+            transform: translateY(-3px);
+        }
+        
+        .partita-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .partita-info {
+            flex: 1;
+        }
+        
+        .partita-squadre {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+        
+        .partita-data {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .partita-risultato {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #28a745;
+            margin: 0 20px;
+        }
+        
+        .partita-dettagli {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        /* ALERTS */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* STATO CONNESSIONE */
+        .connessione-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .connessione-ok {
+            background: #4CAF50;
+            color: white;
+            border: 2px solid #45a049;
+        }
+        
+        .connessione-caricamento {
+            background: #FFA500;
+            color: white;
+            border: 2px solid #FF8C00;
+        }
+        
+        .connessione-ko {
+            background: #f44336;
+            color: white;
+            border: 2px solid #d32f2f;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            animation: modalSlide 0.3s ease;
+        }
+        
+        @keyframes modalSlide {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .modal-header h3 {
+            color: #1e3c72;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        /* MOBILE */
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .partita-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .partita-risultato {
+                margin: 10px 0;
+                font-size: 1.5em;
+            }
+            
+            .connessione-status {
+                top: 5px;
+                right: 5px;
+                padding: 4px 8px;
+                font-size: 0.7em;
+            }
+            
+            .risultato-display {
+                font-size: 2em;
+            }
+            
+            .evento-item {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
+        
+        /* UTILITY */
+        .text-center { text-align: center; }
+        .mt-20 { margin-top: 20px; }
+        .mb-20 { margin-bottom: 20px; }
+        .flex { display: flex; }
+        .gap-10 { gap: 10px; }
+        .justify-between { justify-content: space-between; }
+    </style>
+</head>
+<body>
+    <!-- MODAL ELIMINA PARTITA -->
+    <div id="modalElimina" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🗑️ Elimina Partita</h3>
+                <button class="close-modal" onclick="chiudiModal()">×</button>
+            </div>
+            <div id="modalMessaggio">
+                Sei sicuro di voler eliminare questa partita?
+            </div>
+            <div class="flex gap-10 mt-20">
+                <button class="btn btn-secondary" onclick="chiudiModal()">Annulla</button>
+                <button class="btn btn-danger" id="modalConfermaBtn">Elimina</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="header">
+        <h1>📅 GESTIONE PARTITE</h1>
+        <p>Registra partite, eventi, valutazioni e risultati</p>
+        
+        <!-- STATO CONNESSIONE -->
+        <div id="connessioneStatus" class="connessione-status connessione-caricamento">
+            <div class="loading"></div> Caricamento...
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- ALERT MESSAGES -->
+        <div id="alertSuccess" class="alert alert-success" style="display: none;"></div>
+        <div id="alertError" class="alert alert-error" style="display: none;"></div>
+        <div id="alertWarning" class="alert alert-warning" style="display: none;"></div>
+        <div id="alertInfo" class="alert alert-info" style="display: none;"></div>
+        
+        <!-- 1. INFO BASE PARTITA -->
+        <div class="section">
+            <h3>📝 INFORMAZIONI PARTITA</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="dataPartita">Data *</label>
+                    <input type="date" id="dataPartita" value="">
+                </div>
+                <div class="form-group">
+                    <label for="oraPartita">Ora</label>
+                    <input type="time" id="oraPartita" value="15:00">
+                </div>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="squadraCasa">Squadra Casa *</label>
+                    <select id="squadraCasa">
+                        <option value="">Seleziona squadra...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="squadraOspite">Squadra Ospite *</label>
+                    <select id="squadraOspite">
+                        <option value="">Seleziona squadra...</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 2. RISULTATO PARTITA -->
+        <div class="section">
+            <h3>⚽ RISULTATO FINALE</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="golCasa">Gol Squadra Casa *</label>
+                    <input type="number" id="golCasa" min="0" value="0" onchange="aggiornaRisultato()">
+                </div>
+                <div class="form-group">
+                    <label for="golOspite">Gol Squadra Ospite *</label>
+                    <input type="number" id="golOspite" min="0" value="0" onchange="aggiornaRisultato()">
+                </div>
+            </div>
+            
+            <div class="risultato-container" id="risultatoDisplay">
+                <div id="squadreRisultato" class="partita-squadre">Squadra Casa - Squadra Ospite</div>
+                <div class="risultato-display" id="risultatoNumerico">0 - 0</div>
+                <div id="vincitoreRisultato" style="font-weight: bold; color: #1e3c72;"></div>
+            </div>
+        </div>
+        
+        <!-- 3. EVENTI PARTITA (Gol, Ammonizioni, Espulsioni) -->
+        <div class="section">
+            <h3>📋 EVENTI PARTITA</h3>
+            
+            <!-- CONTROLLO GOL -->
+            <div class="alert alert-info" style="display: block;">
+                <strong>⚠️ ATTENZIONE:</strong> I gol totali negli eventi DEVONO corrispondere al risultato finale!
+                <div class="gol-counter mt-20">
+                    <div>Gol Casa: <span id="golCasaEventi" class="gol-totale">0</span></div>
+                    <div>Gol Ospite: <span id="golOspiteEventi" class="gol-totale">0</span></div>
+                    <div>Totale Gol Eventi: <span id="golTotaliEventi" class="gol-totale">0</span></div>
+                    <div>Totale Gol Risultato: <span id="golTotaliRisultato" class="gol-totale">0</span></div>
+                    <div id="statoGol" style="font-weight: bold; color: #dc143c;">❌ NON CORRISPONDONO</div>
+                </div>
+            </div>
+            
+            <!-- FORM AGGIUNGI EVENTO -->
+            <div class="eventi-container">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="tipoEvento">Tipo Evento *</label>
+                        <select id="tipoEvento">
+                            <option value="gol">⚽ Gol</option>
+                            <option value="amm">🟨 Ammonizione</option>
+                            <option value="esp">🟥 Espulsione</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="squadraEvento">Squadra *</label>
+                        <select id="squadraEvento">
+                            <option value="">Seleziona squadra...</option>
+                            <option value="casa">Casa</option>
+                            <option value="ospite">Ospite</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="giocatoreEvento">Giocatore *</label>
+                        <select id="giocatoreEvento">
+                            <option value="">Seleziona giocatore...</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="aggiungiEvento()">
+                    <span>➕</span> AGGIUNGI EVENTO
+                </button>
+            </div>
+            
+            <!-- LISTA EVENTI -->
+            <h4 class="mt-20">Eventi Aggiunti:</h4>
+            <div id="listaEventi" style="min-height: 100px;">
+                <div class="alert alert-info" style="display: block; text-align: center;">
+                    <p>Nessun evento aggiunto. Aggiungi il primo evento usando il form qui sopra.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 4. VALUTAZIONI -->
+        <div class="section">
+            <h3>⭐ VALUTAZIONI</h3>
+            
+            <!-- MIGLIOR GIOCATORE -->
+            <div class="valutazioni-container">
+                <h4>🏆 MIGLIOR GIOCATORE DELLA PARTITA</h4>
+                <p style="color: #666; margin-bottom: 15px;">Seleziona UN giocatore (di qualsiasi squadra) come miglior giocatore</p>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="migliorGiocatore">Giocatore *</

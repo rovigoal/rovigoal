@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rovigoal - Classifica</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        table {
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .posizione {
+            width: 60px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .squadra {
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        .primo {
+            background-color: #FFD700;
+        }
+        
+        .secondo {
+            background-color: #C0C0C0;
+        }
+        
+        .terzo {
+            background-color: #CD7F32;
+        }
+        
+        .btn-back {
+            display: block;
+            margin: 30px auto;
+            padding: 12px 30px;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-back:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        /* STATO CONNESSIONE */
+        .connessione-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .connessione-ok {
+            background: #4CAF50;
+            color: white;
+            border: 2px solid #45a049;
+        }
+        
+        .connessione-caricamento {
+            background: #FFA500;
+            color: white;
+            border: 2px solid #FF8C00;
+        }
+        
+        .connessione-ko {
+            background: #f44336;
+            color: white;
+            border: 2px solid #d32f2f;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* NOTIFICA AGGIORNAMENTO */
+        .notifica-aggiornamento {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 9999;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2s forwards;
+            font-weight: bold;
+            display: none;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; transform: translateX(100%); }
+        }
+        
+        /* MESSAGGIO VUOTO */
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .empty-message h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        /* DATA AGGIORNAMENTO */
+        .data-aggiornamento {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        /* MEDIA QUERY MOBILE */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .stat-card {
+                padding: 12px;
+            }
+            
+            .stat-value {
+                font-size: 1.5em;
+            }
+            
+            th, td {
+                padding: 10px 8px;
+                font-size: 0.9em;
+            }
+            
+            .posizione {
+                width: 40px;
+                font-size: 1em;
+            }
+            
+            .connessione-status {
+                top: 5px;
+                right: 5px;
+                padding: 4px 8px;
+                font-size: 0.7em;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            table {
+                font-size: 0.85em;
+            }
+            
+            th, td {
+                padding: 8px 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NOTIFICA AGGIORNAMENTO -->
+    <div id="notificaAggiornamento" class="notifica-aggiornamento">
+        🔄 Classifica aggiornata in tempo reale!
+    </div>
+    
+    <div class="header">
+        <h1>🏆 CLASSIFICA ROVIGOAL</h1>
+        <p>Aggiornata in tempo reale</p>
+        
+        <!-- STATO CONNESSIONE -->
+        <div id="connessioneStatus" class="connessione-status connessione-caricamento">
+            <div class="loading"></div> Caricamento...
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totSquadre">0</div>
+                <div class="stat-label">Squadre</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totPartite">0</div>
+                <div class="stat-label">Partite</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totGol">0</div>
+                <div class="stat-label">Gol Totali</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="mediaGol">0.0</div>
+                <div class="stat-label">Media Gol/Partita</div>
+            </div>
+        </div>
+        
+        <!-- DATA ULTIMO AGGIORNAMENTO -->
+        <div class="data-aggiornamento" id="dataAggiornamento">
+            Ultimo aggiornamento: --/--/---- --:--:--
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th class="posizione">#</th>
+                    <th class="squadra">SQUADRA</th>
+                    <th>P</th>
+                    <th>PG</th>
+                    <th>V</th>
+                    <th>N</th>
+                    <th>P</th>
+                    <th>GF</th>
+                    <th>GS</th>
+                    <th>DR</th>
+                </tr>
+            </thead>
+            <tbody id="tabellaClassifica">
+                <!-- La classifica verrà inserita qui -->
+            </tbody>
+        </table>
+        
+        <button class="btn-back" onclick="tornaIndietro()">← TORNA ALLA HOME</button>
+    </div>
+    
+    <script type="module">
+        // Importa il gestore database Supabase
+        import database from './database-supabase.js';
+        
+        // VARIABILI GLOBALI
+        let datiTorneo = {
+            squadre: [],
+            partite: []
+        };
+        
+        let ultimoAggiornamento = null;
+        let contatoreAggiornamenti = 0;
+        
+        // INIZIALIZZAZIONE
+        document.addEventListener('DOMContentLoaded', async function() {
+            aggiornaStatoConnessione('caricamento');
+            
+            try {
+                // Prima controlla se ci sono dati in cache
+                await caricaDaCache();
+                
+                // Poi carica dati freschi da Supabase
+                await caricaDatiIniziali();
+                
+                // Setup listener in tempo reale
+                setupRealtimeListeners();
+                
+                aggiornaStatoConnessione('ok');
+                
+            } catch (error) {
+                console.error('Errore caricamento classifica:', error);
+                aggiornaStatoConnessione('ko');
+                mostraErrore('Errore nel caricamento della classifica. Riprova più tardi.');
+            }
+        });
+        
+        // CARICA DATI DA CACHE (per performance)
+        async function caricaDaCache() {
+            try {
+                const cacheSquadre = sessionStorage.getItem('cache_squadre');
+                const cachePartite = sessionStorage.getItem('cache_partite');
+                
+                if (cacheSquadre && cachePartite) {
+                    datiTorneo.squadre = JSON.parse(cacheSquadre);
+                    datiTorneo.partite = JSON.parse(cachePartite);
+                    
+                    console.log('Dati caricati dalla cache:', {
+                        squadre: datiTorneo.squadre.length,
+                        partite: datiTorneo.partite.length
+                    });
+                    
+                    // Mostra subito i dati dalla cache
+                    generaClassifica();
+                    aggiornaStatistiche();
+                    
+                    // Poi aggiorna con i dati freschi
+                    return true;
+                }
+            } catch (error) {
+                console.warn('Errore caricamento cache:', error);
+            }
+            return false;
+        }
+        
+        // CARICA DATI INIZIALI DA SUPABASE
+        async function caricaDatiIniziali() {
+            try {
+                // Carica dati in parallelo
+                const [squadre, partite] = await Promise.all([
+                    database.getSquadre(),
+                    database.getPartite()
+                ]);
+                
+                // Aggiorna dati
+                datiTorneo.squadre = squadre || [];
+                datiTorneo.partite = partite || [];
+                
+                ultimoAggiornamento = new Date();
+                
+                console.log('Dati Supabase caricati:', {
+                    squadre: datiTorneo.squadre.length,
+                    partite: datiTorneo.partite.length
+                });
+                
+                // Aggiorna cache
+                sessionStorage.setItem('cache_squadre', JSON.stringify(datiTorneo.squadre));
+                sessionStorage.setItem('cache_partite', JSON.stringify(datiTorneo.partite));
+                
+                // Genera classifica
+                generaClassifica();
+                aggiornaStatistiche();
+                aggiornaDataAggiornamento();
+                
+            } catch (error) {
+                console.error('Errore nel caricamento iniziale:', error);
+                throw error;
+            }
+        }
+        
+        // SETUP LISTENER TEMPO REALE
+        function setupRealtimeListeners() {
+            // Ascolta aggiornamenti dal database Supabase
+            window.onDatabaseUpdate = function(type, data) {
+                console.log(`Aggiornamento classifica: ${type}`);
+                
+                // Aggiorna i dati locali
+                if (type === 'squadre') {
+                    datiTorneo.squadre = data || [];
+                    sessionStorage.setItem('cache_squadre', JSON.stringify(data));
+                } else if (type === 'partite') {
+                    datiTorneo.partite = data || [];
+                    sessionStorage.setItem('cache_partite', JSON.stringify(data));
+                }
+                
+                ultimoAggiornamento = new Date();
+                contatoreAggiornamenti++;
+                
+                // Aggiorna l'interfaccia
+                generaClassifica();
+                aggiornaStatistiche();
+                aggiornaDataAggiornamento();
+                aggiornaStatoConnessione('ok');
+                
+                // Mostra notifica
+                if (type === 'squadre' || type === 'partite') {
+                    mostraNotificaAggiornamento();
+                }
+            };
+        }
+        
+        // GENERA LA CLASSIFICA
+        function generaClassifica() {
+            const tabella = document.getElementById('tabellaClassifica');
+            
+            if (!datiTorneo.squadre || datiTorneo.squadre.length === 0) {
+                tabella.innerHTML = `
+                    <tr>
+                        <td colspan="10" class="empty-message">
+                            <h3>📋 Nessuna squadra registrata</h3>
+                            <p>Vai in Area Admin per aggiungere squadre e iniziare il torneo.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Ordina squadre per punti (punti > differenza reti > gol fatti)
+            const squadreOrdinate = [...datiTorneo.squadre].sort((a, b) => {
+                if (b.punti !== a.punti) return b.punti - a.punti;
+                
+                const drA = (a.gol_fatti || 0) - (a.gol_subiti || 0);
+                const drB = (b.gol_fatti || 0) - (b.gol_subiti || 0);
+                if (drB !== drA) return drB - drA;
+                
+                return (b.gol_fatti || 0) - (a.gol_fatti || 0);
+            });
+            
+            let html = '';
+            squadreOrdinate.forEach((squadra, index) => {
+                const posizione = index + 1;
+                const dr = (squadra.gol_fatti || 0) - (squadra.gol_subiti || 0);
+                
+                let classePosizione = '';
+                if (posizione === 1) classePosizione = 'primo';
+                else if (posizione === 2) classePosizione = 'secondo';
+                else if (posizione === 3) classePosizione = 'terzo';
+                
+                // Medaglie per i primi 3
+                let medaglia = '';
+                if (posizione === 1) medaglia = '🥇 ';
+                else if (posizione === 2) medaglia = '🥈 ';
+                else if (posizione === 3) medaglia = '🥉 ';
+                
+                html += `
+                    <tr class="${classePosizione}">
+                        <td class="posizione">${posizione}</td>
+                        <td class="squadra">${medaglia}${squadra.nome}</td>
+                        <td><strong>${squadra.punti || 0}</strong></td>
+                        <td>${squadra.partite_giocate || 0}</td>
+                        <td>${squadra.vittorie || 0}</td>
+                        <td>${squadra.pareggi || 0}</td>
+                        <td>${squadra.sconfitte || 0}</td>
+                        <td>${squadra.gol_fatti || 0}</td>
+                        <td>${squadra.gol_subiti || 0}</td>
+                        <td>${dr > 0 ? '+' : ''}${dr}</td>
+                    </tr>
+                `;
+            });
+            
+            tabella.innerHTML = html;
+        }
+        
+        // AGGIORNA STATISTICHE
+        function aggiornaStatistiche() {
+            // Squadre totali
+            document.getElementById('totSquadre').textContent = datiTorneo.squadre.length;
+            
+            // Partite totali
+            document.getElementById('totPartite').textContent = datiTorneo.partite.length;
+            
+            // Gol totali
+            let totGol = 0;
+            datiTorneo.partite.forEach(partita => {
+                totGol += (partita.gol_casa || 0) + (partita.gol_ospite || 0);
+            });
+            document.getElementById('totGol').textContent = totGol;
+            
+            // Media gol per partita
+            const mediaGol = datiTorneo.partite.length > 0 
+                ? (totGol / datiTorneo.partite.length).toFixed(2) 
+                : "0.00";
+            document.getElementById('mediaGol').textContent = mediaGol;
+        }
+        
+        // AGGIORNA DATA ULTIMO AGGIORNAMENTO
+        function aggiornaDataAggiornamento() {
+            const elemento = document.getElementById('dataAggiornamento');
+            if (ultimoAggiornamento) {
+                elemento.textContent = `Ultimo aggiornamento: ${ultimoAggiornamento.toLocaleDateString('it-IT')} ${ultimoAggiornamento.toLocaleTimeString('it-IT')}`;
+                elemento.style.color = '#4CAF50';
+                elemento.style.fontWeight = 'bold';
+            }
+        }
+        
+        // FUNZIONI AUSILIARIE
+        function aggiornaStatoConnessione(stato) {
+            const statusElement = document.getElementById('connessioneStatus');
+            
+            switch(stato) {
+                case 'caricamento':
+                    statusElement.className = 'connessione-status connessione-caricamento';
+                    statusElement.innerHTML = '<div class="loading"></div> Caricamento classifica...';
+                    break;
+                    
+                case 'ok':
+                    statusElement.className = 'connessione-status connessione-ok';
+                    statusElement.innerHTML = '✓ Connesso in tempo reale';
+                    break;
+                    
+                case 'ko':
+                    statusElement.className = 'connessione-status connessione-ko';
+                    statusElement.innerHTML = '✗ Disconnesso';
+                    break;
+            }
+        }
+        
+        function mostraNotificaAggiornamento() {
+            const notifica = document.getElementById('notificaAggiornamento');
+            notifica.textContent = `🔄 Classifica aggiornata! (${++contatoreAggiornamenti} aggiornamenti)`;
+            notifica.style.display = 'block';
+            
+            // Nascondi dopo 3 secondi
+            setTimeout(() => {
+                notifica.style.display = 'none';
+            }, 3000);
+        }
+        
+        function mostraErrore(messaggio) {
+            const tabella = document.getElementById('tabellaClassifica');
+            tabella.innerHTML = `
+                <tr>
+                    <td colspan="10" class="empty-message" style="color: #f44336;">
+                        <h3>⚠️ Errore di connessione</h3>
+                        <p>${messaggio}</p>
+                        <button onclick="location.reload()" style="margin-top: 15px; padding: 8px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            Riprova
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        // NAVIGAZIONE
+        function tornaIndietro() {
+            window.location.href = 'main.html';
+        }
+        
+        // CONTROLLO ACCESSO
+        if(localStorage.getItem('rovigoal_entrato') !== 'true') {
+            window.location.href = 'index.html';
+        }
+        
+        // CONTROLLO PERIODICO CONNESSIONE
+        setInterval(async () => {
+            try {
+                const test = await database.getSquadre();
+                if (Array.isArray(test)) {
+                    aggiornaStatoConnessione('ok');
+                } else {
+                    aggiornaStatoConnessione('ko');
+                }
+            } catch (error) {
+                aggiornaStatoConnessione('ko');
+            }
+        }, 30000);
+        
+        // ESPORTA FUNZIONI
+        window.tornaIndietro = tornaIndietro;
+        
+    </script>
+</body>
+</html>

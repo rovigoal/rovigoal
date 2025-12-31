@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rovigoal - Statistiche</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #32CD32 0%, #228B22 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .tab.active {
+            background: #1e3c72;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        th {
+            background: #f5f5f5;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+            color: #333;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .posizione {
+            width: 50px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .giocatore {
+            font-weight: bold;
+        }
+        
+        .gol {
+            text-align: center;
+            font-weight: bold;
+            color: #228B22;
+        }
+        
+        .squadra {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .btn-back {
+            display: block;
+            margin: 30px auto;
+            padding: 12px 30px;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-back:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .medaglie {
+            display: inline-block;
+            margin-left: 10px;
+        }
+        
+        .medaglia-oro { color: #FFD700; }
+        .medaglia-argento { color: #C0C0C0; }
+        .medaglia-bronzo { color: #CD7F32; }
+        
+        .badge {
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+        
+        .badge-giallo { background: #FFFACD; color: #8B6914; }
+        .badge-rosso { background: #FFB6C1; color: #8B0000; }
+        .badge-voto { 
+            background: #8A2BE2; 
+            color: white;
+            margin: 2px;
+        }
+        
+        .voto-cell {
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .voto-alto { color: #228B22; }
+        .voto-medio { color: #FF8C00; }
+        .voto-basso { color: #DC143C; }
+        
+        .punteggio-totale {
+            font-size: 1.3em;
+            color: #8A2BE2;
+        }
+        
+        .media-partita {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .partita-row {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .partita-row:hover {
+            background-color: #f0f8ff;
+        }
+        
+        .partita-dettagli {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 5px;
+            border-left: 4px solid #1e3c72;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 500px; }
+        }
+        
+        .partita-dettagli.aperta {
+            display: block;
+        }
+        
+        .eventi-partita {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .evento-badge {
+            background: #e8f4ff;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            border: 1px solid #b3d9ff;
+        }
+        
+        .filtro-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .filtro-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        select {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .risultato-partita {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #1e3c72;
+        }
+        
+        .avviso {
+            background: #e7f5ff;
+            border-left: 4px solid #1c7ed6;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-portiere {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left: 4px solid #2196F3;
+        }
+        
+        /* STATO CONNESSIONE */
+        .connessione-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .connessione-ok {
+            background: #4CAF50;
+            color: white;
+            border: 2px solid #45a049;
+        }
+        
+        .connessione-caricamento {
+            background: #FFA500;
+            color: white;
+            border: 2px solid #FF8C00;
+        }
+        
+        .connessione-ko {
+            background: #f44336;
+            color: white;
+            border: 2px solid #d32f2f;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* NOTIFICA AGGIORNAMENTO */
+        .notifica-aggiornamento {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 9999;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2s forwards;
+            font-weight: bold;
+            display: none;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; transform: translateX(100%); }
+        }
+        
+        /* INFO DATA AGGIORNAMENTO */
+        .info-aggiornamento {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        /* MEDIA QUERY MOBILE */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .tabs {
+                gap: 5px;
+            }
+            
+            .tab {
+                padding: 8px 12px;
+                font-size: 0.9em;
+                flex: 1;
+                min-width: calc(50% - 10px);
+            }
+            
+            .tab-content {
+                padding: 15px;
+            }
+            
+            table {
+                font-size: 0.85em;
+            }
+            
+            th, td {
+                padding: 8px 6px;
+            }
+            
+            .connessione-status {
+                top: 5px;
+                right: 5px;
+                padding: 4px 8px;
+                font-size: 0.7em;
+            }
+            
+            .filtro-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                min-width: 100%;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NOTIFICA AGGIORNAMENTO -->
+    <div id="notificaAggiornamento" class="notifica-aggiornamento">
+        🔄 Statistiche aggiornate in tempo reale!
+    </div>
+    
+    <div class="header">
+        <h1>📊 STATISTICHE ROVIGOAL</h1>
+        <p>Statistiche dettagliate giocatori e squadre</p>
+        
+        <!-- STATO CONNESSIONE -->
+        <div id="connessioneStatus" class="connessione-status connessione-caricamento">
+            <div class="loading"></div> Caricamento...
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- INFO AGGIORNAMENTO -->
+        <div class="info-aggiornamento" id="infoAggiornamento">
+            Ultimo aggiornamento: --/--/---- --:--:--
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="apriTab('cannoniere')">⚽ CANNONIERI</button>
+            <button class="tab" onclick="apriTab('ammoniti')">🟨 AMMONITI</button>
+            <button class="tab" onclick="apriTab('espulsi')">🟥 ESPULSI</button>
+            <button class="tab" onclick="apriTab('portieri')">🥅 PORTIERI</button>
+            <button class="tab" onclick="apriTab('punteggi')">⭐ PUNTEGGI</button>
+            <button class="tab" onclick="apriTab('partite')">📅 PARTITE</button>
+        </div>
+        
+        <!-- TAB 1: CANNONIERI -->
+        <div id="cannoniere" class="tab-content active">
+            <h2>Classifica Cannonieri</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="60">#</th>
+                        <th>Giocatore</th>
+                        <th>Squadra</th>
+                        <th>Ruolo</th>
+                        <th width="100">Gol</th>
+                        <th>Partite</th>
+                        <th>Media Gol/Partita</th>
+                    </tr>
+                </thead>
+                <tbody id="tabellaCannoniere">
+                    <tr><td colspan="7" class="empty-state">Caricamento cannonieri...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- TAB 2: AMMONITI -->
+        <div id="ammoniti" class="tab-content">
+            <h2>Giocatori più Ammoniti</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="60">#</th>
+                        <th>Giocatore</th>
+                        <th>Squadra</th>
+                        <th>Ruolo</th>
+                        <th width="100">Ammonizioni</th>
+                        <th>Partite</th>
+                        <th>Media/Partita</th>
+                    </tr>
+                </thead>
+                <tbody id="tabellaAmmoniti">
+                    <tr><td colspan="7" class="empty-state">Caricamento ammoniti...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- TAB 3: ESPULSI -->
+        <div id="espulsi" class="tab-content">
+            <h2>Giocatori Espulsi</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="60">#</th>
+                        <th>Giocatore</th>
+                        <th>Squadra</th>
+                        <th>Ruolo</th>
+                        <th width="100">Espulsioni</th>
+                        <th>Partite</th>
+                    </tr>
+                </thead>
+                <tbody id="tabellaEspulsi">
+                    <tr><td colspan="6" class="empty-state">Caricamento espulsi...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- TAB 4: PORTIERI -->
+        <div id="portieri" class="tab-content">
+            <h2>🥅 CLASSIFICA PORTIERI</h2>
+            <div class="avviso">
+                <strong>Nota:</strong> Questa classifica tiene conto dei voti assegnati come "Miglior Portiere" durante le partite
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="60">#</th>
+                        <th>Portiere</th>
+                        <th>Squadra</th>
+                        <th width="100">Punteggio</th>
+                        <th width="100">Premi</th>
+                        <th width="100">Media Voto</th>
+                        <th width="100">Partite</th>
+                    </tr>
+                </thead>
+                <tbody id="tabellaPortieri">
+                    <tr><td colspan="7" class="empty-state">Caricamento portieri...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- TAB 5: PUNTEGGI -->
+        <div id="punteggi" class="tab-content">
+            <h2>⭐ CLASSIFICA MIGLIORI GIOCATORI</h2>
+            <div class="avviso">
+                <strong>Nota:</strong> Questa classifica mostra SOLO i giocatori che hanno ricevuto voti come "Miglior Giocatore"
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="60">#</th>
+                        <th>Giocatore</th>
+                        <th>Squadra</th>
+                        <th>Ruolo</th>
+                        <th width="120">Punteggio Totale</th>
+                        <th width="100">Premi</th>
+                        <th width="100">Media Voto</th>
+                    </tr>
+                </thead>
+                <tbody id="tabellaPunteggi">
+                    <tr><td colspan="7" class="empty-state">Caricamento punteggi...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- TAB 6: PARTITE -->
+        <div id="partite" class="tab-content">
+            <h2>📅 PARTITE GIOCATE</h2>
+            
+            <div class="filtro-container">
+                <div class="filtro-row">
+                    <div>
+                        <label for="filtroSquadra">Filtra per squadra:</label>
+                        <select id="filtroSquadra" onchange="filtraPartite()">
+                            <option value="">Tutte le squadre</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filtroData">Ordina per:</label>
+                        <select id="filtroData" onchange="filtraPartite()">
+                            <option value="recenti">Più recenti</option>
+                            <option value="vecchie">Più vecchie</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th width="100">Data</th>
+                        <th>Partita</th>
+                        <th width="100">Risultato</th>
+                        <th width="120">Gol Giocatori</th>
+                        <th width="100">Ammonizioni</th>
+                        <th width="100">Espulsioni</th>
+                        <th width="100">Voti Assegnati</th>
+                    </tr>
+                </thead>
+                <tbody id="tabellaPartite">
+                    <tr><td colspan="7" class="empty-state">Caricamento partite...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <button class="btn-back" onclick="tornaIndietro()">← TORNA ALLA HOME</button>
+    </div>
+    
+    <script type="module">
+        // Importa il gestore database Supabase
+        import database from './database-supabase.js';
+        
+        // VARIABILI GLOBALI
+        let datiTorneo = {
+            squadre: [],
+            giocatori: [],
+            partite: []
+        };
+        
+        let partiteAperte = new Set();
+        let ultimoAggiornamento = null;
+        let contatoreAggiornamenti = 0;
+        let tabAttivo = 'cannoniere';
+        
+        // INIZIALIZZAZIONE
+        document.addEventListener('DOMContentLoaded', async function() {
+            aggiornaStatoConnessione('caricamento');
+            
+            try {
+                // Prima controlla se ci sono dati in cache
+                await caricaDaCache();
+                
+                // Poi carica dati freschi da Supabase
+                await caricaDatiIniziali();
+                
+                // Setup listener in tempo reale
+                setupRealtimeListeners();
+                
+                aggiornaStatoConnessione('ok');
+                
+                // Carica il tab attivo
+                caricaStatistiche(tabAttivo);
+                
+            } catch (error) {
+                console.error('Errore caricamento statistiche:', error);
+                aggiornaStatoConnessione('ko');
+                mostraErrore('Errore nel caricamento delle statistiche. Riprova più tardi.');
+            }
+        });
+        
+        // CARICA DATI DA CACHE
+        async function caricaDaCache() {
+            try {
+                const cacheSquadre = sessionStorage.getItem('cache_squadre');
+                const cacheGiocatori = sessionStorage.getItem('cache_giocatori');
+                const cachePartite = sessionStorage.getItem('cache_partite');
+                
+                if (cacheSquadre && cacheGiocatori && cachePartite) {
+                    datiTorneo.squadre = JSON.parse(cacheSquadre);
+                    datiTorneo.giocatori = JSON.parse(cacheGiocatori);
+                    datiTorneo.partite = JSON.parse(cachePartite);
+                    
+                    console.log('Dati caricati dalla cache:', {
+                        squadre: datiTorneo.squadre.length,
+                        giocatori: datiTorneo.giocatori.length,
+                        partite: datiTorneo.partite.length
+                    });
+                    
+                    return true;
+                }
+            } catch (error) {
+                console.warn('Errore caricamento cache:', error);
+            }
+            return false;
+        }
+        
+        // CARICA DATI INIZIALI DA SUPABASE
+        async function caricaDatiIniziali() {
+            try {
+                // Carica dati in parallelo
+                const [squadre, giocatori, partite] = await Promise.all([
+                    database.getSquadre(),
+                    database.getGiocatori(),
+                    database.getPartite()
+                ]);
+                
+                // Aggiorna dati
+                datiTorneo.squadre = squadre || [];
+                datiTorneo.giocatori = giocatori || [];
+                datiTorneo.partite = partite || [];
+                
+                ultimoAggiornamento = new Date();
+                aggiornaInfoAggiornamento();
+                
+                console.log('Dati Supabase caricati:', {
+                    squadre: datiTorneo.squadre.length,
+                    giocatori: datiTorneo.giocatori.length,
+                    partite: datiTorneo.partite.length
+                });
+                
+                // Aggiorna cache
+                sessionStorage.setItem('cache_squadre', JSON.stringify(datiTorneo.squadre));
+                sessionStorage.setItem('cache_giocatori', JSON.stringify(datiTorneo.giocatori));
+                sessionStorage.setItem('cache_partite', JSON.stringify(datiTorneo.partite));
+                
+                // Aggiorna filtro squadre
+                aggiornaFiltroSquadre();
+                
+            } catch (error) {
+                console.error('Errore nel caricamento iniziale:', error);
+                throw error;
+            }
+        }
+        
+        // SETUP LISTENER TEMPO REALE
+        function setupRealtimeListeners() {
+            // Ascolta aggiornamenti dal database Supabase
+            window.onDatabaseUpdate = function(type, data) {
+                console.log(`Aggiornamento statistiche: ${type}`);
+                
+                // Aggiorna i dati locali
+                if (type === 'squadre') {
+                    datiTorneo.squadre = data || [];
+                    sessionStorage.setItem('cache_squadre', JSON.stringify(data));
+                    aggiornaFiltroSquadre();
+                } else if (type === 'giocatori') {
+                    datiTorneo.giocatori = data || [];
+                    sessionStorage.setItem('cache_giocatori', JSON.stringify(data));
+                } else if (type === 'partite') {
+                    datiTorneo.partite = data || [];
+                    sessionStorage.setItem('cache_partite', JSON.stringify(data));
+                }
+                
+                ultimoAggiornamento = new Date();
+                contatoreAggiornamenti++;
+                
+                // Aggiorna l'interfaccia
+                aggiornaInfoAggiornamento();
+                aggiornaStatoConnessione('ok');
+                
+                // Ricarica il tab attivo
+                caricaStatistiche(tabAttivo);
+                
+                // Mostra notifica
+                mostraNotificaAggiornamento(type);
+            };
+        }
+        
+        // FUNZIONE PER CAMBIARE TAB
+        function apriTab(tabName) {
+            // Salva tab attivo
+            tabAttivo = tabName;
+            
+            // Nascondi tutti i tab
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Rimuovi active da tutti i tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Mostra il tab selezionato
+            document.getElementById(tabName).classList.add('active');
+            
+            // Attiva il button del tab
+            event.target.classList.add('active');
+            
+            // Carica i dati per il tab selezionato
+            caricaStatistiche(tabName);
+        }
+        
+        // CARICA STATISTICHE PER TAB
+        function caricaStatistiche(tipo) {
+            console.log(`Caricamento statistiche: ${tipo}`);
+            
+            switch(tipo) {
+                case 'cannoniere':
+                    caricaTabellaCannoniere();
+                    break;
+                    
+                case 'ammoniti':
+                    caricaTabellaAmmoniti();
+                    break;
+                    
+                case 'espulsi':
+                    caricaTabellaEspulsi();
+                    break;
+                    
+                case 'portieri':
+                    caricaTabellaPortieri();
+                    break;
+                    
+                case 'punteggi':
+                    caricaTabellaPunteggi();
+                    break;
+                    
+                case 'partite':
+                    caricaTabellaPartite();
+                    break;
+            }
+        }
+        
+        // CALCOLA PARTITE GIOCATE DA UN GIOCATORE
+        function calcolaPartiteGiocate(giocatore) {
+            const squadra = giocatore.squadra;
+            if (!squadra) return 0;
+            
+            // Conta partite della squadra
+            const partiteSquadra = datiTorneo.partite.filter(p => 
+                p.squadra_casa === squadra || p.squadra_ospite === squadra
+            ).length;
+            
+            return partiteSquadra || 0;
+        }
+        
+        // TABELLA CANNONIERI
+        function caricaTabellaCannoniere() {
+            const tbody = document.getElementById('tabellaCannoniere');
+            
+            // Filtra giocatori con gol
+            const cannonieri = datiTorneo.giocatori
+                .filter(g => (g.gol || 0) > 0)
+                .sort((a, b) => (b.gol || 0) - (a.gol || 0));
+            
+            if (cannonieri.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            Nessun gol registrato ancora
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            cannonieri.forEach((giocatore, index) => {
+                let medaglia = '';
+                if (index === 0) medaglia = '<span class="medaglie medaglia-oro">🥇</span>';
+                else if (index === 1) medaglia = '<span class="medaglie medaglia-argento">🥈</span>';
+                else if (index === 2) medaglia = '<span class="medaglie medaglia-bronzo">🥉</span>';
+                
+                const partiteGiocate = calcolaPartiteGiocate(giocatore);
+                const mediaGol = partiteGiocate > 0 ? (giocatore.gol / partiteGiocate).toFixed(2) : '0.00';
+                
+                html += `
+                    <tr>
+                        <td class="posizione">${index + 1}${medaglia}</td>
+                        <td class="giocatore">${giocatore.nome}</td>
+                        <td class="squadra">${giocatore.squadra || 'N/A'}</td>
+                        <td>${giocatore.ruolo || 'Giocatore'}</td>
+                        <td class="gol">${giocatore.gol || 0}</td>
+                        <td>${partiteGiocate}</td>
+                        <td>${mediaGol}</td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        // TABELLA AMMONITI
+        function caricaTabellaAmmoniti() {
+            const tbody = document.getElementById('tabellaAmmoniti');
+            
+            const ammoniti = datiTorneo.giocatori
+                .filter(g => (g.ammonizioni || 0) > 0)
+                .sort((a, b) => (b.ammonizioni || 0) - (a.ammonizioni || 0));
+            
+            if (ammoniti.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            Nessuna ammonizione registrata
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            ammoniti.forEach((giocatore, index) => {
+                const partiteGiocate = calcolaPartiteGiocate(giocatore);
+                const mediaAmm = partiteGiocate > 0 ? (giocatore.ammonizioni / partiteGiocate).toFixed(2) : '0.00';
+                
+                html += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${giocatore.nome}</td>
+                        <td>${giocatore.squadra || 'N/A'}</td>
+                        <td>${giocatore.ruolo || 'Giocatore'}</td>
+                        <td>
+                            ${giocatore.ammonizioni || 0}
+                            <span class="badge badge-giallo">🟨</span>
+                        </td>
+                        <td>${partiteGiocate}</td>
+                        <td>${mediaAmm}</td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        // TABELLA ESPULSI
+        function caricaTabellaEspulsi() {
+            const tbody = document.getElementById('tabellaEspulsi');
+            
+            const espulsi = datiTorneo.giocatori
+                .filter(g => (g.espulsioni || 0) > 0)
+                .sort((a, b) => (b.espulsioni || 0) - (a.espulsioni || 0));
+            
+            if (espulsi.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            Nessuna espulsione registrata
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            espulsi.forEach((giocatore, index) => {
+                const partiteGiocate = calcolaPartiteGiocate(giocatore);
+                
+                html += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${giocatore.nome}</td>
+                        <td>${giocatore.squadra || 'N/A'}</td>
+                        <td>${giocatore.ruolo || 'Giocatore'}</td>
+                        <td>
+                            ${giocatore.espulsioni || 0}
+                            <span class="badge badge-rosso">🟥</span>
+                        </td>
+                        <td>${partiteGiocate}</td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        // TABELLA PORTIERI
+        function caricaTabellaPortieri() {
+            const tbody = document.getElementById('tabellaPortieri');
+            
+            // Filtra SOLO portieri con voti
+            const portieriConVoti = datiTorneo.giocatori.filter(g => 
+                g.ruolo && g.ruolo.toLowerCase() === 'portiere' && 
+                g.punteggio_totale && g.punteggio_totale > 0 && 
+                g.premi_miglior_portiere > 0
+            );
+            
+            if (portieriConVoti.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            Nessun portiere ha ancora ricevuto voti come "Miglior Portiere"
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Ordina per punteggio
+            portieriConVoti.sort((a, b) => b.punteggio_totale - a.punteggio_totale);
+            
+            let html = '';
+            portieriConVoti.forEach((portiere, index) => {
+                let medaglia = '';
+                if (index === 0) medaglia = '<span class="medaglie medaglia-oro">🥇</span>';
+                else if (index === 1) medaglia = '<span class="medaglie medaglia-argento">🥈</span>';
+                else if (index === 2) medaglia = '<span class="medaglie medaglia-bronzo">🥉</span>';
+                
+                const premi = portiere.premi_miglior_portiere || 0;
+                const mediaVoto = premi > 0 ? (portiere.punteggio_totale / premi).toFixed(2) : '0.00';
+                const partiteGiocate = calcolaPartiteGiocate(portiere);
+                
+                html += `
+                    <tr class="stat-portiere">
+                        <td class="posizione">${index + 1}${medaglia}</td>
+                        <td class="giocatore">${portiere.nome}</td>
+                        <td class="squadra">${portiere.squadra || 'N/A'}</td>
+                        <td class="voto-cell voto-alto">
+                            <strong>${portiere.punteggio_totale}</strong>
+                        </td>
+                        <td>
+                            <strong>${premi}</strong> 🏅
+                        </td>
+                        <td class="voto-alto">
+                            <strong>${mediaVoto}/10</strong>
+                        </td>
+                        <td>${partiteGiocate}</td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        // TABELLA PUNTEGGI
+        function caricaTabellaPunteggi() {
+            const tbody = document.getElementById('tabellaPunteggi');
+            
+            // Filtra SOLO giocatori di campo con voti
+            const giocatoriConVoti = datiTorneo.giocatori.filter(g => 
+                g.punteggio_totale && g.punteggio_totale > 0 && 
+                g.premi_miglior_giocatore > 0 &&
+                g.ruolo === 'Giocatore'
+            );
+            
+            if (giocatoriConVoti.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            Nessun giocatore di campo ha ancora ricevuto voti come "Miglior Giocatore"
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Ordina per punteggio
+            giocatoriConVoti.sort((a, b) => b.punteggio_totale - a.punteggio_totale);
+            
+            let html = '';
+            giocatoriConVoti.forEach((giocatore, index) => {
+                let medaglia = '';
+                if (index === 0) medaglia = '<span class="medaglie medaglia-oro">🥇</span>';
+                else if (index === 1) medaglia = '<span class="medaglie medaglia-argento">🥈</span>';
+                else if (index === 2) medaglia = '<span class="medaglie medaglia-bronzo">🥉</span>';
+                
+                const premi = giocatore.premi_miglior_giocatore || 0;
+                const mediaVoto = premi > 0 ? (giocatore.punteggio_totale / premi).toFixed(2) : '0.00';
+                
+                let classeVoto = '';
+                const mediaNum = parseFloat(mediaVoto);
+                if (mediaNum >= 7) classeVoto = 'voto-alto';
+                else if (mediaNum >= 5) classeVoto = 'voto-medio';
+                else classeVoto = 'voto-basso';
+                
+                html += `
+                    <tr>
+                        <td class="posizione">${index + 1}${medaglia}</td>
+                        <td class="giocatore">${giocatore.nome}</td>
+                        <td class="squadra">${giocatore.squadra || 'N/A'}</td>
+                        <td>Giocatore</td>
+                        <td class="voto-cell ${classeVoto}">
+                            <span class="punteggio-totale">${giocatore.punteggio_totale}</span>
+                        </td>
+                        <td>
+                            <strong>${premi}</strong> 🏆
+                        </td>
+                        <td class="${classeVoto}">
+                            <strong>${mediaVoto}/10</strong>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        // TABELLA PARTITE
+        function caricaTabellaPartite() {
+            const tbody = document.getElementById('tabellaPartite');
+            
+            if (datiTorneo.partite.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            Nessuna partita registrata ancora
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Applica filtri
+            let partiteFiltrate = [...datiTorneo.partite];
+            const filtroSquadraVal = document.getElementById('filtroSquadra').value;
+            const filtroData = document.getElementById('filtroData').value;
+            
+            if (filtroSquadraVal) {
+                partiteFiltrate = partiteFiltrate.filter(p => 
+                    p.squadra_casa === filtroSquadraVal || p.squadra_ospite === filtroSquadraVal
+                );
+            }
+            
+            // Ordina per data
+            if (filtroData === 'recenti') {
+                partiteFiltrate.reverse();
+            }
+            
+            let html = '';
+            partiteFiltrate.forEach((partita, index) => {
+                // Calcola statistiche dagli eventi
+                let golGiocatori = 0;
+                let ammonizioni = 0;
+                let espulsioni = 0;
+                let votiAssegnati = 0;
+                
+                if (partita.eventi) {
+                    partita.eventi.forEach(evento => {
+                        switch(evento.tipo) {
+                            case 'gol':
+                                golGiocatori += 1;
+                                break;
+                            case 'amm':
+                                ammonizioni += 1;
+                                break;
+                            case 'esp':
+                                espulsioni += 1;
+                                break;
+                        }
+                    });
+                }
+                
+                // Conta voti assegnati
+                if (partita.voto_miglior_giocatore && partita.voto_miglior_giocatore > 0) votiAssegnati++;
+                if (partita.voto_portiere_casa && partita.voto_portiere_casa > 0) votiAssegnati++;
+                if (partita.voto_portiere_ospite && partita.voto_portiere_ospite > 0) votiAssegnati++;
+                
+                const isAperta = partiteAperte.has(partita.id);
+                
+                html += `
+                    <tr class="partita-row" onclick="toggleDettagliPartita('${partita.id}', ${index})">
+                        <td>${partita.data || 'N/D'}</td>
+                        <td>
+                            <strong>${partita.squadra_casa}</strong> vs <strong>${partita.squadra_ospite}</strong>
+                            <br>
+                            <small>${partita.ora || ''}</small>
+                        </td>
+                        <td class="risultato-partita">${partita.gol_casa || 0} - ${partita.gol_ospite || 0}</td>
+                        <td>${golGiocatori}</td>
+                        <td>${ammonizioni}</td>
+                        <td>${espulsioni}</td>
+                        <td>${votiAssegnati}</td>
+                    </tr>
+                    <tr id="dettagli-${index}" class="partita-dettagli ${isAperta ? 'aperta' : ''}">
+                        <td colspan="7">
+                            <h4>Dettagli Partita</h4>
+                            <p><strong>Data:</strong> ${partita.data || 'N/D'} ${partita.ora || ''}</p>
+                            <p><strong>Risultato:</strong> ${partita.squadra_casa} ${partita.gol_casa || 0} - ${partita.gol_ospite || 0} ${partita.squadra_ospite}</p>
+                            
+                            ${partita.miglior_giocatore ? `
+                                <p><strong>🏆 Miglior Giocatore:</strong> ${trovaNomeGiocatore(partita.miglior_giocatore)} (Voto: ${partita.voto_miglior_giocatore}/10)</p>
+                            ` : ''}
+                            
+                            ${partita.portiere_casa ? `
+                                <p><strong>🥅 Portiere Casa:</strong> ${trovaNomeGiocatore(partita.portiere_casa)} (Voto: ${partita.voto_portiere_casa || 0}/10)</p>
+                            ` : ''}
+                            
+                            ${partita.portiere_ospite ? `
+                                <p><strong>🥅 Portiere Ospite:</strong> ${trovaNomeGiocatore(partita.portiere_ospite)} (Voto: ${partita.voto_portiere_ospite || 0}/10)</p>
+                            ` : ''}
+                            
+                            ${partita.eventi && partita.eventi.length > 0 ? `
+                                <h5>Eventi della partita:</h5>
+                                <div class="eventi-partita">
+                                    ${partita.eventi.map(evento => {
+                                        let icona = '📝';
+                                        let testo = `${evento.giocatoreNome || 'Giocatore'}`;
+                                        
+                                        switch(evento.tipo) {
+                                            case 'gol':
+                                                icona = '⚽';
+                                                testo = `Gol di ${evento.giocatoreNome}`;
+                                                break;
+                                            case 'amm':
+                                                icona = '🟨';
+                                                testo = `Ammonizione per ${evento.giocatoreNome}`;
+                                                break;
+                                            case 'esp':
+                                                icona = '🟥';
+                                                testo = `Espulsione di ${evento.giocatoreNome}`;
+                                                break;
+                                        }
+                                        
+                                        return `<div class="evento-badge">${icona} ${testo}</div>`;
+                                    }).join('')}
+                                </div>
+                            ` : '<p>Nessun evento registrato per questa partita.</p>'}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        // TROVA NOME GIOCATORE PER ID
+        function trovaNomeGiocatore(giocatoreId) {
+            const giocatore = datiTorneo.giocatori.find(g => g.id === giocatoreId);
+            return giocatore ? giocatore.nome : 'Giocatore non trovato';
+        }
+        
+        // AGGIORNA FILTRO SQUADRE
+        function aggiornaFiltroSquadre() {
+            const filtroSquadra = document.getElementById('filtroSquadra');
+            
+            // Pulisci opzioni esistenti (mantieni solo la prima)
+            while (filtroSquadra.options.length > 1) {
+                filtroSquadra.remove(1);
+            }
+            
+            // Aggiungi squadre
+            datiTorneo.squadre.forEach(squadra => {
+                const option = document.createElement('option');
+                option.value = squadra.nome;
+                option.textContent = squadra.nome;
+                filtroSquadra.appendChild(option);
+            });
+        }
+        
+        // FILTRA PARTITE
+        function filtraPartite() {
+            caricaTabellaPartite();
+        }
+        
+        // MOSTRA/NASCONDI DETTAGLI PARTITA
+        function toggleDettagliPartita(partitaId, index) {
+            const dettagli = document.getElementById(`dettagli-${index}`);
+            
+            if (partiteAperte.has(partitaId)) {
+                dettagli.classList.remove('aperta');
+                partiteAperte.delete(partitaId);
+            } else {
+                dettagli.classList.add('aperta');
+                partiteAperte.add(partitaId);
+            }
+        }
+        
+        // FUNZIONI AUSILIARIE
+        function aggiornaStatoConnessione(stato) {
+            const statusElement = document.getElementById('connessioneStatus');
+            
+            switch(stato) {
+                case 'caricamento':
+                    statusElement.className = 'connessione-status connessione-caricamento';
+                    statusElement.innerHTML = '<div class="loading"></div> Caricamento statistiche...';
+                    break;
+                    
+                case 'ok':
+                    statusElement.className = 'connessione-status connessione-ok';
+                    statusElement.innerHTML = '✓ Connesso in tempo reale';
+                    break;
+                    
+                case 'ko':
+                    statusElement.className = 'connessione-status connessione-ko';
+                    statusElement.innerHTML = '✗ Disconnesso';
+                    break;
+            }
+        }
+        
+        function aggiornaInfoAggiornamento() {
+            const elemento = document.getElementById('infoAggiornamento');
+            if (ultimoAggiornamento) {
+                elemento.textContent = `Ultimo aggiornamento: ${ultimoAggiornamento.toLocaleDateString('it-IT')} ${ultimoAggiornamento.toLocaleTimeString('it-IT')}`;
+                elemento.style.color = '#4CAF50';
+                elemento.style.fontWeight = 'bold';
+            }
+        }
+        
+        function mostraNotificaAggiornamento(tipo) {
+            const notifica = document.getElementById('notificaAggiornamento');
+            
+            const messaggi = {
+                'squadre': 'Squadre aggiornate!',
+                'giocatori': 'Giocatori aggiornati!',
+                'partite': 'Partite aggiornate!'
+            };
+            
+            notifica.textContent = `🔄 ${messaggi[tipo] || 'Statistiche aggiornate!'}`;
+            notifica.style.display = 'block';
+            
+            setTimeout(() => {
+                notifica.style.display = 'none';
+            }, 3000);
+        }
+        
+        function mostraErrore(messaggio) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                const tbody = tab.querySelector('tbody');
+                if (tbody) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="10" class="empty-state" style="color: #f44336;">
+                                <h3>⚠️ Errore di connessione</h3>
+                                <p>${messaggio}</p>
+                                <button onclick="location.reload()" style="margin-top: 15px; padding: 8px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                    Riprova
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }
+            });
+        }
+        
+        // NAVIGAZIONE
+        function tornaIndietro() {
+            window.location.href = 'main.html';
+        }
+        
+        // CONTROLLO ACCESSO
+        if (localStorage.getItem('rovigoal_entrato') !== 'true') {
+            window.location.href = 'index.html';
+        }
+        
+        // CONTROLLO PERIODICO CONNESSIONE
+        setInterval(async () => {
+            try {
+                const test = await database.getSquadre();
+                if (Array.isArray(test)) {
+                    aggiornaStatoConnessione('ok');
+                } else {
+                    aggiornaStatoConnessione('ko');
+                }
+            } catch (error) {
+                aggiornaStatoConnessione('ko');
+            }
+        }, 30000);
+        
+        // ESPORTA FUNZIONI
+        window.apriTab = apriTab;
+        window.tornaIndietro = tornaIndietro;
+        window.filtraPartite = filtraPartite;
+        window.toggleDettagliPartita = toggleDettagliPartita;
+        
+    </script>
+</body>
+</html>

@@ -455,4 +455,431 @@
             <h4 style="margin-bottom: 15px; color: #495057;">🔍 FILTRA GIOCATORI</h4>
             <div class="filtri-grid">
                 <div class="form-group">
-                    <label for="filtroSquadra">
+                    <label for="filtroSquadra">Per Squadra</label>
+                    <select id="filtroSquadra" onchange="filtraGiocatori()">
+                        <option value="">Tutte le squadre</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="filtroRuolo">Per Ruolo</label>
+                    <select id="filtroRuolo" onchange="filtraGiocatori()">
+                        <option value="">Tutti i ruoli</option>
+                        <option value="Portiere">Portiere</option>
+                        <option value="Giocatore">Giocatore</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="filtroOrdina">Ordina per</label>
+                    <select id="filtroOrdina" onchange="filtraGiocatori()">
+                        <option value="nome">Nome (A-Z)</option>
+                        <option value="numero">Numero Maglia</option>
+                        <option value="squadra">Squadra</option>
+                        <option value="ruolo">Ruolo</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- LISTA GIOCATORI -->
+        <div class="giocatori-lista">
+            <h3>📋 GIOCATORI REGISTRATI</h3>
+            <div id="listaGiocatori">
+                <div class="empty-message">
+                    <h4>Caricamento giocatori...</h4>
+                    <p>Attendere il caricamento dei dati</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PULSANTE TORNA INDIETRO -->
+        <button class="btn btn-secondary" onclick="tornaIndietro()">
+            <span>←</span> TORNA ALL'AREA ADMIN
+        </button>
+    </div>
+    
+    <script type="module">
+        // Importa il gestore database Supabase
+        import database from './database-supabase.js';
+        
+        // VARIABILI
+        let giocatori = [];
+        let squadre = [];
+        
+        // INIZIALIZZAZIONE
+        document.addEventListener('DOMContentLoaded', async function() {
+            aggiornaStatoConnessione('caricamento');
+            
+            // Controlla accesso admin
+            if (sessionStorage.getItem('admin_accesso') !== 'true') {
+                alert('Accesso non autorizzato!');
+                window.location.href = 'main.html';
+                return;
+            }
+            
+            try {
+                // Carica dati
+                await caricaDati();
+                aggiornaStatoConnessione('ok');
+                
+            } catch (error) {
+                console.error('Errore caricamento giocatori:', error);
+                aggiornaStatoConnessione('ko');
+                mostraAlert('Errore nel caricamento dei dati. Riprova più tardi.', 'error');
+            }
+        });
+        
+        // CARICA DATI
+        async function caricaDati() {
+            try {
+                // Carica squadre e giocatori in parallelo
+                [squadre, giocatori] = await Promise.all([
+                    database.getSquadre(),
+                    database.getGiocatori()
+                ]);
+                
+                // Aggiorna select squadre nel form
+                aggiornaSelectSquadre();
+                
+                // Aggiorna filtro squadre
+                aggiornaFiltroSquadre();
+                
+                // Aggiorna lista giocatori
+                aggiornaListaGiocatori();
+                
+            } catch (error) {
+                console.error('Errore caricamento dati:', error);
+                throw error;
+            }
+        }
+        
+        // AGGIORNA SELECT SQUADRE NEL FORM
+        function aggiornaSelectSquadre() {
+            const select = document.getElementById('squadraGiocatore');
+            const filtroSelect = document.getElementById('filtroSquadra');
+            
+            // Pulisci opzioni (mantieni la prima)
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+            while (filtroSelect.options.length > 1) {
+                filtroSelect.remove(1);
+            }
+            
+            if (squadre.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'Nessuna squadra disponibile';
+                select.appendChild(option);
+                return;
+            }
+            
+            // Aggiungi squadre al form
+            squadre.forEach(squadra => {
+                const option = document.createElement('option');
+                option.value = squadra.nome;
+                option.textContent = squadra.nome;
+                select.appendChild(option);
+            });
+            
+            // Aggiungi squadre al filtro
+            squadre.forEach(squadra => {
+                const option = document.createElement('option');
+                option.value = squadra.nome;
+                option.textContent = squadra.nome;
+                filtroSelect.appendChild(option);
+            });
+        }
+        
+        // AGGIORNA FILTRO SQUADRE
+        function aggiornaFiltroSquadre() {
+            const select = document.getElementById('filtroSquadra');
+            const selectedValue = select.value;
+            
+            // Ripristina selezione se possibile
+            if (selectedValue) {
+                select.value = selectedValue;
+            }
+        }
+        
+        // AGGIUNGI GIOCATORE
+        async function aggiungiGiocatore() {
+            const nomeInput = document.getElementById('nomeGiocatore');
+            const numeroInput = document.getElementById('numeroGiocatore');
+            const squadraSelect = document.getElementById('squadraGiocatore');
+            const ruoloSelect = document.getElementById('ruoloGiocatore');
+            
+            const nome = nomeInput.value.trim();
+            const numero = numeroInput.value;
+            const squadra = squadraSelect.value;
+            const ruolo = ruoloSelect.value;
+            
+            // Validazioni
+            if (!nome) {
+                mostraAlert('Inserisci il nome del giocatore!', 'error');
+                nomeInput.focus();
+                return;
+            }
+            
+            if (!squadra) {
+                mostraAlert('Seleziona una squadra!', 'error');
+                squadraSelect.focus();
+                return;
+            }
+            
+            if (!ruolo) {
+                mostraAlert('Seleziona un ruolo (Portiere o Giocatore)!', 'error');
+                ruoloSelect.focus();
+                return;
+            }
+            
+            // Controlla se il numero è già usato in quella squadra
+            if (numero) {
+                const numeroEsistente = giocatori.some(g => 
+                    g.squadra === squadra && 
+                    g.numero && 
+                    g.numero.toString() === numero
+                );
+                
+                if (numeroEsistente) {
+                    mostraAlert(`Il numero ${numero} è già utilizzato in ${squadra}!`, 'error');
+                    numeroInput.focus();
+                    return;
+                }
+            }
+            
+            try {
+                aggiornaStatoConnessione('caricamento');
+                
+                const giocatoreData = {
+                    nome: nome,
+                    numero: numero ? parseInt(numero) : null,
+                    squadra: squadra,
+                    ruolo: ruolo,
+                    gol: 0,
+                    ammonizioni: 0,
+                    espulsioni: 0,
+                    punteggio_totale: 0,
+                    premi_miglior_giocatore: 0,
+                    premi_miglior_portiere: 0
+                };
+                
+                // Aggiungi al database
+                await database.aggiungiGiocatore(giocatoreData);
+                
+                // Aggiorna lista
+                await caricaDati();
+                
+                // Mostra successo
+                mostraAlert(`Giocatore "${nome}" aggiunto con successo a ${squadra} come ${ruolo}!`, 'success');
+                
+                // Pulisci form
+                nomeInput.value = '';
+                numeroInput.value = '';
+                squadraSelect.value = '';
+                ruoloSelect.value = '';
+                nomeInput.focus();
+                
+                aggiornaStatoConnessione('ok');
+                
+            } catch (error) {
+                console.error('Errore aggiunta giocatore:', error);
+                mostraAlert('Errore nell\'aggiunta del giocatore: ' + error.message, 'error');
+                aggiornaStatoConnessione('ko');
+            }
+        }
+        
+        // FILTRA GIOCATORI
+        function filtraGiocatori() {
+            aggiornaListaGiocatori();
+        }
+        
+        // AGGIORNA LISTA VISUALE GIOCATORI
+        function aggiornaListaGiocatori() {
+            const container = document.getElementById('listaGiocatori');
+            
+            if (!giocatori || giocatori.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-message">
+                        <h4>⚽ Nessun giocatore registrato</h4>
+                        <p>Aggiungi il primo giocatore usando il form qui sopra!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Applica filtri
+            let giocatoriFiltrati = [...giocatori];
+            const filtroSquadra = document.getElementById('filtroSquadra').value;
+            const filtroRuolo = document.getElementById('filtroRuolo').value;
+            const filtroOrdina = document.getElementById('filtroOrdina').value;
+            
+            // Filtra per squadra
+            if (filtroSquadra) {
+                giocatoriFiltrati = giocatoriFiltrati.filter(g => g.squadra === filtroSquadra);
+            }
+            
+            // Filtra per ruolo
+            if (filtroRuolo) {
+                giocatoriFiltrati = giocatoriFiltrati.filter(g => g.ruolo === filtroRuolo);
+            }
+            
+            // Ordina
+            switch(filtroOrdina) {
+                case 'nome':
+                    giocatoriFiltrati.sort((a, b) => a.nome.localeCompare(b.nome, 'it'));
+                    break;
+                case 'numero':
+                    giocatoriFiltrati.sort((a, b) => (a.numero || 99) - (b.numero || 99));
+                    break;
+                case 'squadra':
+                    giocatoriFiltrati.sort((a, b) => a.squadra.localeCompare(b.squadra, 'it'));
+                    break;
+                case 'ruolo':
+                    giocatoriFiltrati.sort((a, b) => {
+                        if (a.ruolo === b.ruolo) return a.nome.localeCompare(b.nome, 'it');
+                        return a.ruolo.localeCompare(b.ruolo, 'it');
+                    });
+                    break;
+            }
+            
+            if (giocatoriFiltrati.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-message">
+                        <h4>🔍 Nessun giocatore trovato</h4>
+                        <p>Prova con altri filtri di ricerca</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            giocatoriFiltrati.forEach(giocatore => {
+                const badgeRuolo = giocatore.ruolo === 'Portiere' ? 
+                    '<span class="badge badge-portiere">🥅 Portiere</span>' : 
+                    '<span class="badge badge-giocatore">⚽ Giocatore</span>';
+                
+                html += `
+                    <div class="giocatore-item">
+                        <div class="giocatore-header">
+                            <div class="giocatore-nome">${giocatore.nome}</div>
+                            <button class="btn btn-danger" onclick="eliminaGiocatore('${giocatore.id}', '${giocatore.nome}')">
+                                🗑️ Elimina
+                            </button>
+                        </div>
+                        
+                        <div class="giocatore-dettagli">
+                            ${giocatore.numero ? `<span class="badge badge-numero">#${giocatore.numero}</span>` : ''}
+                            <span class="badge badge-squadra">${giocatore.squadra || 'Nessuna squadra'}</span>
+                            ${badgeRuolo}
+                        </div>
+                        
+                        <div class="giocatore-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">${giocatore.gol || 0}</div>
+                                <div class="stat-label">Gol</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${giocatore.ammonizioni || 0}</div>
+                                <div class="stat-label">Ammonizioni</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${giocatore.espulsioni || 0}</div>
+                                <div class="stat-label">Espulsioni</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${giocatore.punteggio_totale || 0}</div>
+                                <div class="stat-label">Punti</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // ELIMINA GIOCATORE
+        function eliminaGiocatore(giocatoreId, nomeGiocatore) {
+            if (!confirm(`Sei sicuro di voler eliminare il giocatore "${nomeGiocatore}"?\n\nQuesta azione non può essere annullata.`)) {
+                return;
+            }
+            
+            confermaEliminaGiocatore(giocatoreId, nomeGiocatore);
+        }
+        
+        async function confermaEliminaGiocatore(giocatoreId, nomeGiocatore) {
+            try {
+                aggiornaStatoConnessione('caricamento');
+                
+                // Elimina dal database
+                await database.eliminaGiocatore(giocatoreId);
+                
+                // Aggiorna lista
+                await caricaDati();
+                
+                // Mostra successo
+                mostraAlert(`Giocatore "${nomeGiocatore}" eliminato con successo!`, 'success');
+                
+                aggiornaStatoConnessione('ok');
+                
+            } catch (error) {
+                console.error('Errore eliminazione giocatore:', error);
+                mostraAlert('Errore nell\'eliminazione del giocatore: ' + error.message, 'error');
+                aggiornaStatoConnessione('ko');
+            }
+        }
+        
+        // FUNZIONI AUSILIARIE
+        function mostraAlert(messaggio, tipo = 'success') {
+            const alertId = `alert${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`;
+            const alertEl = document.getElementById(alertId);
+            
+            alertEl.innerHTML = messaggio;
+            alertEl.style.display = 'block';
+            
+            // Scrolla all'alert
+            alertEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Nascondi dopo 5 secondi
+            setTimeout(() => {
+                alertEl.style.display = 'none';
+            }, 5000);
+        }
+        
+        function aggiornaStatoConnessione(stato) {
+            const statusElement = document.getElementById('connessioneStatus');
+            
+            switch(stato) {
+                case 'caricamento':
+                    statusElement.className = 'connessione-status connessione-caricamento';
+                    statusElement.innerHTML = '<div class="loading"></div> Caricamento...';
+                    break;
+                    
+                case 'ok':
+                    statusElement.className = 'connessione-status connessione-ok';
+                    statusElement.innerHTML = '✓ Connesso in tempo reale';
+                    break;
+                    
+                case 'ko':
+                    statusElement.className = 'connessione-status connessione-ko';
+                    statusElement.innerHTML = '✗ Disconnesso';
+                    break;
+            }
+        }
+        
+        // NAVIGAZIONE
+        function tornaIndietro() {
+            window.location.href = 'admin.html';
+        }
+        
+        // ESPORTA FUNZIONI
+        window.aggiungiGiocatore = aggiungiGiocatore;
+        window.filtraGiocatori = filtraGiocatori;
+        window.eliminaGiocatore = eliminaGiocatore;
+        window.tornaIndietro = tornaIndietro;
+        
+    </script>
+</body>
+</html>

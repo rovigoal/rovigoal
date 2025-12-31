@@ -488,26 +488,30 @@
             finale: null
         };
         
-        // PARTITE IN CORSO - STRUTTURA MODIFICATA
-        let partitaInCorso = {
-            eventi: [],
-            migliorGiocatore: null,
-            votoGiocatore: 0,
-            portiereCasa: null,
-            portiereOspite: null,
-            votoPortiereCasa: 0,
-            votoPortiereOspite: 0
-        };
-        
-        let finaleInCorso = {
-            eventi: [],
-            migliorGiocatore: null,
-            votoGiocatore: 0,
-            portiereCasa: null,
-            portiereOspite: null,
-            votoPortiereCasa: 0,
-            votoPortiereOspite: 0
-        };
+        // PARTITE IN CORSO - STRUTTURA AGGIORNATA (2 migliori giocatori)
+let partitaInCorso = {
+    eventi: [],
+    migliorGiocatoreCasa: null,
+    migliorGiocatoreOspite: null,
+    votoGiocatoreCasa: 0,
+    votoGiocatoreOspite: 0,
+    portiereCasa: null,
+    portiereOspite: null,
+    votoPortiereCasa: 0,
+    votoPortiereOspite: 0
+};
+
+let finaleInCorso = {
+    eventi: [],
+    migliorGiocatoreCasa: null,
+    migliorGiocatoreOspite: null,
+    votoGiocatoreCasa: 0,
+    votoGiocatoreOspite: 0,
+    portiereCasa: null,
+    portiereOspite: null,
+    votoPortiereCasa: 0,
+    votoPortiereOspite: 0
+};
         
         // INIZIALIZZAZIONE
         document.addEventListener('DOMContentLoaded', async function() {
@@ -1783,6 +1787,7 @@ if(modalita === 'normale') {
     </script>
 </body>
 </html>
+
 
 
 

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rovigoal - Area Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #FF4500 0%, #DC143C 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 3px solid #FF6347;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* MENU ADMIN */
+        .admin-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .admin-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .admin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            border-color: #1e3c72;
+        }
+        
+        .admin-card h3 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        .admin-card p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+        
+        .admin-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        /* STATO CONNESSIONE */
+        .connessione-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .connessione-ok {
+            background: #4CAF50;
+            color: white;
+            border: 2px solid #45a049;
+        }
+        
+        .connessione-caricamento {
+            background: #FFA500;
+            color: white;
+            border: 2px solid #FF8C00;
+        }
+        
+        .connessione-ko {
+            background: #f44336;
+            color: white;
+            border: 2px solid #d32f2f;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* BUTTONS */
+        .btn {
+            display: block;
+            margin: 30px auto 0;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            max-width: 300px;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* ZONA PERICOLOSA */
+        .danger-zone {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
+            border: 2px solid #ff6b6b;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .danger-zone h3 {
+            color: #dc143c;
+            margin-bottom: 15px;
+        }
+        
+        .danger-zone p {
+            color: #721c24;
+            margin-bottom: 20px;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #DC143C 0%, #FF4500 100%);
+            color: white;
+            margin: 10px auto;
+        }
+        
+        /* ALERTS */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* MOBILE */
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .admin-menu {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .admin-card {
+                padding: 20px;
+            }
+            
+            .connessione-status {
+                top: 5px;
+                right: 5px;
+                padding: 4px 8px;
+                font-size: 0.7em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔧 AREA ADMIN ROVIGOAL</h1>
+        <p>Gestione completa del torneo</p>
+        
+        <!-- STATO CONNESSIONE -->
+        <div id="connessioneStatus" class="connessione-status connessione-caricamento">
+            <div class="loading"></div> Connessione...
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- ALERT MESSAGES -->
+        <div id="alertSuccess" class="alert alert-success" style="display: none;"></div>
+        <div id="alertError" class="alert alert-error" style="display: none;"></div>
+        
+        <!-- MENU PRINCIPALE -->
+        <div class="admin-menu">
+            <a href="gestione-squadre.html" class="admin-card">
+                <span class="admin-icon">👥</span>
+                <h3>GESTIONE SQUADRE</h3>
+                <p>Aggiungi o elimina squadre. Clicca qui per gestire le squadre.</p>
+            </a>
+            
+            <a href="gestione-giocatori.html" class="admin-card">
+                <span class="admin-icon">⚽</span>
+                <h3>GESTIONE GIOCATORI</h3>
+                <p>Gestisci tutti i giocatori: aggiungi, modifica, assegna a squadre.</p>
+            </a>
+            
+            <a href="gestione-partite.html" class="admin-card">
+                <span class="admin-icon">📅</span>
+                <h3>GESTIONE PARTITE</h3>
+                <p>Crea nuove partite, registra risultati, assegna premi.</p>
+            </a>
+            
+            <a href="gestione-finale.html" class="admin-card">
+                <span class="admin-icon">🏆</span>
+                <h3>GESTIONE FINALE</h3>
+                <p>Configura e gestisci la partita finale del torneo.</p>
+            </a>
+            
+            <a href="elimina-partite.html" class="admin-card">
+                <span class="admin-icon">🗑️</span>
+                <h3>ELIMINA PARTITE</h3>
+                <p>Visualizza, gestisci ed elimina partite esistenti.</p>
+            </a>
+        </div>
+        
+        <!-- ZONA PERICOLOSA -->
+        <div class="danger-zone">
+            <h3>⚠️ ZONA PERICOLOSA</h3>
+            <p>Queste operazioni eliminano TUTTI i dati del torneo e non possono essere annullate!</p>
+            <button class="btn btn-danger" onclick="resetDatabase()">
+                🗑️ RESET COMPLETO DATABASE
+            </button>
+        </div>
+        
+        <!-- PULSANTE TORNA INDIETRO -->
+        <a href="main.html" class="btn">
+            ← TORNA ALLA HOME
+        </a>
+    </div>
+    
+    <script type="module">
+        // Importa il gestore database
+        import database from './database-supabase.js';
+        
+        // INIZIALIZZAZIONE
+        document.addEventListener('DOMContentLoaded', async function() {
+            aggiornaStatoConnessione('caricamento');
+            
+            // Controlla accesso admin
+            const passwordSalvata = sessionStorage.getItem('admin_accesso');
+            if (passwordSalvata !== 'true') {
+                // Chiedi password
+                const password = prompt("Inserisci la password ADMIN:");
+                if (password === "1246912.!!") {
+                    sessionStorage.setItem('admin_accesso', 'true');
+                    mostraAlert("Accesso admin autorizzato!", "success");
+                } else {
+                    alert("Password errata! Accesso negato.");
+                    window.location.href = 'main.html';
+                    return;
+                }
+            }
+            
+            try {
+                // Testa connessione al database chiamando una funzione esistente
+                console.log("Test connessione al database...");
+                
+                // Prova a chiamare una funzione che esiste sicuramente
+                const squadre = await database.getSquadre();
+                const giocatori = await database.getGiocatori();
+                
+                if (squadre !== null && giocatori !== null) {
+                    aggiornaStatoConnessione('ok');
+                    mostraAlert("Connessione al database OK!", "success");
+                } else {
+                    aggiornaStatoConnessione('ko');
+                    mostraAlert("Errore di connessione al database", "error");
+                }
+                
+            } catch (error) {
+                console.error('❌ Errore connessione admin:', error);
+                aggiornaStatoConnessione('ko');
+                mostraAlert('Errore di connessione al database. Riprova più tardi.', 'error');
+            }
+        });
+        
+        // RESET COMPLETO DATABASE
+        async function resetDatabase() {
+            if (!confirm('⚠️ ATTENZIONE! Vuoi ELIMINARE TUTTI i dati?\n\nQuesta operazione:\n• Elimina TUTTE le squadre\n• Elimina TUTTI i giocatori\n• Elimina TUTTE le partite\n• Elimina la finale\n\nL\'operazione è IRREVERSIBILE!')) {
+                return;
+            }
+            
+            if (!confirm('⛔ SEI ASSOLUTAMENTE SICURO?\n\nDigita "ELIMINA" per confermare:')) {
+                return;
+            }
+            
+            const conferma = prompt('Digita "ELIMINA" per procedere:');
+            if (conferma !== 'ELIMINA') {
+                mostraAlert('Operazione annullata', 'error');
+                return;
+            }
+            
+            try {
+                aggiornaStatoConnessione('caricamento');
+                
+                // Ora la funzione eliminaTutto() esiste nel database-supabase.js corretto
+                const risultato = await database.eliminaTutto();
+                
+                if (risultato) {
+                    mostraAlert('✅ Database completamente resettato!', 'success');
+                    aggiornaStatoConnessione('ok');
+                } else {
+                    mostraAlert('❌ Errore nel reset del database', 'error');
+                    aggiornaStatoConnessione('ko');
+                }
+                
+            } catch (error) {
+                console.error('❌ Errore reset database:', error);
+                mostraAlert('Errore nel reset del database: ' + error.message, 'error');
+                aggiornaStatoConnessione('ko');
+            }
+        }
+        
+        // FUNZIONI AUSILIARIE
+        function mostraAlert(messaggio, tipo = 'success') {
+            const alertId = `alert${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`;
+            const alertEl = document.getElementById(alertId);
+            
+            alertEl.innerHTML = messaggio;
+            alertEl.style.display = 'block';
+            
+            // Scrolla all'alert
+            alertEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Nascondi dopo 5 secondi
+            setTimeout(() => {
+                alertEl.style.display = 'none';
+            }, 5000);
+        }
+        
+        function aggiornaStatoConnessione(stato) {
+            const statusElement = document.getElementById('connessioneStatus');
+            
+            switch(stato) {
+                case 'caricamento':
+                    statusElement.className = 'connessione-status connessione-caricamento';
+                    statusElement.innerHTML = '<div class="loading"></div> Connessione...';
+                    break;
+                    
+                case 'ok':
+                    statusElement.className = 'connessione-status connessione-ok';
+                    statusElement.innerHTML = '✓ Connesso al database';
+                    break;
+                    
+                case 'ko':
+                    statusElement.className = 'connessione-status connessione-ko';
+                    statusElement.innerHTML = '✗ Database offline';
+                    break;
+            }
+        }
+        
+        // ESPORTA FUNZIONI
+        window.resetDatabase = resetDatabase;
+        
+    </script>
+</body>
+</html>

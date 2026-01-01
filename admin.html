@@ -298,7 +298,7 @@
     </div>
     
     <script type="module">
-        // Importa il gestore database SEMPLIFICATO
+        // Importa il gestore database
         import database from './database-supabase.js';
         
         // INIZIALIZZAZIONE
@@ -321,10 +321,14 @@
             }
             
             try {
-                // Testa connessione al database
-                const connessioneOk = await database.testConnessione();
+                // Testa connessione al database chiamando una funzione esistente
+                console.log("Test connessione al database...");
                 
-                if (connessioneOk) {
+                // Prova a chiamare una funzione che esiste sicuramente
+                const squadre = await database.getSquadre();
+                const giocatori = await database.getGiocatori();
+                
+                if (squadre !== null && giocatori !== null) {
                     aggiornaStatoConnessione('ok');
                     mostraAlert("Connessione al database OK!", "success");
                 } else {
@@ -339,7 +343,7 @@
             }
         });
         
-        // RESET COMPLETO DATABASE
+        // RESET COMPLETO DATABASE (versione semplificata)
         async function resetDatabase() {
             if (!confirm('⚠️ ATTENZIONE! Vuoi ELIMINARE TUTTI i dati?\n\nQuesta operazione:\n• Elimina TUTTE le squadre\n• Elimina TUTTI i giocatori\n• Elimina TUTTE le partite\n• Elimina la finale\n\nL\'operazione è IRREVERSIBILE!')) {
                 return;
@@ -358,15 +362,25 @@
             try {
                 aggiornaStatoConnessione('caricamento');
                 
-                await database.eliminaTutto();
+                // Nota: Questa funzione eliminaTutto() non esiste nel tuo database-supabase.js
+                // Devi crearla o usare funzioni separate
                 
-                mostraAlert('✅ Database completamente resettato!', 'success');
+                // Se non hai la funzione eliminaTutto(), mostra un messaggio
+                mostraAlert('⚠️ Funzione reset non implementata. Contatta lo sviluppatore.', 'error');
+                
+                // Oppure, se vuoi implementarla, aggiungi al database-supabase.js:
+                /*
+                async eliminaTutto() {
+                    // Elimina in ordine per evitare errori di foreign key
+                    await supabase.from('giocatori').delete().neq('id', 0);
+                    await supabase.from('partite').delete().neq('id', 0);
+                    await supabase.from('finale').delete().neq('id', 0);
+                    await supabase.from('squadre').delete().neq('id', 0);
+                    return true;
+                }
+                */
+                
                 aggiornaStatoConnessione('ok');
-                
-                // Ricarica la pagina dopo 3 secondi
-                setTimeout(() => {
-                    location.reload();
-                }, 3000);
                 
             } catch (error) {
                 console.error('❌ Errore reset database:', error);

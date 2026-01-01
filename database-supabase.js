@@ -355,4 +355,123 @@ const DatabaseManager = {
     }
 }
 
+// Aggiungi queste funzioni alla fine del file database-supabase.js
+
+// ============ FUNZIONI PER EVENTI PARTITA ============
+async function aggiungiEventoPartita(partitaId, evento) {
+    try {
+        // Prima ottieni la partita corrente
+        const { data: partita, error: getError } = await supabase
+            .from('partite')
+            .select('eventi')
+            .eq('id', partitaId)
+            .single();
+
+        if (getError) throw getError;
+
+        // Aggiungi il nuovo evento agli eventi esistenti
+        const eventiAggiornati = partita.eventi ? [...partita.eventi, evento] : [evento];
+
+        // Aggiorna la partita
+        const { data, error } = await supabase
+            .from('partite')
+            .update({ eventi: eventiAggiornati })
+            .eq('id', partitaId)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
+
+    } catch (error) {
+        console.error('Errore aggiungiEventoPartita:', error);
+        throw error;
+    }
+}
+
+async function aggiornaPartita(partitaId, datiAggiornati) {
+    try {
+        const { data, error } = await supabase
+            .from('partite')
+            .update(datiAggiornati)
+            .eq('id', partitaId)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
+
+    } catch (error) {
+        console.error('Errore aggiornaPartita:', error);
+        throw error;
+    }
+}
+
+// ============ FUNZIONI PER AGGIORNARE GIOCATORI ============
+async function aggiornaStatisticheGiocatore(giocatoreId, datiAggiornati) {
+    try {
+        const { data, error } = await supabase
+            .from('giocatori')
+            .update(datiAggiornati)
+            .eq('id', giocatoreId)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
+
+    } catch (error) {
+        console.error('Errore aggiornaStatisticheGiocatore:', error);
+        throw error;
+    }
+}
+
+// ============ FUNZIONE PER AGGIORNARE CLASSIFICA SQUADRE ============
+async function aggiornaClassificaSquadra(squadraNome, risultato, golFatti, golSubiti) {
+    try {
+        // Trova la squadra
+        const { data: squadre, error: findError } = await supabase
+            .from('squadre')
+            .select('*')
+            .eq('nome', squadraNome)
+            .single();
+
+        if (findError) throw findError;
+
+        // Calcola i nuovi valori
+        const nuoviDati = {
+            partite_giocate: (squadre.partite_giatte || 0) + 1,
+            gol_fatti: (squadre.gol_fatti || 0) + golFatti,
+            gol_subiti: (squadre.gol_subiti || 0) + golSubiti
+        };
+
+        // Aggiorna vittorie/pareggi/sconfitte
+        if (risultato === 'vittoria') {
+            nuoviDati.vittorie = (squadre.vittorie || 0) + 1;
+            nuoviDati.punti = (squadre.punti || 0) + 3;
+        } else if (risultato === 'pareggio') {
+            nuoviDati.pareggi = (squadre.pareggi || 0) + 1;
+            nuoviDati.punti = (squadre.punti || 0) + 1;
+        } else if (risultato === 'sconfitta') {
+            nuoviDati.sconfitte = (squadre.sconfitte || 0) + 1;
+        }
+
+        // Aggiorna la squadra
+        const { data, error } = await supabase
+            .from('squadre')
+            .update(nuoviDati)
+            .eq('nome', squadraNome)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
+
+    } catch (error) {
+        console.error('Errore aggiornaClassificaSquadra:', error);
+        throw error;
+    }
+}
+
 export default DatabaseManager
+

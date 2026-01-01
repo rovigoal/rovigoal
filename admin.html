@@ -280,6 +280,12 @@
                 <h3>GESTIONE FINALE</h3>
                 <p>Configura e gestisci la partita finale del torneo.</p>
             </a>
+            
+            <a href="elimina-partite.html" class="admin-card">
+                <span class="admin-icon">🗑️</span>
+                <h3>ELIMINA PARTITE</h3>
+                <p>Visualizza, gestisci ed elimina partite esistenti.</p>
+            </a>
         </div>
         
         <!-- ZONA PERICOLOSA -->
@@ -342,42 +348,43 @@
                 mostraAlert('Errore di connessione al database. Riprova più tardi.', 'error');
             }
         });
-        // RESET COMPLETO DATABASE (versione corretta)
-async function resetDatabase() {
-    if (!confirm('⚠️ ATTENZIONE! Vuoi ELIMINARE TUTTI i dati?\n\nQuesta operazione:\n• Elimina TUTTE le squadre\n• Elimina TUTTI i giocatori\n• Elimina TUTTE le partite\n• Elimina la finale\n\nL\'operazione è IRREVERSIBILE!')) {
-        return;
-    }
-    
-    if (!confirm('⛔ SEI ASSOLUTAMENTE SICURO?\n\nDigita "ELIMINA" per confermare:')) {
-        return;
-    }
-    
-    const conferma = prompt('Digita "ELIMINA" per procedere:');
-    if (conferma !== 'ELIMINA') {
-        mostraAlert('Operazione annullata', 'error');
-        return;
-    }
-    
-    try {
-        aggiornaStatoConnessione('caricamento');
         
-        // Ora la funzione eliminaTutto() esiste nel database-supabase.js corretto
-        const risultato = await database.eliminaTutto();
-        
-        if (risultato) {
-            mostraAlert('✅ Database completamente resettato!', 'success');
-            aggiornaStatoConnessione('ok');
-        } else {
-            mostraAlert('❌ Errore nel reset del database', 'error');
-            aggiornaStatoConnessione('ko');
+        // RESET COMPLETO DATABASE
+        async function resetDatabase() {
+            if (!confirm('⚠️ ATTENZIONE! Vuoi ELIMINARE TUTTI i dati?\n\nQuesta operazione:\n• Elimina TUTTE le squadre\n• Elimina TUTTI i giocatori\n• Elimina TUTTE le partite\n• Elimina la finale\n\nL\'operazione è IRREVERSIBILE!')) {
+                return;
+            }
+            
+            if (!confirm('⛔ SEI ASSOLUTAMENTE SICURO?\n\nDigita "ELIMINA" per confermare:')) {
+                return;
+            }
+            
+            const conferma = prompt('Digita "ELIMINA" per procedere:');
+            if (conferma !== 'ELIMINA') {
+                mostraAlert('Operazione annullata', 'error');
+                return;
+            }
+            
+            try {
+                aggiornaStatoConnessione('caricamento');
+                
+                // Ora la funzione eliminaTutto() esiste nel database-supabase.js corretto
+                const risultato = await database.eliminaTutto();
+                
+                if (risultato) {
+                    mostraAlert('✅ Database completamente resettato!', 'success');
+                    aggiornaStatoConnessione('ok');
+                } else {
+                    mostraAlert('❌ Errore nel reset del database', 'error');
+                    aggiornaStatoConnessione('ko');
+                }
+                
+            } catch (error) {
+                console.error('❌ Errore reset database:', error);
+                mostraAlert('Errore nel reset del database: ' + error.message, 'error');
+                aggiornaStatoConnessione('ko');
+            }
         }
-        
-    } catch (error) {
-        console.error('❌ Errore reset database:', error);
-        mostraAlert('Errore nel reset del database: ' + error.message, 'error');
-        aggiornaStatoConnessione('ko');
-    }
-}
         
         // FUNZIONI AUSILIARIE
         function mostraAlert(messaggio, tipo = 'success') {
@@ -423,4 +430,3 @@ async function resetDatabase() {
     </script>
 </body>
 </html>
-

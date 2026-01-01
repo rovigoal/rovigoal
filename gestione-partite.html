@@ -1401,24 +1401,40 @@
                     return !errorStep1;
                     
                 case 2:
-                    const golCasa = parseInt(document.getElementById('golCasa').value) || 0;
-                    const golOspite = parseInt(document.getElementById('golOspite').value) || 0;
-                    
-                    // Controlla che i gol degli eventi corrispondano
-                    const { totaleGolCasa, totaleGolOspite } = calcolaTotaleGolEventi();
-                    
-                    if (totaleGolCasa !== golCasa || totaleGolOspite !== golOspite) {
-                        const conferma = confirm(`⚠️ ATTENZIONE!\n\nI gol degli eventi (${totaleGolCasa}-${totaleGolOspite}) non corrispondono al risultato finale (${golCasa}-${golOspite}).\n\nVuoi continuare comunque?`);
-                        
-                        if (!conferma) {
-                            // Torna al step 3 per correggere
-                            currentStep = 3;
-                            cambiaStep(3);
-                            return false;
-                        }
-                    }
-                    
-                    return true;
+    const golCasa = parseInt(document.getElementById('golCasa').value) || 0;
+    const golOspite = parseInt(document.getElementById('golOspite').value) || 0;
+    
+    // Validazione base: i gol devono essere numeri
+    if (isNaN(golCasa) || isNaN(golOspite)) {
+        mostraAlert('Inserisci un punteggio valido per entrambe le squadre!', 'error');
+        return false;
+    }
+    
+    // Controlla che i gol non siano negativi
+    if (golCasa < 0 || golOspite < 0) {
+        mostraAlert('Il punteggio non può essere negativo!', 'error');
+        return false;
+    }
+    
+    // Controlla che i gol degli eventi corrispondano (SOLO se ci sono eventi)
+    if (partitaData.eventi.length > 0) {
+        const { totaleGolCasa, totaleGolOspite } = calcolaTotaleGolEventi();
+        
+        if (totaleGolCasa !== golCasa || totaleGolOspite !== golOspite) {
+            const conferma = confirm(`⚠️ ATTENZIONE!\n\nI gol degli eventi (${totaleGolCasa}-${totaleGolOspite}) non corrispondono al risultato finale (${golCasa}-${golOspite}).\n\nVuoi continuare comunque?`);
+            
+            if (!conferma) {
+                // Torna al step 3 per correggere
+                setTimeout(() => {
+                    currentStep = 3;
+                    cambiaStep(3);
+                }, 100);
+                return false;
+            }
+        }
+    }
+    
+    return true;
                     
                 case 3:
                     // Il step 3 non blocca il passaggio, ma mostra warning

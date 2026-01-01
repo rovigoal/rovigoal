@@ -1,4 +1,4 @@
-// database-supabase.js - VERSIONE DEFINITIVA CON NOMI CORRETTI
+// database-supabase.js - VERSIONE CON MARCATORI
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
 
 const SUPABASE_URL = 'https://jgcjhawtmwfsovuegryz.supabase.co'
@@ -207,22 +207,23 @@ const DatabaseManager = {
             // Elimina finale esistente
             await supabase.from('finale').delete().neq('id', 0)
             
-            // INSERIMENTO CON I NOMI DELLE COLONNE ESATTI
+            // INSERIMENTO CON MARCATORI
             const { data, error } = await supabase
                 .from('finale')
                 .insert([{
-                    data: null, // Non serve più
-                    ora: null,  // Non serve più
+                    data: null,
+                    ora: null,
                     squadra_casa: finale.squadra_casa,
                     squadra_ospite: finale.squadra_ospite,
                     gol_casa: finale.gol_casa || 0,
                     gol_ospite: finale.gol_ospite || 0,
                     miglior_giocatore: finale.miglior_giocatore || null,
                     voto_miglior_giocatore: finale.voto_miglior_giocatore || null,
-                    portiere_casa: finale.miglior_portiere || null, // Usiamo portiere_casa per il miglior portiere
-                    portiere_ospite: null, // Lasciamo vuoto
-                    voto_portiere_casa: finale.voto_miglior_portiere || null, // Usiamo voto_portiere_casa per il voto del miglior portiere
-                    voto_portiere_ospite: null, // Lasciamo vuoto
+                    portiere_casa: finale.miglior_portiere || null,
+                    portiere_ospite: null,
+                    voto_portiere_casa: finale.voto_miglior_portiere || null,
+                    voto_portiere_ospite: null,
+                    marcatori: finale.marcatori || [], // NUOVO: aggiungi i marcatori
                     eventi: finale.eventi || []
                 }])
                 .select()

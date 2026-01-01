@@ -592,6 +592,130 @@
         window.salvaFinale = salvaFinale;
         window.eliminaFinale = eliminaFinale;
         window.tornaIndietro = tornaIndietro;
+
+        // VARIABILI GLOBALI PER MARCATORI
+let marcatoriContatore = 1;
+
+// AGGIUNGI MARCATORE
+function aggiungiMarcatore() {
+    const container = document.getElementById('marcatoriContainer');
+    const squadraCasa = document.getElementById('finaleSquadraCasa').value || 'Squadra Casa';
+    const squadraOspite = document.getElementById('finaleSquadraOspite').value || 'Squadra Ospite';
+    
+    const nuovoMarcatore = document.createElement('div');
+    nuovoMarcatore.className = 'marcatore-item';
+    nuovoMarcatore.style.marginBottom = '10px';
+    nuovoMarcatore.style.display = 'flex';
+    nuovoMarcatore.style.gap = '10px';
+    nuovoMarcatore.style.alignItems = 'center';
+    nuovoMarcatore.innerHTML = `
+        <select class="marcatore-giocatore" style="flex: 2;">
+            <option value="">Seleziona giocatore...</option>
+        </select>
+        <select class="marcatore-squadra" style="flex: 1;">
+            <option value="casa">${squadraCasa}</option>
+            <option value="ospite">${squadraOspite}</option>
+        </select>
+        <input type="number" class="marcatore-minuto" placeholder="Min." min="1" max="120" style="width: 80px;">
+        <button type="button" class="btn-rimuovi" onclick="rimuoviMarcatore(this)" style="background: #dc143c; color: white; border: none; border-radius: 5px; padding: 5px 10px; cursor: pointer;">✕</button>
+    `;
+    
+    container.appendChild(nuovoMarcatore);
+    aggiornaSelectGiocatoriMarcatore();
+    marcatoriContatore++;
+}
+
+// RIMUOVI MARCATORE
+function rimuoviMarcatore(button) {
+    button.parentElement.remove();
+}
+
+// AGGIORNA SELECT GIOCATORI PER MARCATORI
+function aggiornaSelectGiocatoriMarcatore() {
+    const selectGiocatori = document.querySelectorAll('.marcatore-giocatore:last-child');
+    const ultimoSelect = selectGiocatori[selectGiocatori.length - 1];
+    
+    if (!ultimoSelect) return;
+    
+    // Rimuovi tutte le opzioni tranne la prima
+    while (ultimoSelect.options.length > 1) {
+        ultimoSelect.remove(1);
+    }
+    
+    // Aggiungi tutti i giocatori
+    giocatori.forEach(giocatore => {
+        const option = document.createElement('option');
+        option.value = giocatore.id;
+        option.textContent = `${giocatore.nome} (${giocatore.squadra})`;
+        ultimoSelect.appendChild(option);
+    });
+}
+
+// AGGIORNA NOMI SQUADRE NEI SELECT MARCATORI
+function aggiornaNomiSquadreMarcatori() {
+    const squadraCasa = document.getElementById('finaleSquadraCasa').value || 'Squadra Casa';
+    const squadraOspite = document.getElementById('finaleSquadraOspite').value || 'Squadra Ospite';
+    
+    document.querySelectorAll('.marcatore-squadra').forEach(select => {
+        select.options[0].text = squadraCasa;
+        select.options[1].text = squadraOspite;
+    });
+}
+
+// RACCOGLI MARCATORI
+function raccogliMarcatori() {
+    const marcatori = [];
+    
+    document.querySelectorAll('.marcatore-item').forEach(item => {
+        const giocatoreId = item.querySelector('.marcatore-giocatore').value;
+        const squadra = item.querySelector('.marcatore-squadra').value;
+        const minuto = item.querySelector('.marcatore-minuto').value;
+        
+        if (giocatoreId && minuto) {
+            const giocatore = giocatori.find(g => g.id == giocatoreId);
+            if (giocatore) {
+                marcatori.push({
+                    giocatore_id: giocatoreId,
+                    giocatore_nome: giocatore.nome,
+                    squadra: squadra, // 'casa' o 'ospite'
+                    minuto: parseInt(minuto),
+                    squadra_nome: squadra === 'casa' ? 
+                        document.getElementById('finaleSquadraCasa').value : 
+                        document.getElementById('finaleSquadraOspite').value
+                });
+            }
+        }
+    });
+    
+    return marcatori;
+}
+
+// MODIFICA LA FUNZIONE salvaFinale
+async function salvaFinale() {
+    try {
+        // Raccogli dati
+        const finaleData = {
+            data: null,
+            ora: null,
+            squadra_casa: document.getElementById('finaleSquadraCasa').value,
+            squadra_ospite: document.getElementById('finaleSquadraOspite').value,
+            gol_casa: parseInt(document.getElementById('finaleGolCasa').value) || 0,
+            gol_ospite: parseInt(document.getElementById('finaleGolOspite').value) || 0,
+            miglior_giocatore: document.getElementById('finaleMigliorGiocatore').value,
+            voto_miglior_giocatore: parseInt(document.getElementById('finaleVotoMigliorGiocatore').value) || null,
+            miglior_portiere: document.getElementById('finaleMigliorPortiere').value,
+            voto_miglior_portiere: parseInt(document.getElementById('finaleVotoMigliorPortiere').value) || null,
+            marcatori: raccogliMarcatori(), // NUOVO: aggiungi i marcatori
+            eventi: []
+        };
+        
+        // ... resto del codice rimane uguale ...
+        
+    } catch (error) {
+        console.error('Errore salvataggio finale:', error);
+        mostraAlert('Errore nel salvataggio: ' + error.message, 'error');
+    }
+}
         
     </script>
 </body>

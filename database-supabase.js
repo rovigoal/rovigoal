@@ -1,4 +1,4 @@
-// database-supabase.js - VERSIONE DEFINITIVA
+// database-supabase.js - VERSIONE COMPLETA E FUNZIONANTE
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
 
 const SUPABASE_URL = 'https://jgcjhawtmwfsovuegryz.supabase.co'
@@ -93,7 +93,7 @@ const DatabaseManager = {
         }
     },
     
-    // ============ CRUD ============
+    // ============ CRUD SQUADRE ============
     async aggiungiSquadra(squadra) {
         try {
             const { data, error } = await supabase
@@ -120,6 +120,23 @@ const DatabaseManager = {
         }
     },
     
+    async eliminaSquadra(squadraId) {
+        try {
+            const { error } = await supabase
+                .from('squadre')
+                .delete()
+                .eq('id', squadraId)
+            
+            if (error) throw error
+            return true
+            
+        } catch (error) {
+            console.error('Errore eliminaSquadra:', error)
+            throw error
+        }
+    },
+    
+    // ============ CRUD GIOCATORI ============
     async aggiungiGiocatore(giocatore) {
         try {
             const { data, error } = await supabase
@@ -145,22 +162,6 @@ const DatabaseManager = {
         }
     },
     
-    async eliminaSquadra(squadraId) {
-        try {
-            const { error } = await supabase
-                .from('squadre')
-                .delete()
-                .eq('id', squadraId)
-            
-            if (error) throw error
-            return true
-            
-        } catch (error) {
-            console.error('Errore eliminaSquadra:', error)
-            throw error
-        }
-    },
-    
     async eliminaGiocatore(giocatoreId) {
         try {
             const { error } = await supabase
@@ -177,6 +178,7 @@ const DatabaseManager = {
         }
     },
     
+    // ============ CRUD PARTITE ============
     async aggiungiPartita(partita) {
         try {
             const { data, error } = await supabase
@@ -202,6 +204,7 @@ const DatabaseManager = {
         }
     },
     
+    // ============ CRUD FINALE ============
     async salvaFinale(finale) {
         try {
             console.log('Salvataggio finale con dati:', finale);
@@ -215,7 +218,7 @@ const DatabaseManager = {
                 gol_casa: finale.gol_casa || 0,
                 gol_ospite: finale.gol_ospite || 0,
                 eventi: finale.eventi || [],
-                marcatori: finale.marcatori || [], // COLONNA MARCATORI
+                marcatori: finale.marcatori || [],
                 miglior_giocatore: finale.miglior_giocatore || null,
                 voto_miglior_giocatore: finale.voto_miglior_giocatore || null,
                 portiere_casa: finale.portiere_casa || null,
@@ -259,6 +262,94 @@ const DatabaseManager = {
             
         } catch (error) {
             console.error('Errore eliminaFinale:', error)
+            throw error
+        }
+    },
+    
+    // ============ FUNZIONI AGGIUNTIVE PER ADMIN ============
+    async testConnessione() {
+        try {
+            // Prova a fare una query semplice
+            const { data, error } = await supabase
+                .from('squadre')
+                .select('id')
+                .limit(1)
+            
+            if (error) {
+                console.error('Test connessione fallito:', error);
+                return false;
+            }
+            
+            return true;
+            
+        } catch (error) {
+            console.error('Test connessione fallito:', error);
+            return false;
+        }
+    },
+    
+    async eliminaTutto() {
+        try {
+            console.log('Inizio eliminazione totale...');
+            
+            // Elimina in ordine per evitare errori di foreign key
+            // Prima finale (non ha dipendenze)
+            await supabase.from('finale').delete().neq('id', 0);
+            console.log('Finale eliminata');
+            
+            // Poi partite
+            await supabase.from('partite').delete().neq('id', 0);
+            console.log('Partite eliminate');
+            
+            // Poi giocatori (dipende da squadre)
+            await supabase.from('giocatori').delete().neq('id', 0);
+            console.log('Giocatori eliminati');
+            
+            // Infine squadre
+            await supabase.from('squadre').delete().neq('id', 0);
+            console.log('Squadre eliminate');
+            
+            return true;
+            
+        } catch (error) {
+            console.error('Errore eliminaTutto:', error);
+            throw error;
+        }
+    },
+    
+    // ============ FUNZIONI AGGIUNTIVE UTILI ============
+    async aggiornaSquadra(squadraId, datiAggiornati) {
+        try {
+            const { data, error } = await supabase
+                .from('squadre')
+                .update(datiAggiornati)
+                .eq('id', squadraId)
+                .select()
+                .single()
+            
+            if (error) throw error
+            return data
+            
+        } catch (error) {
+            console.error('Errore aggiornaSquadra:', error)
+            throw error
+        }
+    },
+    
+    async aggiornaGiocatore(giocatoreId, datiAggiornati) {
+        try {
+            const { data, error } = await supabase
+                .from('giocatori')
+                .update(datiAggiornati)
+                .eq('id', giocatoreId)
+                .select()
+                .single()
+            
+            if (error) throw error
+            return data
+            
+        } catch (error) {
+            console.error('Errore aggiornaGiocatore:', error)
             throw error
         }
     }

@@ -384,32 +384,46 @@
             
             <!-- SEZIONE PREMI -->
             <div class="premi-section">
-                <h3>⭐ Premi della Finale</h3>
-                
-                <div class="form-group">
-                    <label for="finaleMigliorGiocatore">🏆 Miglior Giocatore</label>
-                    <select id="finaleMigliorGiocatore">
-                        <option value="">Seleziona...</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="finaleVotoMigliorGiocatore">Voto (1-10)</label>
-                    <input type="number" id="finaleVotoMigliorGiocatore" min="1" max="10" value="9">
-                </div>
-                
-                <div class="form-group">
-                    <label for="finaleMigliorPortiere">🥅 Miglior Portiere</label>
-                    <select id="finaleMigliorPortiere">
-                        <option value="">Seleziona portiere...</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="finaleVotoMigliorPortiere">Voto Portiere (1-10)</label>
-                    <input type="number" id="finaleVotoMigliorPortiere" min="1" max="10" value="8">
-                </div>
-            </div>
+    <h3>⭐ Premi della Finale</h3>
+    
+    <div class="form-group">
+        <label for="finaleMigliorGiocatore">🏆 Miglior Giocatore</label>
+        <select id="finaleMigliorGiocatore">
+            <option value="">Seleziona...</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label for="finaleVotoMigliorGiocatore">Voto (1-10)</label>
+        <input type="number" id="finaleVotoMigliorGiocatore" min="1" max="10" value="9">
+    </div>
+    
+    <!-- RIMUOVI LA SEZIONE MIGLIOR PORTIERE se non esiste nel DB -->
+    <!-- Se hai portiere_casa e portiere_ospite invece, aggiungi: -->
+    <div class="form-group">
+        <label for="portiereCasa">🥅 Portiere Casa</label>
+        <select id="portiereCasa">
+            <option value="">Seleziona portiere...</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label for="votoPortiereCasa">Voto Portiere Casa (1-10)</label>
+        <input type="number" id="votoPortiereCasa" min="1" max="10" value="7">
+    </div>
+    
+    <div class="form-group">
+        <label for="portiereOspite">🥅 Portiere Ospite</label>
+        <select id="portiereOspite">
+            <option value="">Seleziona portiere...</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label for="votoPortiereOspite">Voto Portiere Ospite (1-10)</label>
+        <input type="number" id="votoPortiereOspite" min="1" max="10" value="7">
+    </div>
+</div>
             
             <button class="btn btn-success" onclick="salvaFinale()">
                 ✅ SALVA PARTITA FINALE

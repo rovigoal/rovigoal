@@ -1,4 +1,5 @@
-// database-supabase.js - VERSIONE COMPLETA E AGGIORNATA
+[file name]: database-supabase.js
+// database-supabase.js - VERSIONE COMPLETA AGGIORNATA CON TUTTE LE FUNZIONI
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
 
 const SUPABASE_URL = 'https://jgcjhawtmwfsovuegryz.supabase.co'
@@ -77,12 +78,12 @@ const DatabaseManager = {
                 .limit(1)
                 .single()
             
-            // Se non c'è finale, ritorna null (non è un errore)
             if (error) {
                 if (error.code === 'PGRST116') {
                     return null
                 }
-                throw error
+                console.error('Errore getFinale:', error)
+                return null
             }
             
             return data || null
@@ -213,12 +214,52 @@ const DatabaseManager = {
         }
     },
     
+    async eliminaPartita(partitaId) {
+        try {
+            console.log('Eliminazione partita ID:', partitaId);
+            
+            const { error } = await supabase
+                .from('partite')
+                .delete()
+                .eq('id', partitaId)
+            
+            if (error) {
+                console.error('Errore eliminaPartita:', error);
+                throw error;
+            }
+            
+            console.log('Partita eliminata con successo');
+            return true
+            
+        } catch (error) {
+            console.error('Errore eliminaPartita:', error);
+            throw error;
+        }
+    },
+    
+    async aggiornaPartita(partitaId, datiAggiornati) {
+        try {
+            const { data, error } = await supabase
+                .from('partite')
+                .update(datiAggiornati)
+                .eq('id', partitaId)
+                .select()
+                .single();
+
+            if (error) throw error;
+            return data;
+
+        } catch (error) {
+            console.error('Errore aggiornaPartita:', error);
+            throw error;
+        }
+    },
+    
     // ============ CRUD FINALE ============
     async salvaFinale(finale) {
         try {
             console.log('Salvataggio finale con dati:', finale);
             
-            // Prepara dati secondo la TUA struttura esatta
             const datiDaInserire = {
                 data: finale.data,
                 ora: finale.ora || null,
@@ -278,7 +319,6 @@ const DatabaseManager = {
     // ============ FUNZIONI PER GESTIONE EVENTI PARTITE ============
     async aggiungiEventoPartita(partitaId, evento) {
         try {
-            // Prima ottieni la partita corrente
             const { data: partita, error: getError } = await supabase
                 .from('partite')
                 .select('eventi')
@@ -287,10 +327,8 @@ const DatabaseManager = {
 
             if (getError) throw getError;
 
-            // Aggiungi il nuovo evento agli eventi esistenti
             const eventiAggiornati = partita.eventi ? [...partita.eventi, evento] : [evento];
 
-            // Aggiorna la partita
             const { data, error } = await supabase
                 .from('partite')
                 .update({ eventi: eventiAggiornati })
@@ -303,24 +341,6 @@ const DatabaseManager = {
 
         } catch (error) {
             console.error('Errore aggiungiEventoPartita:', error);
-            throw error;
-        }
-    },
-    
-    async aggiornaPartita(partitaId, datiAggiornati) {
-        try {
-            const { data, error } = await supabase
-                .from('partite')
-                .update(datiAggiornati)
-                .eq('id', partitaId)
-                .select()
-                .single();
-
-            if (error) throw error;
-            return data;
-
-        } catch (error) {
-            console.error('Errore aggiornaPartita:', error);
             throw error;
         }
     },
@@ -346,7 +366,6 @@ const DatabaseManager = {
     
     async aggiornaStatisticheGiocatoreEvento(giocatoreId, tipoEvento) {
         try {
-            // Prima ottieni il giocatore corrente
             const { data: giocatore, error: getError } = await supabase
                 .from('giocatori')
                 .select('*')
@@ -369,7 +388,6 @@ const DatabaseManager = {
                     break;
             }
             
-            // Aggiorna il giocatore
             const { data, error } = await supabase
                 .from('giocatori')
                 .update(datiAggiornati)
@@ -428,7 +446,6 @@ const DatabaseManager = {
     
     async aggiornaClassificaSquadra(squadraNome, risultato, golFatti, golSubiti) {
         try {
-            // Trova la squadra
             const { data: squadre, error: findError } = await supabase
                 .from('squadre')
                 .select('*')
@@ -437,14 +454,12 @@ const DatabaseManager = {
 
             if (findError) throw findError;
 
-            // Calcola i nuovi valori
             const nuoviDati = {
                 partite_giocate: (squadre.partite_giocate || 0) + 1,
                 gol_fatti: (squadre.gol_fatti || 0) + golFatti,
                 gol_subiti: (squadre.gol_subiti || 0) + golSubiti
             };
 
-            // Aggiorna vittorie/pareggi/sconfitte
             if (risultato === 'vittoria') {
                 nuoviDati.vittorie = (squadre.vittorie || 0) + 1;
                 nuoviDati.punti = (squadre.punti || 0) + 3;
@@ -455,7 +470,6 @@ const DatabaseManager = {
                 nuoviDati.sconfitte = (squadre.sconfitte || 0) + 1;
             }
 
-            // Aggiorna la squadra
             const { data, error } = await supabase
                 .from('squadre')
                 .update(nuoviDati)
@@ -475,7 +489,6 @@ const DatabaseManager = {
     // ============ FUNZIONI AGGIUNTIVE PER ADMIN ============
     async testConnessione() {
         try {
-            // Prova a fare una query semplice
             const { data, error } = await supabase
                 .from('squadre')
                 .select('id')
@@ -498,20 +511,15 @@ const DatabaseManager = {
         try {
             console.log('Inizio eliminazione totale...');
             
-            // Elimina in ordine per evitare errori di foreign key
-            // Prima finale (non ha dipendenze)
             await supabase.from('finale').delete().neq('id', 0);
             console.log('Finale eliminata');
             
-            // Poi partite
             await supabase.from('partite').delete().neq('id', 0);
             console.log('Partite eliminate');
             
-            // Poi giocatori (dipende da squadre)
             await supabase.from('giocatori').delete().neq('id', 0);
             console.log('Giocatori eliminati');
             
-            // Infine squadre
             await supabase.from('squadre').delete().neq('id', 0);
             console.log('Squadre eliminate');
             
@@ -635,7 +643,6 @@ const DatabaseManager = {
     
     // ============ FUNZIONE PER REAL-TIME UPDATES ============
     setupRealtime(callback) {
-        // Ascolta cambiamenti su tutte le tabelle
         const subscription = supabase
             .channel('rovigoal-updates')
             .on('postgres_changes', 

@@ -1,4 +1,4 @@
-// database-supabase.js - VERSIONE CORRETTA E COMPLETA
+// database-supabase.js - VERSIONE COMPLETA E TESTATA
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
 
 const SUPABASE_URL = 'https://jgcjhawtmwfsovuegryz.supabase.co'
@@ -6,36 +6,30 @@ const SUPABASE_KEY = 'sb_publishable_X6PIatMpCblUcS487cOMfQ_HfP2GpUq'
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
-// FUNZIONE DI TEST PER DEBUG
-async function testConnessioneSemplice() {
-    try {
-        console.log('🔍 Test connessione Supabase...');
-        
-        const { data, error } = await supabase
-            .from('squadre')
-            .select('id')
-            .limit(1);
-        
-        if (error) {
-            console.error('❌ Errore connessione Supabase:', error);
-            return { success: false, error: error.message };
-        }
-        
-        console.log('✅ Connessione Supabase OK');
-        return { success: true, data: data };
-        
-    } catch (error) {
-        console.error('❌ Errore test connessione:', error);
-        return { success: false, error: error.message };
-    }
-}
-
 // OGGETTO PRINCIPALE DEL DATABASE
 const DatabaseManager = {
     
     // ============ TEST E DEBUG ============
     async testConnessione() {
-        return await testConnessioneSemplice();
+        try {
+            console.log('🔍 Test connessione Supabase...');
+            const { data, error } = await supabase
+                .from('squadre')
+                .select('id')
+                .limit(1);
+            
+            if (error) {
+                console.error('❌ Errore connessione:', error);
+                return { success: false, error: error.message };
+            }
+            
+            console.log('✅ Connessione OK');
+            return { success: true, data: data };
+            
+        } catch (error) {
+            console.error('❌ Errore test:', error);
+            return { success: false, error: error.message };
+        }
     },
     
     // ============ GETTERS ============
@@ -44,18 +38,18 @@ const DatabaseManager = {
             const { data, error } = await supabase
                 .from('squadre')
                 .select('*')
-                .order('punti', { ascending: false })
+                .order('punti', { ascending: false });
             
             if (error) {
-                console.error('Errore getSquadre:', error)
-                return []
+                console.error('❌ Errore getSquadre:', error);
+                return [];
             }
             
-            return data || []
+            return data || [];
             
         } catch (error) {
-            console.error('Errore getSquadre:', error)
-            return []
+            console.error('❌ Errore getSquadre:', error);
+            return [];
         }
     },
     
@@ -64,18 +58,18 @@ const DatabaseManager = {
             const { data, error } = await supabase
                 .from('giocatori')
                 .select('*')
-                .order('nome')
+                .order('nome');
             
             if (error) {
-                console.error('Errore getGiocatori:', error)
-                return []
+                console.error('❌ Errore getGiocatori:', error);
+                return [];
             }
             
-            return data || []
+            return data || [];
             
         } catch (error) {
-            console.error('Errore getGiocatori:', error)
-            return []
+            console.error('❌ Errore getGiocatori:', error);
+            return [];
         }
     },
     
@@ -84,18 +78,19 @@ const DatabaseManager = {
             const { data, error } = await supabase
                 .from('partite')
                 .select('*')
-                .order('data', { ascending: false })
+                .order('data', { ascending: false });
             
             if (error) {
-                console.error('Errore getPartite:', error)
-                return []
+                console.error('❌ Errore getPartite:', error);
+                return [];
             }
             
-            return data || []
+            console.log('✅ Partite caricate:', data?.length || 0);
+            return data || [];
             
         } catch (error) {
-            console.error('Errore getPartite:', error)
-            return []
+            console.error('❌ Errore getPartite:', error);
+            return [];
         }
     },
     
@@ -105,21 +100,21 @@ const DatabaseManager = {
                 .from('finale')
                 .select('*')
                 .limit(1)
-                .single()
+                .single();
             
             if (error) {
                 if (error.code === 'PGRST116') {
                     console.log('ℹ️ Nessuna finale trovata');
                     return null;
                 }
-                console.error('Errore getFinale:', error);
+                console.error('❌ Errore getFinale:', error);
                 return null;
             }
             
-            return data || null;
+            return data;
             
         } catch (error) {
-            console.error('Errore getFinale:', error);
+            console.error('❌ Errore getFinale:', error);
             return null;
         }
     },
@@ -140,13 +135,13 @@ const DatabaseManager = {
                     gol_subiti: 0
                 }])
                 .select()
-                .single()
+                .single();
             
             if (error) throw error;
             return data;
             
         } catch (error) {
-            console.error('Errore aggiungiSquadra:', error);
+            console.error('❌ Errore aggiungiSquadra:', error);
             throw error;
         }
     },
@@ -156,13 +151,13 @@ const DatabaseManager = {
             const { error } = await supabase
                 .from('squadre')
                 .delete()
-                .eq('id', squadraId)
+                .eq('id', squadraId);
             
             if (error) throw error;
             return true;
             
         } catch (error) {
-            console.error('Errore eliminaSquadra:', error);
+            console.error('❌ Errore eliminaSquadra:', error);
             throw error;
         }
     },
@@ -185,13 +180,13 @@ const DatabaseManager = {
                     premi_miglior_portiere: 0
                 }])
                 .select()
-                .single()
+                .single();
             
             if (error) throw error;
             return data;
             
         } catch (error) {
-            console.error('Errore aggiungiGiocatore:', error);
+            console.error('❌ Errore aggiungiGiocatore:', error);
             throw error;
         }
     },
@@ -201,13 +196,13 @@ const DatabaseManager = {
             const { error } = await supabase
                 .from('giocatori')
                 .delete()
-                .eq('id', giocatoreId)
+                .eq('id', giocatoreId);
             
             if (error) throw error;
             return true;
             
         } catch (error) {
-            console.error('Errore eliminaGiocatore:', error);
+            console.error('❌ Errore eliminaGiocatore:', error);
             throw error;
         }
     },
@@ -215,6 +210,8 @@ const DatabaseManager = {
     // ============ CRUD PARTITE ============
     async aggiungiPartita(partita) {
         try {
+            console.log('➕ Aggiunta partita:', partita);
+            
             const { data, error } = await supabase
                 .from('partite')
                 .insert([{
@@ -233,31 +230,66 @@ const DatabaseManager = {
                     voto_portiere_ospite: partita.voto_portiere_ospite || null
                 }])
                 .select()
-                .single()
+                .single();
             
             if (error) throw error;
+            
+            console.log('✅ Partita aggiunta con ID:', data.id);
             return data;
             
         } catch (error) {
-            console.error('Errore aggiungiPartita:', error);
+            console.error('❌ Errore aggiungiPartita:', error);
             throw error;
         }
     },
     
     async eliminaPartita(partitaId) {
         try {
-            console.log('Eliminazione partita ID:', partitaId);
+            console.log('🗑️ Eliminazione partita ID:', partitaId);
+            console.log('🔢 Tipo ID:', typeof partitaId, 'Valore:', partitaId);
             
+            // Converti in numero se necessario
+            let idDaUsare = partitaId;
+            if (typeof partitaId === 'string') {
+                idDaUsare = Number(partitaId);
+                console.log('🔄 ID convertito a numero:', idDaUsare);
+            }
+            
+            // Controlla se la partita esiste prima di eliminare
+            const { data: partitaEsistente, error: checkError } = await supabase
+                .from('partite')
+                .select('id, squadra_casa, squadra_ospite')
+                .eq('id', idDaUsare)
+                .maybeSingle();
+            
+            if (checkError) {
+                console.error('❌ Errore verifica partita:', checkError);
+                throw new Error(`Errore verifica: ${checkError.message}`);
+            }
+            
+            if (!partitaEsistente) {
+                console.error('❌ Partita non trovata con ID:', idDaUsare);
+                throw new Error('Partita non trovata nel database');
+            }
+            
+            console.log('✅ Partita trovata:', partitaEsistente);
+            
+            // Ora elimina
             const { error } = await supabase
                 .from('partite')
                 .delete()
-                .eq('id', partitaId)
+                .eq('id', idDaUsare);
             
-            if (error) throw error;
+            if (error) {
+                console.error('❌ Errore eliminazione:', error);
+                throw error;
+            }
+            
+            console.log('✅ Partita eliminata con successo');
             return true;
             
         } catch (error) {
-            console.error('Errore eliminaPartita:', error);
+            console.error('❌ Errore eliminaPartita:', error);
             throw error;
         }
     },
@@ -270,12 +302,12 @@ const DatabaseManager = {
                 .eq('id', partitaId)
                 .select()
                 .single();
-
+            
             if (error) throw error;
             return data;
-
+            
         } catch (error) {
-            console.error('Errore aggiornaPartita:', error);
+            console.error('❌ Errore aggiornaPartita:', error);
             throw error;
         }
     },
@@ -283,7 +315,7 @@ const DatabaseManager = {
     // ============ CRUD FINALE ============
     async salvaFinale(finale) {
         try {
-            console.log('Salvataggio finale con dati:', finale);
+            console.log('🏆 Salvataggio finale:', finale);
             
             const datiDaInserire = {
                 data: finale.data,
@@ -310,13 +342,13 @@ const DatabaseManager = {
                 .from('finale')
                 .insert([datiDaInserire])
                 .select()
-                .single()
+                .single();
             
             if (error) throw error;
             return data;
             
         } catch (error) {
-            console.error('Errore salvaFinale:', error);
+            console.error('❌ Errore salvaFinale:', error);
             throw error;
         }
     },
@@ -326,42 +358,13 @@ const DatabaseManager = {
             const { error } = await supabase
                 .from('finale')
                 .delete()
-                .neq('id', 0)
+                .neq('id', 0);
             
             if (error) throw error;
             return true;
             
         } catch (error) {
-            console.error('Errore eliminaFinale:', error);
-            throw error;
-        }
-    },
-    
-    // ============ FUNZIONI PER GESTIONE EVENTI PARTITE ============
-    async aggiungiEventoPartita(partitaId, evento) {
-        try {
-            const { data: partita, error: getError } = await supabase
-                .from('partite')
-                .select('eventi')
-                .eq('id', partitaId)
-                .single();
-
-            if (getError) throw getError;
-
-            const eventiAggiornati = partita.eventi ? [...partita.eventi, evento] : [evento];
-
-            const { data, error } = await supabase
-                .from('partite')
-                .update({ eventi: eventiAggiornati })
-                .eq('id', partitaId)
-                .select()
-                .single();
-
-            if (error) throw error;
-            return data;
-
-        } catch (error) {
-            console.error('Errore aggiungiEventoPartita:', error);
+            console.error('❌ Errore eliminaFinale:', error);
             throw error;
         }
     },
@@ -374,75 +377,14 @@ const DatabaseManager = {
                 .update(datiAggiornati)
                 .eq('id', giocatoreId)
                 .select()
-                .single()
-            
-            if (error) throw error;
-            return data;
-            
-        } catch (error) {
-            console.error('Errore aggiornaGiocatore:', error);
-            throw error;
-        }
-    },
-    
-    async aggiornaStatisticheGiocatoreEvento(giocatoreId, tipoEvento) {
-        try {
-            const { data: giocatore, error: getError } = await supabase
-                .from('giocatori')
-                .select('*')
-                .eq('id', giocatoreId)
-                .single();
-            
-            if (getError) throw getError;
-            
-            let datiAggiornati = {};
-            
-            switch(tipoEvento) {
-                case 'gol':
-                    datiAggiornati.gol = (giocatore.gol || 0) + 1;
-                    break;
-                case 'ammonizione':
-                    datiAggiornati.ammonizioni = (giocatore.ammonizioni || 0) + 1;
-                    break;
-                case 'espulsione':
-                    datiAggiornati.espulsioni = (giocatore.espulsioni || 0) + 1;
-                    break;
-            }
-            
-            const { data, error } = await supabase
-                .from('giocatori')
-                .update(datiAggiornati)
-                .eq('id', giocatoreId)
-                .select()
                 .single();
             
             if (error) throw error;
             return data;
             
         } catch (error) {
-            console.error('Errore aggiornaStatisticheGiocatoreEvento:', error);
+            console.error('❌ Errore aggiornaGiocatore:', error);
             throw error;
-        }
-    },
-    
-    async getGiocatoriPerSquadra(nomeSquadra) {
-        try {
-            const { data, error } = await supabase
-                .from('giocatori')
-                .select('*')
-                .eq('squadra', nomeSquadra)
-                .order('nome');
-            
-            if (error) {
-                console.error('Errore getGiocatoriPerSquadra:', error);
-                return [];
-            }
-            
-            return data || [];
-            
-        } catch (error) {
-            console.error('Errore getGiocatoriPerSquadra:', error);
-            return [];
         }
     },
     
@@ -454,60 +396,61 @@ const DatabaseManager = {
                 .update(datiAggiornati)
                 .eq('id', squadraId)
                 .select()
-                .single()
+                .single();
             
             if (error) throw error;
             return data;
             
         } catch (error) {
-            console.error('Errore aggiornaSquadra:', error);
+            console.error('❌ Errore aggiornaSquadra:', error);
             throw error;
         }
     },
     
-    async aggiornaClassificaSquadra(squadraNome, risultato, golFatti, golSubiti) {
+    // ============ FUNZIONI UTILI ============
+    async getGiocatoriPerSquadra(nomeSquadra) {
         try {
-            const { data: squadra, error: findError } = await supabase
-                .from('squadre')
-                .select('*')
-                .eq('nome', squadraNome)
-                .single();
-
-            if (findError) throw findError;
-
-            const nuoviDati = {
-                partite_giocate: (squadra.partite_giocate || 0) + 1,
-                gol_fatti: (squadra.gol_fatti || 0) + golFatti,
-                gol_subiti: (squadra.gol_subiti || 0) + golSubiti
-            };
-
-            if (risultato === 'vittoria') {
-                nuoviDati.vittorie = (squadra.vittorie || 0) + 1;
-                nuoviDati.punti = (squadra.punti || 0) + 3;
-            } else if (risultato === 'pareggio') {
-                nuoviDati.pareggi = (squadra.pareggi || 0) + 1;
-                nuoviDati.punti = (squadra.punti || 0) + 1;
-            } else if (risultato === 'sconfitta') {
-                nuoviDati.sconfitte = (squadra.sconfitte || 0) + 1;
-            }
-
             const { data, error } = await supabase
-                .from('squadre')
-                .update(nuoviDati)
-                .eq('nome', squadraNome)
-                .select()
-                .single();
-
-            if (error) throw error;
-            return data;
-
+                .from('giocatori')
+                .select('*')
+                .eq('squadra', nomeSquadra)
+                .order('nome');
+            
+            if (error) {
+                console.error('❌ Errore getGiocatoriPerSquadra:', error);
+                return [];
+            }
+            
+            return data || [];
+            
         } catch (error) {
-            console.error('Errore aggiornaClassificaSquadra:', error);
-            throw error;
+            console.error('❌ Errore getGiocatoriPerSquadra:', error);
+            return [];
         }
     },
     
-    // ============ FUNZIONI AGGIUNTIVE PER ADMIN ============
+    async getPartitePerSquadra(nomeSquadra) {
+        try {
+            const { data, error } = await supabase
+                .from('partite')
+                .select('*')
+                .or(`squadra_casa.eq.${nomeSquadra},squadra_ospite.eq.${nomeSquadra}`)
+                .order('data', { ascending: false });
+            
+            if (error) {
+                console.error('❌ Errore getPartitePerSquadra:', error);
+                return [];
+            }
+            
+            return data || [];
+            
+        } catch (error) {
+            console.error('❌ Errore getPartitePerSquadra:', error);
+            return [];
+        }
+    },
+    
+    // ============ FUNZIONI ADMIN ============
     async eliminaTutto() {
         try {
             console.log('⚠️ INIZIO ELIMINAZIONE TOTALE DATABASE');
@@ -533,50 +476,7 @@ const DatabaseManager = {
         }
     },
     
-    // ============ FUNZIONI UTILI PER FILTRI E RICERCHE ============
-    async cercaGiocatorePerNome(nome) {
-        try {
-            const { data, error } = await supabase
-                .from('giocatori')
-                .select('*')
-                .ilike('nome', `%${nome}%`)
-                .limit(10);
-            
-            if (error) {
-                console.error('Errore cercaGiocatorePerNome:', error);
-                return [];
-            }
-            
-            return data || [];
-            
-        } catch (error) {
-            console.error('Errore cercaGiocatorePerNome:', error);
-            return [];
-        }
-    },
-    
-    async getPartitePerSquadra(nomeSquadra) {
-        try {
-            const { data, error } = await supabase
-                .from('partite')
-                .select('*')
-                .or(`squadra_casa.eq.${nomeSquadra},squadra_ospite.eq.${nomeSquadra}`)
-                .order('data', { ascending: false });
-            
-            if (error) {
-                console.error('Errore getPartitePerSquadra:', error);
-                return [];
-            }
-            
-            return data || [];
-            
-        } catch (error) {
-            console.error('Errore getPartitePerSquadra:', error);
-            return [];
-        }
-    },
-    
-    // ============ FUNZIONI PER STATISTICHE AVANZATE ============
+    // ============ STATISTICHE ============
     async getCannonieri(limit = 10) {
         try {
             const { data, error } = await supabase
@@ -586,14 +486,14 @@ const DatabaseManager = {
                 .limit(limit);
             
             if (error) {
-                console.error('Errore getCannonieri:', error);
+                console.error('❌ Errore getCannonieri:', error);
                 return [];
             }
             
             return data || [];
             
         } catch (error) {
-            console.error('Errore getCannonieri:', error);
+            console.error('❌ Errore getCannonieri:', error);
             return [];
         }
     },
@@ -608,62 +508,18 @@ const DatabaseManager = {
                 .limit(limit);
             
             if (error) {
-                console.error('Errore getMiglioriGiocatori:', error);
+                console.error('❌ Errore getMiglioriGiocatori:', error);
                 return [];
             }
             
             return data || [];
             
         } catch (error) {
-            console.error('Errore getMiglioriGiocatori:', error);
+            console.error('❌ Errore getMiglioriGiocatori:', error);
             return [];
-        }
-    },
-    
-    async getMiglioriPortieri(limit = 10) {
-        try {
-            const { data, error } = await supabase
-                .from('giocatori')
-                .select('*')
-                .eq('ruolo', 'Portiere')
-                .gt('premi_miglior_portiere', 0)
-                .order('punteggio_totale', { ascending: false })
-                .limit(limit);
-            
-            if (error) {
-                console.error('Errore getMiglioriPortieri:', error);
-                return [];
-            }
-            
-            return data || [];
-            
-        } catch (error) {
-            console.error('Errore getMiglioriPortieri:', error);
-            return [];
-        }
-    },
-    
-    // ============ FUNZIONE PER REAL-TIME UPDATES ============
-    setupRealtime(callback) {
-        try {
-            const subscription = supabase
-                .channel('rovigoal-updates')
-                .on('postgres_changes', 
-                    { event: '*', schema: 'public' }, 
-                    (payload) => {
-                        callback(payload.table, payload.new, payload.old);
-                    }
-                )
-                .subscribe();
-            
-            return subscription;
-            
-        } catch (error) {
-            console.error('Errore setupRealtime:', error);
-            return null;
         }
     }
 };
 
-// ESPORTAZIONE CORRETTA
+// ESPORTAZIONE
 export default DatabaseManager;

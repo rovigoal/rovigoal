@@ -286,6 +286,29 @@
             
             <div class="premi-section">
                 <h3>⭐ Premi della Finale</h3>
+
+                <div class="premi-section" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border: 2px solid #4CAF50;">
+    <h3>⚽ MARCATORI</h3>
+    
+    <div id="marcatoriContainer">
+        <!-- I marcatori saranno aggiunti qui dinamicamente -->
+        <div class="marcatore-item" style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center;">
+            <select class="marcatore-giocatore" style="flex: 2;">
+                <option value="">Seleziona giocatore...</option>
+            </select>
+            <select class="marcatore-squadra" style="flex: 1;">
+                <option value="casa">${finale.squadra_casa}</option>
+                <option value="ospite">${finale.squadra_ospite}</option>
+            </select>
+            <input type="number" class="marcatore-minuto" placeholder="Min." min="1" max="120" style="width: 80px;">
+            <button type="button" class="btn-rimuovi" style="background: #dc143c; color: white; border: none; border-radius: 5px; padding: 5px 10px; cursor: pointer;">✕</button>
+        </div>
+    </div>
+    
+    <button type="button" class="btn" onclick="aggiungiMarcatore()" style="background: #4CAF50; margin-top: 10px; width: auto; padding: 10px 20px;">
+        ➕ AGGIUNGI MARCATORE
+    </button>
+</div>
                 
                 <div class="form-group">
                     <label for="finaleMigliorGiocatore">🏆 Miglior Giocatore</label>

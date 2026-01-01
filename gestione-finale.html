@@ -220,11 +220,7 @@
         .marcatore-nome {
             font-weight: bold;
             color: #1e3c72;
-        }
-        
-        .marcatore-dettagli {
-            font-size: 0.9em;
-            color: #666;
+            font-size: 1.1em;
         }
         
         .btn-remove {
@@ -242,8 +238,7 @@
         }
         
         .marcatori-input-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
+            display: flex;
             gap: 10px;
             align-items: center;
             margin-bottom: 10px;
@@ -261,6 +256,7 @@
             align-items: center;
             justify-content: center;
             gap: 5px;
+            margin-top: 10px;
         }
         
         /* MOBILE */
@@ -294,7 +290,7 @@
             }
             
             .marcatori-input-row {
-                grid-template-columns: 1fr;
+                flex-direction: column;
                 gap: 5px;
             }
         }
@@ -362,16 +358,12 @@
                 <h3 style="margin: 0;">Pareggio 0-0</h3>
             </div>
             
-            <!-- SEZIONE MARCATORI -->
+            <!-- SEZIONE MARCATORI SEMPLIFICATA -->
             <div class="marcatori-section">
                 <h3>⚽ Marcatori della Finale</h3>
                 
                 <div class="marcatori-input-row">
-                    <input type="text" id="nomeMarcatore" placeholder="Nome marcatore" class="form-control">
-                    <input type="number" id="minutoMarcatore" placeholder="Min." min="1" max="120">
-                    <select id="squadraMarcatore">
-                        <option value="">Squadra</option>
-                    </select>
+                    <input type="text" id="nomeMarcatore" placeholder="Nome marcatore" style="flex: 1;">
                 </div>
                 
                 <button type="button" class="btn-add" onclick="aggiungiMarcatore()">
@@ -460,15 +452,6 @@
                 // Aggiorna select
                 aggiornaSelectSquadre();
                 
-                // Popola squadraMarcatore
-                const selectSquadraMarc = document.getElementById('squadraMarcatore');
-                squadre.forEach(squadra => {
-                    const option = document.createElement('option');
-                    option.value = squadra.nome;
-                    option.textContent = squadra.nome;
-                    selectSquadraMarc.appendChild(option);
-                });
-                
                 // Se esiste finale, mostra i dati
                 if (finaleEsistente) {
                     mostraFinaleEsistente();
@@ -527,31 +510,25 @@
             });
         }
         
-        // AGGIUNGI MARCATORE
+        // AGGIUNGI MARCATORE (SOLO NOME)
         function aggiungiMarcatore() {
             const nome = document.getElementById('nomeMarcatore').value.trim();
-            const minuto = document.getElementById('minutoMarcatore').value;
-            const squadra = document.getElementById('squadraMarcatore').value;
             
-            if (!nome || !squadra) {
-                mostraAlert('Inserisci nome e squadra del marcatore', 'error');
+            if (!nome) {
+                mostraAlert('Inserisci il nome del marcatore', 'error');
                 return;
             }
             
-            // Aggiungi all'array
+            // Aggiungi all'array (solo nome)
             marcatori.push({
-                nome: nome,
-                minuto: minuto || 'N/D',
-                squadra: squadra
+                nome: nome
             });
             
             // Aggiorna visualizzazione
             aggiornaListaMarcatori();
             
-            // Pulisci campi
+            // Pulisci campo
             document.getElementById('nomeMarcatore').value = '';
-            document.getElementById('minutoMarcatore').value = '';
-            document.getElementById('squadraMarcatore').value = '';
         }
         
         // RIMUOVI MARCATORE
@@ -576,7 +553,6 @@
                     <div class="marcatore-item">
                         <div class="marcatore-info">
                             <span class="marcatore-nome">${marcatore.nome}</span>
-                            <span class="marcatore-dettagli">Squadra: ${marcatore.squadra} | Minuto: ${marcatore.minuto}</span>
                         </div>
                         <button class="btn-remove" onclick="rimuoviMarcatore(${index})">×</button>
                     </div>
@@ -654,7 +630,7 @@
                 finaleEsistente.marcatori.forEach(marcatore => {
                     marcatoriHTML += `
                         <div style="margin-bottom: 5px; padding: 8px; background: #f8f9fa; border-radius: 5px;">
-                            <strong>${marcatore.nome}</strong> (${marcatore.squadra}) - Minuto ${marcatore.minuto}
+                            <strong>${marcatore.nome}</strong>
                         </div>
                     `;
                 });
@@ -711,7 +687,7 @@
                     voto_portiere_casa: parseInt(document.getElementById('votoPortiereCasa').value) || null,
                     portiere_ospite: document.getElementById('portiereOspite').value,
                     voto_portiere_ospite: parseInt(document.getElementById('votoPortiereOspite').value) || null,
-                    marcatori: marcatori, // ARRAY DI MARCATORI
+                    marcatori: marcatori, // ARRAY DI MARCATORI (solo nome)
                     eventi: [] // Eventi della partita
                 };
                 

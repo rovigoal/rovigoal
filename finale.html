@@ -85,6 +85,14 @@
             margin-top: 20px;
         }
         
+        .portieri-section {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #28a745;
+            margin-top: 20px;
+        }
+        
         .btn-back {
             display: block;
             margin: 30px auto;
@@ -130,14 +138,12 @@
             margin-bottom: 8px;
             border-radius: 8px;
             border: 1px solid #dee2e6;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         
         .marcatore-nome {
             font-weight: bold;
             color: #1e3c72;
+            display: block;
         }
         
         .marcatore-dettagli {
@@ -210,7 +216,8 @@
             
             // Trova giocatori premiati
             const migliorGiocatore = giocatori.find(g => g.id === finale.miglior_giocatore);
-            const migliorPortiere = giocatori.find(g => g.id === finale.miglior_portiere);
+            const portiereCasa = giocatori.find(g => g.id === finale.portiere_casa);
+            const portiereOspite = giocatori.find(g => g.id === finale.portiere_ospite);
             
             // Determina vincitore
             let vincitore = '';
@@ -233,10 +240,8 @@
                 finale.marcatori.forEach((marcatore, index) => {
                     marcatoriHTML += `
                         <div class="marcatore-item">
-                            <div>
-                                <div class="marcatore-nome">${marcatore.nome}</div>
-                                <div class="marcatore-dettagli">Squadra: ${marcatore.squadra} | Minuto: ${marcatore.minuto}</div>
-                            </div>
+                            <span class="marcatore-nome">${marcatore.nome}</span>
+                            <span class="marcatore-dettagli">Squadra: ${marcatore.squadra} | Minuto: ${marcatore.minuto}</span>
                         </div>
                     `;
                 });
@@ -273,24 +278,35 @@
                     </div>
                     
                     <div class="premi-section">
-                        <h3 style="color: #1e3c72; margin-bottom: 15px;">🎖️ PREMI DELLA FINALE</h3>
+                        <h3 style="color: #1e3c72; margin-bottom: 15px;">🎖️ MIGLIOR GIOCATORE</h3>
                         
                         ${migliorGiocatore ? `
                             <div style="margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
-                                <div style="font-weight: bold; color: #1976D2;">🏆 MIGLIOR GIOCATORE</div>
-                                <div style="font-size: 1.2em; margin: 10px 0;">${migliorGiocatore.nome}</div>
+                                <div style="font-weight: bold; color: #1976D2;">🏆 ${migliorGiocatore.nome}</div>
                                 ${finale.voto_miglior_giocatore ? `
-                                    <div style="color: #FFD700; font-weight: bold;">Voto: ${finale.voto_miglior_giocatore}/10</div>
+                                    <div style="color: #FFD700; font-weight: bold; margin-top: 5px;">Voto: ${finale.voto_miglior_giocatore}/10</div>
+                                ` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="portieri-section">
+                        <h3 style="color: #1e3c72; margin-bottom: 15px;">🥅 PORTIERI</h3>
+                        
+                        ${portiereCasa ? `
+                            <div style="margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+                                <div style="font-weight: bold; color: #1976D2;">Portiere ${finale.squadra_casa}: ${portiereCasa.nome}</div>
+                                ${finale.voto_portiere_casa ? `
+                                    <div style="color: #28a745; font-weight: bold; margin-top: 5px;">Voto: ${finale.voto_portiere_casa}/10</div>
                                 ` : ''}
                             </div>
                         ` : ''}
                         
-                        ${migliorPortiere ? `
+                        ${portiereOspite ? `
                             <div style="margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
-                                <div style="font-weight: bold; color: #1976D2;">🥅 MIGLIOR PORTIERE</div>
-                                <div style="font-size: 1.2em; margin: 10px 0;">${migliorPortiere.nome}</div>
-                                ${finale.voto_miglior_portiere ? `
-                                    <div style="color: #FFD700; font-weight: bold;">Voto: ${finale.voto_miglior_portiere}/10</div>
+                                <div style="font-weight: bold; color: #1976D2;">Portiere ${finale.squadra_ospite}: ${portiereOspite.nome}</div>
+                                ${finale.voto_portiere_ospite ? `
+                                    <div style="color: #28a745; font-weight: bold; margin-top: 5px;">Voto: ${finale.voto_portiere_ospite}/10</div>
                                 ` : ''}
                             </div>
                         ` : ''}

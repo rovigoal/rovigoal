@@ -28,6 +28,7 @@
             margin-bottom: 20px;
             text-align: center;
             border: 3px solid gold;
+            position: relative;
         }
         
         .container {
@@ -35,7 +36,54 @@
             margin: 0 auto;
         }
         
-        /* TAB NAVIGATION */
+        /* STATO CONNESSIONE */
+        .connessione-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .connessione-ok {
+            background: #4CAF50;
+            color: white;
+            border: 2px solid #45a049;
+        }
+        
+        .connessione-caricamento {
+            background: #FFA500;
+            color: white;
+            border: 2px solid #FF8C00;
+        }
+        
+        .connessione-ko {
+            background: #f44336;
+            color: white;
+            border: 2px solid #d32f2f;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* TABS */
         .tabs {
             display: flex;
             background: white;
@@ -199,6 +247,37 @@
             color: #1e3c72;
         }
         
+        /* CONTROLLO GOL */
+        .gol-counter {
+            background: #e7f5ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            border: 2px solid #1e3c72;
+        }
+        
+        .gol-counter-ok {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        
+        .gol-counter-error {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+        
+        .gol-counter-info {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .gol-counter-detail {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
         /* EVENTI */
         .eventi-container {
             max-height: 300px;
@@ -232,37 +311,6 @@
             grid-template-columns: 1fr 1fr 1fr auto;
             gap: 10px;
             align-items: center;
-        }
-        
-        /* GOL COUNTER */
-        .gol-counter {
-            background: #e7f5ff;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-            text-align: center;
-            border: 2px solid #1e3c72;
-        }
-        
-        .gol-counter-ok {
-            background: #d4edda;
-            border-color: #28a745;
-        }
-        
-        .gol-counter-error {
-            background: #f8d7da;
-            border-color: #dc3545;
-        }
-        
-        .gol-counter-info {
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .gol-counter-detail {
-            font-size: 0.9em;
-            color: #666;
         }
         
         /* PARTITE LIST */
@@ -340,6 +388,13 @@
             color: white;
         }
         
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            padding: 8px 15px;
+            font-size: 0.9em;
+        }
+        
         .nav-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -356,7 +411,7 @@
             font-size: 1em;
             display: flex;
             align-items: center;
-            justify-items: center;
+            justify-content: center;
             gap: 8px;
         }
         
@@ -374,20 +429,6 @@
             background: #28a745;
             color: white;
             grid-column: span 2;
-        }
-        
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-            padding: 8px 15px;
-            font-size: 0.9em;
-        }
-        
-        .btn-warning {
-            background: #ffc107;
-            color: #333;
-            padding: 8px 15px;
-            font-size: 0.9em;
         }
         
         .btn-back {
@@ -429,63 +470,11 @@
             border: 1px solid #ffeaa7;
         }
         
-        .required-field::after {
-            content: " *";
-            color: #dc143c;
-        }
-        
         /* EMPTY STATE */
         .empty-state {
             text-align: center;
             padding: 40px;
             color: #666;
-        }
-        
-        /* STATO CONNESSIONE */
-        .connessione-status {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: bold;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .connessione-ok {
-            background: #4CAF50;
-            color: white;
-            border: 2px solid #45a049;
-        }
-        
-        .connessione-caricamento {
-            background: #FFA500;
-            color: white;
-            border: 2px solid #FF8C00;
-        }
-        
-        .connessione-ko {
-            background: #f44336;
-            color: white;
-            border: 2px solid #d32f2f;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
         
         /* RESPONSIVE */
@@ -568,7 +557,7 @@
             <div class="step-content active" id="step1">
                 <h2>Squadre</h2>
                 <div class="form-group">
-                    <label class="required-field">Squadre</label>
+                    <label>Squadre *</label>
                     <div class="squadre-row">
                         <select id="squadraCasa">
                             <option value="">Squadra Casa</option>
@@ -585,7 +574,7 @@
             <div class="step-content" id="step2">
                 <h2>Risultato</h2>
                 <div class="form-group">
-                    <label class="required-field">Punteggio</label>
+                    <label>Punteggio *</label>
                     <div class="gol-row">
                         <input type="number" id="golCasa" min="0" value="0" class="gol-input" onchange="aggiornaContatoreGol()">
                         <div class="gol-separator">-</div>
@@ -645,38 +634,38 @@
                 <h2>Premi</h2>
                 
                 <div class="form-group">
-                    <label class="required-field">🏆 Miglior Giocatore</label>
+                    <label>🏆 Miglior Giocatore *</label>
                     <select id="migliorGiocatore">
                         <option value="">Seleziona...</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
-                    <label class="required-field">Voto (1-10)</label>
+                    <label>Voto (1-10) *</label>
                     <input type="number" id="votoMigliorGiocatore" min="1" max="10" placeholder="8">
                 </div>
                 
                 <div class="form-group">
-                    <label class="required-field">🥅 Portiere Casa</label>
+                    <label>🥅 Portiere Casa *</label>
                     <select id="portiereCasa">
                         <option value="">Seleziona...</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
-                    <label class="required-field">Voto (1-10)</label>
+                    <label>Voto (1-10) *</label>
                     <input type="number" id="votoPortiereCasa" min="1" max="10" placeholder="7">
                 </div>
                 
                 <div class="form-group">
-                    <label class="required-field">🥅 Portiere Ospite</label>
+                    <label>🥅 Portiere Ospite *</label>
                     <select id="portiereOspite">
                         <option value="">Seleziona...</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
-                    <label class="required-field">Voto (1-10)</label>
+                    <label>Voto (1-10) *</label>
                     <input type="number" id="votoPortiereOspite" min="1" max="10" placeholder="7">
                 </div>
             </div>
@@ -710,6 +699,7 @@
     </div>
     
     <script type="module">
+        // Importa il gestore database
         import database from './database-supabase.js';
         
         // VARIABILI GLOBALI
@@ -723,32 +713,52 @@
         let golSegnatiCasa = 0;
         let golSegnatiOspite = 0;
         
+        // FUNZIONE PER AGGIORNARE STATO CONNESSIONE
+        function aggiornaStatoConnessione(stato) {
+            const statusElement = document.getElementById('connessioneStatus');
+            
+            switch(stato) {
+                case 'caricamento':
+                    statusElement.className = 'connessione-status connessione-caricamento';
+                    statusElement.innerHTML = '<div class="loading"></div> Caricamento...';
+                    break;
+                    
+                case 'ok':
+                    statusElement.className = 'connessione-status connessione-ok';
+                    statusElement.innerHTML = '✓ Connesso al database';
+                    break;
+                    
+                case 'ko':
+                    statusElement.className = 'connessione-status connessione-ko';
+                    statusElement.innerHTML = '✗ Database offline';
+                    break;
+            }
+        }
+        
+        // FUNZIONE PER MOSTRARE ALERT
+        function mostraAlert(messaggio, tipo) {
+            const alert = document.getElementById('alert' + tipo.charAt(0).toUpperCase() + tipo.slice(1));
+            alert.textContent = messaggio;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+        
         // INIZIALIZZAZIONE
         document.addEventListener('DOMContentLoaded', async () => {
-            aggiornaStatoConnessione('caricamento');
-            
             // Controlla accesso admin
             if (sessionStorage.getItem('admin_accesso') !== 'true') {
-                alert('Accesso non autorizzato!');
+                alert('Accesso non autorizzato! Reindirizzamento...');
                 window.location.href = 'main.html';
                 return;
             }
             
+            aggiornaStatoConnessione('caricamento');
+            
             try {
                 // Carica dati iniziali
-                await caricaDatiIniziali();
-                aggiornaStatoConnessione('ok');
-                
-            } catch (error) {
-                console.error('Errore inizializzazione:', error);
-                aggiornaStatoConnessione('ko');
-                mostraAlert('Errore nel caricamento dei dati. Riprova più tardi.', 'error');
-            }
-        });
-        
-        // CARICA DATI INIZIALI
-        async function caricaDatiIniziali() {
-            try {
                 const [squadreData, giocatoriData, partiteData] = await Promise.all([
                     database.getSquadre(),
                     database.getGiocatori(),
@@ -762,23 +772,21 @@
                 // Popola select squadre
                 aggiornaSelectSquadre();
                 
-                // Carica lista partite se siamo nel tab gestisci
-                if (document.querySelector('#tab-gestisci').classList.contains('active')) {
-                    caricaListaPartite();
-                }
+                aggiornaStatoConnessione('ok');
                 
             } catch (error) {
-                console.error('Errore caricamento dati:', error);
-                throw error;
+                console.error('Errore caricamento:', error);
+                aggiornaStatoConnessione('ko');
+                mostraAlert('Errore nel caricamento dei dati', 'error');
             }
-        }
+        });
         
         // AGGIORNA SELECT SQUADRE
         function aggiornaSelectSquadre() {
             const selectCasa = document.getElementById('squadraCasa');
             const selectOspite = document.getElementById('squadraOspite');
             
-            // Pulisci options (mantieni solo la prima)
+            // Pulisci options
             while (selectCasa.options.length > 1) selectCasa.remove(1);
             while (selectOspite.options.length > 1) selectOspite.remove(1);
             
@@ -792,7 +800,7 @@
                 const optionOspite = document.createElement('option');
                 optionOspite.value = squadra.nome;
                 optionOspite.textContent = squadra.nome;
-                selectOspite.appendChild(optionOspite.cloneNode(true));
+                selectOspite.appendChild(optionOspite);
             });
         }
         
@@ -805,7 +813,7 @@
             document.getElementById('golRisultatoCasa').textContent = golCasa;
             document.getElementById('golRisultatoOspite').textContent = golOspite;
             
-            // Calcola gol segnati negli eventi
+            // Calcola gol segnati
             golSegnatiCasa = eventi.filter(e => e.tipo === 'gol' && e.squadra === 'casa').length;
             golSegnatiOspite = eventi.filter(e => e.tipo === 'gol' && e.squadra === 'ospite').length;
             
@@ -853,7 +861,7 @@
                 return;
             }
             
-            // Filtra giocatori della squadra
+            // Filtra giocatori
             const giocatoriSquadra = giocatori.filter(g => g.squadra === nomeSquadra);
             
             if (giocatoriSquadra.length === 0) {
@@ -929,12 +937,10 @@
                     case 'esp': icona = '🟥'; break;
                 }
                 
-                let coloreSquadra = evento.squadra === 'casa' ? '#1e3c72' : '#dc143c';
-                
                 html += `
                     <div class="evento-item">
                         <div>
-                            <span style="color: ${coloreSquadra}; font-weight: bold;">
+                            <span style="color: ${evento.squadra === 'casa' ? '#1e3c72' : '#dc143c'}; font-weight: bold;">
                                 ${evento.squadra === 'casa' ? '🏠' : '🚌'}
                             </span>
                             ${icona} ${evento.giocatoreNome}
@@ -960,77 +966,6 @@
                 if (eventoRimosso.tipo === 'gol') {
                     aggiornaContatoreGol();
                 }
-                
-                mostraAlert('Evento rimosso!', 'success');
-            }
-        }
-        
-        // VALIDA STEP
-        function validaStep(step) {
-            switch(step) {
-                case 1:
-                    const casa = document.getElementById('squadraCasa').value;
-                    const ospite = document.getElementById('squadraOspite').value;
-                    
-                    if (!casa || !ospite) {
-                        mostraAlert('Seleziona entrambe le squadre!', 'error');
-                        return false;
-                    }
-                    
-                    if (casa === ospite) {
-                        mostraAlert('Le squadre devono essere diverse!', 'error');
-                        return false;
-                    }
-                    
-                    return true;
-                    
-                case 2:
-                    const golCasa = document.getElementById('golCasa').value;
-                    const golOspite = document.getElementById('golOspite').value;
-                    
-                    if (golCasa === '' || golOspite === '') {
-                        mostraAlert('Inserisci il risultato!', 'error');
-                        return false;
-                    }
-                    
-                    return true;
-                    
-                case 3:
-                    // Controlla che i gol negli eventi coincidano con il risultato
-                    aggiornaContatoreGol();
-                    
-                    if (golCasa !== golSegnatiCasa || golOspite !== golSegnatiOspite) {
-                        mostraAlert(
-                            `❌ Errore: i gol non coincidono!\n\n` +
-                            `Risultato: ${golCasa} - ${golOspite}\n` +
-                            `Gol segnati: ${golSegnatiCasa} (casa) - ${golSegnatiOspite} (ospite)\n\n` +
-                            `Aggiungi tutti i gol segnati negli eventi prima di procedere.`,
-                            'error'
-                        );
-                        return false;
-                    }
-                    
-                    return true;
-                    
-                case 4:
-                    const campi = [
-                        'migliorGiocatore', 'votoMigliorGiocatore',
-                        'portiereCasa', 'votoPortiereCasa',
-                        'portiereOspite', 'votoPortiereOspite'
-                    ];
-                    
-                    for (let campo of campi) {
-                        const valore = document.getElementById(campo).value;
-                        if (!valore) {
-                            mostraAlert('Compila tutti i campi dei premi!', 'error');
-                            return false;
-                        }
-                    }
-                    
-                    return true;
-                    
-                default:
-                    return true;
             }
         }
         
@@ -1106,6 +1041,75 @@
             }
         }
         
+        // VALIDA STEP
+        function validaStep(step) {
+            switch(step) {
+                case 1:
+                    const casa = document.getElementById('squadraCasa').value;
+                    const ospite = document.getElementById('squadraOspite').value;
+                    
+                    if (!casa || !ospite) {
+                        mostraAlert('Seleziona entrambe le squadre!', 'error');
+                        return false;
+                    }
+                    
+                    if (casa === ospite) {
+                        mostraAlert('Le squadre devono essere diverse!', 'error');
+                        return false;
+                    }
+                    
+                    return true;
+                    
+                case 2:
+                    const golCasa = document.getElementById('golCasa').value;
+                    const golOspite = document.getElementById('golOspite').value;
+                    
+                    if (golCasa === '' || golOspite === '') {
+                        mostraAlert('Inserisci il risultato!', 'error');
+                        return false;
+                    }
+                    
+                    return true;
+                    
+                case 3:
+                    // Controlla che i gol negli eventi coincidano con il risultato
+                    aggiornaContatoreGol();
+                    
+                    if (golCasa !== golSegnatiCasa || golOspite !== golSegnatiOspite) {
+                        mostraAlert(
+                            `❌ Errore: i gol non coincidono!\n\n` +
+                            `Risultato: ${golCasa} - ${golOspite}\n` +
+                            `Gol segnati: ${golSegnatiCasa} (casa) - ${golSegnatiOspite} (ospite)\n\n` +
+                            `Aggiungi tutti i gol segnati negli eventi prima di procedere.`,
+                            'error'
+                        );
+                        return false;
+                    }
+                    
+                    return true;
+                    
+                case 4:
+                    const campi = [
+                        'migliorGiocatore', 'votoMigliorGiocatore',
+                        'portiereCasa', 'votoPortiereCasa',
+                        'portiereOspite', 'votoPortiereOspite'
+                    ];
+                    
+                    for (let campo of campi) {
+                        const valore = document.getElementById(campo).value;
+                        if (!valore) {
+                            mostraAlert('Compila tutti i campi dei premi!', 'error');
+                            return false;
+                        }
+                    }
+                    
+                    return true;
+                    
+                default:
+                    return true;
+            }
+        }
+        
         // NAVIGAZIONE STEPS
         function prevStep() {
             if (stepCorrente > 1) {
@@ -1146,7 +1150,7 @@
                 };
                 
                 // Salva partita nel database
-                const partitaSalvata = await database.aggiungiPartita(partita);
+                await database.aggiungiPartita(partita);
                 
                 // Aggiorna statistiche giocatori per eventi
                 for (let evento of eventi) {
@@ -1207,19 +1211,49 @@
                 const risultatoOspite = partita.gol_ospite > partita.gol_casa ? 'vittoria' : 
                                        (partita.gol_ospite < partita.gol_casa ? 'sconfitta' : 'pareggio');
                 
-                await aggiornaClassificaSquadra(partita.squadra_casa, risultatoCasa, partita.gol_casa, partita.gol_ospite);
-                await aggiornaClassificaSquadra(partita.squadra_ospite, risultatoOspite, partita.gol_ospite, partita.gol_casa);
+                const squadraCasaObj = squadre.find(s => s.nome === partita.squadra_casa);
+                const squadraOspiteObj = squadre.find(s => s.nome === partita.squadra_ospite);
                 
-                // Aggiorna lista partite
-                await caricaDatiIniziali();
+                if (squadraCasaObj) {
+                    await database.aggiornaSquadra(squadraCasaObj.id, {
+                        partite_giocate: (squadraCasaObj.partite_giocate || 0) + 1,
+                        gol_fatti: (squadraCasaObj.gol_fatti || 0) + partita.gol_casa,
+                        gol_subiti: (squadraCasaObj.gol_subiti || 0) + partita.gol_ospite,
+                        vittorie: (squadraCasaObj.vittorie || 0) + (risultatoCasa === 'vittoria' ? 1 : 0),
+                        pareggi: (squadraCasaObj.pareggi || 0) + (risultatoCasa === 'pareggio' ? 1 : 0),
+                        sconfitte: (squadraCasaObj.sconfitte || 0) + (risultatoCasa === 'sconfitta' ? 1 : 0),
+                        punti: (squadraCasaObj.punti || 0) + (risultatoCasa === 'vittoria' ? 3 : (risultatoCasa === 'pareggio' ? 1 : 0))
+                    });
+                }
+                
+                if (squadraOspiteObj) {
+                    await database.aggiornaSquadra(squadraOspiteObj.id, {
+                        partite_giocate: (squadraOspiteObj.partite_giocate || 0) + 1,
+                        gol_fatti: (squadraOspiteObj.gol_fatti || 0) + partita.gol_ospite,
+                        gol_subiti: (squadraOspiteObj.gol_subiti || 0) + partita.gol_casa,
+                        vittorie: (squadraOspiteObj.vittorie || 0) + (risultatoOspite === 'vittoria' ? 1 : 0),
+                        pareggi: (squadraOspiteObj.pareggi || 0) + (risultatoOspite === 'pareggio' ? 1 : 0),
+                        sconfitte: (squadraOspiteObj.sconfitte || 0) + (risultatoOspite === 'sconfitta' ? 1 : 0),
+                        punti: (squadraOspiteObj.punti || 0) + (risultatoOspite === 'vittoria' ? 3 : (risultatoOspite === 'pareggio' ? 1 : 0))
+                    });
+                }
+                
+                // Ricarica i dati
+                const [squadreData, giocatoriData, partiteData] = await Promise.all([
+                    database.getSquadre(),
+                    database.getGiocatori(),
+                    database.getPartite()
+                ]);
+                
+                squadre = squadreData || [];
+                giocatori = giocatoriData || [];
+                partite = partiteData || [];
                 
                 // Mostra successo
                 mostraAlert(`✅ Partita ${partita.squadra_casa} ${partita.gol_casa}-${partita.gol_ospite} ${partita.squadra_ospite} salvata con successo!`, 'success');
                 
                 // Reset form
-                setTimeout(() => {
-                    resetForm();
-                }, 2000);
+                resetForm();
                 
                 aggiornaStatoConnessione('ok');
                 
@@ -1230,32 +1264,8 @@
             }
         }
         
-        // AGGIORNA CLASSIFICA SQUADRA
-        async function aggiornaClassificaSquadra(nomeSquadra, risultato, golFatti, golSubiti) {
-            const squadra = squadre.find(s => s.nome === nomeSquadra);
-            if (!squadra) return;
-            
-            const update = {
-                partite_giocate: (squadra.partite_giocate || 0) + 1,
-                gol_fatti: (squadra.gol_fatti || 0) + golFatti,
-                gol_subiti: (squadra.gol_subiti || 0) + golSubiti
-            };
-            
-            if (risultato === 'vittoria') {
-                update.vittorie = (squadra.vittorie || 0) + 1;
-                update.punti = (squadra.punti || 0) + 3;
-            } else if (risultato === 'pareggio') {
-                update.pareggi = (squadra.pareggi || 0) + 1;
-                update.punti = (squadra.punti || 0) + 1;
-            } else if (risultato === 'sconfitta') {
-                update.sconfitte = (squadra.sconfitte || 0) + 1;
-            }
-            
-            await database.aggiornaSquadra(squadra.id, update);
-        }
-        
         // CARICA LISTA PARTITE
-        async function caricaListaPartite() {
+        function caricaListaPartite() {
             const container = document.getElementById('listaPartite');
             const emptyState = document.getElementById('emptyPartite');
             
@@ -1311,47 +1321,34 @@
             container.innerHTML = html;
         }
         
-       // ELIMINA PARTITA - VERSIONE CORRETTA
-async function eliminaPartita(partitaId, nomePartita) {
-    if (!confirm(`⚠️ SEI SICURO DI VOLER ELIMINARE QUESTA PARTITA?\n\n"${nomePartita}"\n\nQuesta operazione:\n• Cancella la partita\n• NON aggiorna le statistiche dei giocatori\n• NON aggiorna la classifica delle squadre\n\nL'operazione è irreversibile!`)) {
-        return;
-    }
-    
-    try {
-        aggiornaStatoConnessione('caricamento');
-        
-        // Prima recupera i dati della partita
-        const partita = partite.find(p => p.id === partitaId);
-        if (!partita) {
-            throw new Error('Partita non trovata');
+        // ELIMINA PARTITA
+        async function eliminaPartita(partitaId, nomePartita) {
+            if (!confirm(`⚠️ SEI SICURO DI VOLER ELIMINARE QUESTA PARTITA?\n\n"${nomePartita}"\n\nQuesta operazione è irreversibile!`)) {
+                return;
+            }
+            
+            try {
+                aggiornaStatoConnessione('caricamento');
+                
+                // Elimina la partita dal database
+                await database.eliminaPartita(partitaId);
+                
+                // Rimuovi la partita dalla lista locale
+                partite = partite.filter(p => p.id !== partitaId);
+                
+                // Aggiorna la visualizzazione
+                caricaListaPartite();
+                
+                mostraAlert(`✅ Partita eliminata con successo!`, 'success');
+                
+                aggiornaStatoConnessione('ok');
+                
+            } catch (error) {
+                console.error('Errore eliminazione partita:', error);
+                mostraAlert(`❌ Errore nell'eliminazione della partita: ${error.message}`, 'error');
+                aggiornaStatoConnessione('ko');
+            }
         }
-        
-        // NOTA: Per una versione completa, qui dovremmo:
-        // 1. Trovare tutti i giocatori coinvolti
-        // 2. Sottrarre i gol/ammonizioni/espulsioni
-        // 3. Sottrarre i premi assegnati
-        // 4. Aggiornare la classifica delle squadre
-        // Ma per semplicità, per ora eliminiamo solo la partita
-        
-        // Elimina la partita dal database
-        await database.eliminaPartita(partitaId);
-        
-        // Rimuovi la partita dalla lista locale
-        partite = partite.filter(p => p.id !== partitaId);
-        
-        // Aggiorna la visualizzazione
-        caricaListaPartite();
-        
-        mostraAlert(`✅ Partita "${nomePartita}" eliminata con successo!`, 'success');
-        
-        aggiornaStatoConnessione('ok');
-        
-    } catch (error) {
-        console.error('Errore eliminazione partita:', error);
-        mostraAlert(`❌ Errore nell'eliminazione della partita: ${error.message}`, 'error');
-        aggiornaStatoConnessione('ko');
-    }
-}
         
         // RESET FORM
         function resetForm() {
@@ -1372,9 +1369,6 @@ async function eliminaPartita(partitaId, nomePartita) {
             
             stepCorrente = 1;
             cambiaStep(1);
-            
-            // Torna al tab crea partita
-            apriTab('crea');
         }
         
         // CAMBIA TAB
@@ -1398,41 +1392,7 @@ async function eliminaPartita(partitaId, nomePartita) {
             }
         }
         
-        // FUNZIONI AUSILIARIE
-        function mostraAlert(messaggio, tipo) {
-            const alert = document.getElementById('alert' + tipo.charAt(0).toUpperCase() + tipo.slice(1));
-            alert.textContent = messaggio;
-            alert.style.display = 'block';
-            
-            // Scrolla all'alert
-            alert.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 5000);
-        }
-        
-        function aggiornaStatoConnessione(stato) {
-            const statusElement = document.getElementById('connessioneStatus');
-            
-            switch(stato) {
-                case 'caricamento':
-                    statusElement.className = 'connessione-status connessione-caricamento';
-                    statusElement.innerHTML = '<div class="loading"></div> Caricamento...';
-                    break;
-                    
-                case 'ok':
-                    statusElement.className = 'connessione-status connessione-ok';
-                    statusElement.innerHTML = '✓ Connesso al database';
-                    break;
-                    
-                case 'ko':
-                    statusElement.className = 'connessione-status connessione-ko';
-                    statusElement.innerHTML = '✗ Database offline';
-                    break;
-            }
-        }
-        
+        // TORNA INDIETRO
         function tornaIndietro() {
             window.location.href = 'admin.html';
         }

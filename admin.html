@@ -342,52 +342,42 @@
                 mostraAlert('Errore di connessione al database. Riprova più tardi.', 'error');
             }
         });
+        // RESET COMPLETO DATABASE (versione corretta)
+async function resetDatabase() {
+    if (!confirm('⚠️ ATTENZIONE! Vuoi ELIMINARE TUTTI i dati?\n\nQuesta operazione:\n• Elimina TUTTE le squadre\n• Elimina TUTTI i giocatori\n• Elimina TUTTE le partite\n• Elimina la finale\n\nL\'operazione è IRREVERSIBILE!')) {
+        return;
+    }
+    
+    if (!confirm('⛔ SEI ASSOLUTAMENTE SICURO?\n\nDigita "ELIMINA" per confermare:')) {
+        return;
+    }
+    
+    const conferma = prompt('Digita "ELIMINA" per procedere:');
+    if (conferma !== 'ELIMINA') {
+        mostraAlert('Operazione annullata', 'error');
+        return;
+    }
+    
+    try {
+        aggiornaStatoConnessione('caricamento');
         
-        // RESET COMPLETO DATABASE (versione semplificata)
-        async function resetDatabase() {
-            if (!confirm('⚠️ ATTENZIONE! Vuoi ELIMINARE TUTTI i dati?\n\nQuesta operazione:\n• Elimina TUTTE le squadre\n• Elimina TUTTI i giocatori\n• Elimina TUTTE le partite\n• Elimina la finale\n\nL\'operazione è IRREVERSIBILE!')) {
-                return;
-            }
-            
-            if (!confirm('⛔ SEI ASSOLUTAMENTE SICURO?\n\nDigita "ELIMINA" per confermare:')) {
-                return;
-            }
-            
-            const conferma = prompt('Digita "ELIMINA" per procedere:');
-            if (conferma !== 'ELIMINA') {
-                mostraAlert('Operazione annullata', 'error');
-                return;
-            }
-            
-            try {
-                aggiornaStatoConnessione('caricamento');
-                
-                // Nota: Questa funzione eliminaTutto() non esiste nel tuo database-supabase.js
-                // Devi crearla o usare funzioni separate
-                
-                // Se non hai la funzione eliminaTutto(), mostra un messaggio
-                mostraAlert('⚠️ Funzione reset non implementata. Contatta lo sviluppatore.', 'error');
-                
-                // Oppure, se vuoi implementarla, aggiungi al database-supabase.js:
-                /*
-                async eliminaTutto() {
-                    // Elimina in ordine per evitare errori di foreign key
-                    await supabase.from('giocatori').delete().neq('id', 0);
-                    await supabase.from('partite').delete().neq('id', 0);
-                    await supabase.from('finale').delete().neq('id', 0);
-                    await supabase.from('squadre').delete().neq('id', 0);
-                    return true;
-                }
-                */
-                
-                aggiornaStatoConnessione('ok');
-                
-            } catch (error) {
-                console.error('❌ Errore reset database:', error);
-                mostraAlert('Errore nel reset del database: ' + error.message, 'error');
-                aggiornaStatoConnessione('ko');
-            }
+        // Ora la funzione eliminaTutto() esiste nel database-supabase.js corretto
+        const risultato = await database.eliminaTutto();
+        
+        if (risultato) {
+            mostraAlert('✅ Database completamente resettato!', 'success');
+            aggiornaStatoConnessione('ok');
+        } else {
+            mostraAlert('❌ Errore nel reset del database', 'error');
+            aggiornaStatoConnessione('ko');
         }
+        
+    } catch (error) {
+        console.error('❌ Errore reset database:', error);
+        mostraAlert('Errore nel reset del database: ' + error.message, 'error');
+        aggiornaStatoConnessione('ko');
+    }
+}
         
         // FUNZIONI AUSILIARIE
         function mostraAlert(messaggio, tipo = 'success') {
@@ -433,3 +423,4 @@
     </script>
 </body>
 </html>
+

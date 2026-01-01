@@ -272,19 +272,13 @@
             <a href="gestione-partite.html" class="admin-card">
                 <span class="admin-icon">📅</span>
                 <h3>GESTIONE PARTITE</h3>
-                <p>Crea nuove partite, registra risultati, assegna premi.</p>
+                <p>Crea nuove partite, gestisci ed elimina partite esistenti.</p>
             </a>
             
             <a href="gestione-finale.html" class="admin-card">
                 <span class="admin-icon">🏆</span>
                 <h3>GESTIONE FINALE</h3>
                 <p>Configura e gestisci la partita finale del torneo.</p>
-            </a>
-            
-            <a href="elimina-partite.html" class="admin-card">
-                <span class="admin-icon">🗑️</span>
-                <h3>ELIMINA PARTITE</h3>
-                <p>Visualizza, gestisci ed elimina partite esistenti.</p>
             </a>
         </div>
         
@@ -314,7 +308,6 @@
             // Controlla accesso admin
             const passwordSalvata = sessionStorage.getItem('admin_accesso');
             if (passwordSalvata !== 'true') {
-                // Chiedi password
                 const password = prompt("Inserisci la password ADMIN:");
                 if (password === "1246912.!!") {
                     sessionStorage.setItem('admin_accesso', 'true');
@@ -327,10 +320,7 @@
             }
             
             try {
-                // Testa connessione al database chiamando una funzione esistente
-                console.log("Test connessione al database...");
-                
-                // Prova a chiamare una funzione che esiste sicuramente
+                // Testa connessione
                 const squadre = await database.getSquadre();
                 const giocatori = await database.getGiocatori();
                 
@@ -368,7 +358,6 @@
             try {
                 aggiornaStatoConnessione('caricamento');
                 
-                // Ora la funzione eliminaTutto() esiste nel database-supabase.js corretto
                 const risultato = await database.eliminaTutto();
                 
                 if (risultato) {
@@ -394,10 +383,6 @@
             alertEl.innerHTML = messaggio;
             alertEl.style.display = 'block';
             
-            // Scrolla all'alert
-            alertEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            
-            // Nascondi dopo 5 secondi
             setTimeout(() => {
                 alertEl.style.display = 'none';
             }, 5000);

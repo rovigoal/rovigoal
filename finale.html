@@ -68,71 +68,21 @@
             border: 2px solid #dee2e6;
         }
         
-        .premi-section {
+        .marcatori-section {
             background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
             padding: 20px;
             border-radius: 10px;
             border: 2px solid #2196F3;
-            margin-top: 20px;
-        }
-        
-        .marcatori-section {
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            padding: 20px;
-            border-radius: 10px;
-            border: 2px solid #4CAF50;
-            margin-top: 20px;
+            margin: 20px 0;
             text-align: left;
         }
         
-        .marcatore-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 15px;
-            background: white;
-            margin: 8px 0;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
-        
-        .marcatore-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .marcatore-minuto {
-            font-weight: bold;
-            color: #1e3c72;
-            background: #e3f2fd;
-            padding: 4px 10px;
-            border-radius: 4px;
-            min-width: 50px;
-            text-align: center;
-        }
-        
-        .marcatore-nome {
-            font-weight: 600;
-        }
-        
-        .marcatore-squadra {
-            background: #fff3cd;
-            color: #856404;
-            padding: 5px 12px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.9em;
-        }
-        
-        .marcatore-squadra.casa {
-            background: #e3f2fd;
-            color: #1e3c72;
-        }
-        
-        .marcatore-squadra.ospite {
-            background: #fff3cd;
-            color: #856404;
+        .premi-section {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #ffc107;
+            margin-top: 20px;
         }
         
         .btn-back {
@@ -174,6 +124,27 @@
             margin: 20px auto;
         }
         
+        .marcatore-item {
+            background: white;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .marcatore-nome {
+            font-weight: bold;
+            color: #1e3c72;
+        }
+        
+        .marcatore-dettagli {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
         @keyframes spin { to { transform: rotate(360deg); } }
         
         @media (max-width: 768px) {
@@ -181,15 +152,6 @@
             .header h1 { font-size: 1.8em; }
             .risultato-finale { font-size: 2.5em; }
             .squadre-info { grid-template-columns: 1fr; }
-            .marcatore-item {
-                flex-direction: column;
-                gap: 10px;
-                align-items: flex-start;
-            }
-            .marcatore-info {
-                width: 100%;
-                justify-content: space-between;
-            }
         }
     </style>
 </head>
@@ -231,79 +193,63 @@
             }
         }
         
-       // MOSTRA FINALE
-function mostraFinale(finale, giocatori) {
-    const container = document.getElementById('contenutoFinale');
-    
-    if (!finale) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <h2>🏆 FINALE NON ANCORA GIOCATA</h2>
-                <p>La partita finale non è stata ancora configurata.</p>
-                <p>L'amministratore deve configurare la finale dall'area Admin.</p>
-            </div>
-        `;
-        return;
-    }
-    
-    // Trova giocatori premiati
-    const migliorGiocatore = giocatori.find(g => g.id === finale.miglior_giocatore);
-    const migliorPortiere = giocatori.find(g => g.id === finale.portiere_casa);
-    
-    // Determina vincitore
-    let vincitore = '';
-    if (finale.gol_casa > finale.gol_ospite) {
-        vincitore = finale.squadra_casa;
-    } else if (finale.gol_ospite > finale.gol_casa) {
-        vincitore = finale.squadra_ospite;
-    } else {
-        vincitore = 'PAREGGIO';
-    }
-    
-    // Prepara HTML per i marcatori
-    let marcatoriHTML = '';
-    if (finale.marcatori && finale.marcatori.length > 0) {
-        // Ordina i marcatori per minuto
-        const marcatoriOrdinati = finale.marcatori.sort((a, b) => a.minuto - b.minuto);
-        
-        marcatoriHTML = `
-            <div class="marcatori-section">
-                <h3>⚽ MARCATORI</h3>
-                <div style="margin-top: 15px;">
-                    ${marcatoriOrdinati.map(marcatore => {
-                        // CERCA IL GIOCATORE PER ID
-                        const giocatoreMarcatore = giocatori.find(g => g.id == marcatore.giocatore_id);
-                        const nomeGiocatore = giocatoreMarcatore ? giocatoreMarcatore.nome : 'Giocatore sconosciuto';
-                        const ruoloGiocatore = giocatoreMarcatore ? giocatoreMarcatore.ruolo : '';
-                        
-                        const squadraClasse = marcatore.squadra === 'casa' ? 'casa' : 'ospite';
-                        const squadraNome = marcatore.squadra === 'casa' ? finale.squadra_casa : finale.squadra_ospite;
-                        
-                        return `
-                            <div class="marcatore-item">
-                                <div class="marcatore-info">
-                                    <div class="marcatore-minuto">${marcatore.minuto}'</div>
-                                    <div class="marcatore-nome">
-                                        ${nomeGiocatore}
-                                        ${ruoloGiocatore ? `<span style="font-size: 0.8em; color: #666; margin-left: 5px;">(${ruoloGiocatore})</span>` : ''}
-                                    </div>
-                                </div>
-                                <div class="marcatore-squadra ${squadraClasse}">
-                                    ${squadraNome}
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #c8e6c9; color: #666; font-size: 0.9em;">
-                    Totale gol: ${finale.marcatori.length}
-                </div>
-            </div>
-        `;
-    }
+        // MOSTRA FINALE
+        function mostraFinale(finale, giocatori) {
+            const container = document.getElementById('contenutoFinale');
+            
+            if (!finale) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h2>🏆 FINALE NON ANCORA GIOCATA</h2>
+                        <p>La partita finale non è stata ancora configurata.</p>
+                        <p>L'amministratore deve configurare la finale dall'area Admin.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Trova giocatori premiati
+            const migliorGiocatore = giocatori.find(g => g.id === finale.miglior_giocatore);
+            const migliorPortiere = giocatori.find(g => g.id === finale.miglior_portiere);
+            
+            // Determina vincitore
+            let vincitore = '';
+            if (finale.gol_casa > finale.gol_ospite) {
+                vincitore = finale.squadra_casa;
+            } else if (finale.gol_ospite > finale.gol_casa) {
+                vincitore = finale.squadra_ospite;
+            } else {
+                vincitore = 'PAREGGIO';
+            }
+            
+            // Costruisci HTML marcatori
+            let marcatoriHTML = '';
+            if (finale.marcatori && finale.marcatori.length > 0) {
+                marcatoriHTML = `
+                    <div class="marcatori-section">
+                        <h3 style="color: #1e3c72; margin-bottom: 15px;">⚽ MARCATORI DELLA FINALE</h3>
+                `;
                 
+                finale.marcatori.forEach((marcatore, index) => {
+                    marcatoriHTML += `
+                        <div class="marcatore-item">
+                            <div>
+                                <div class="marcatore-nome">${marcatore.nome}</div>
+                                <div class="marcatore-dettagli">Squadra: ${marcatore.squadra} | Minuto: ${marcatore.minuto}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                marcatoriHTML += '</div>';
+            }
+            
             container.innerHTML = `
                 <div class="finale-box">
+                    <div style="color: #666; margin-bottom: 15px;">
+                        <strong>Data:</strong> ${finale.data || 'N/D'} ${finale.ora || ''}
+                    </div>
+                    
                     <div class="risultato-finale">
                         ${finale.squadra_casa} ${finale.gol_casa || 0} - ${finale.gol_ospite || 0} ${finale.squadra_ospite}
                     </div>
@@ -311,6 +257,8 @@ function mostraFinale(finale, giocatori) {
                     <div class="vincitore">
                         ${vincitore !== 'PAREGGIO' ? `🏆 CAMPIONE: ${vincitore} 🏆` : '⚖️ FINALE PAREGGIATA'}
                     </div>
+                    
+                    ${marcatoriHTML}
                     
                     <div class="squadre-info">
                         <div class="squadra-card">
@@ -325,7 +273,7 @@ function mostraFinale(finale, giocatori) {
                     </div>
                     
                     <div class="premi-section">
-                        <h3>🎖️ PREMI DELLA FINALE</h3>
+                        <h3 style="color: #1e3c72; margin-bottom: 15px;">🎖️ PREMI DELLA FINALE</h3>
                         
                         ${migliorGiocatore ? `
                             <div style="margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
@@ -341,14 +289,12 @@ function mostraFinale(finale, giocatori) {
                             <div style="margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
                                 <div style="font-weight: bold; color: #1976D2;">🥅 MIGLIOR PORTIERE</div>
                                 <div style="font-size: 1.2em; margin: 10px 0;">${migliorPortiere.nome}</div>
-                                ${finale.voto_portiere_casa ? `
-                                    <div style="color: #FFD700; font-weight: bold;">Voto: ${finale.voto_portiere_casa}/10</div>
+                                ${finale.voto_miglior_portiere ? `
+                                    <div style="color: #FFD700; font-weight: bold;">Voto: ${finale.voto_miglior_portiere}/10</div>
                                 ` : ''}
                             </div>
                         ` : ''}
                     </div>
-                    
-                    ${marcatoriHTML}
                 </div>
             `;
         }
@@ -386,4 +332,3 @@ function mostraFinale(finale, giocatori) {
     </script>
 </body>
 </html>
-

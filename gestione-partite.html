@@ -1,4 +1,3 @@
-[file name]: gestione-partite.html
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -708,8 +707,6 @@
         let partite = [];
         let squadre = [];
         let giocatori = [];
-        let golCasa = 0;
-        let golOspite = 0;
         let golSegnatiCasa = 0;
         let golSegnatiOspite = 0;
         
@@ -769,6 +766,12 @@
                 giocatori = giocatoriData || [];
                 partite = partiteData || [];
                 
+                console.log('Dati caricati:', {
+                    squadre: squadre.length,
+                    giocatori: giocatori.length,
+                    partite: partite.length
+                });
+                
                 // Popola select squadre
                 aggiornaSelectSquadre();
                 
@@ -787,8 +790,8 @@
             const selectOspite = document.getElementById('squadraOspite');
             
             // Pulisci options
-            while (selectCasa.options.length > 1) selectCasa.remove(1);
-            while (selectOspite.options.length > 1) selectOspite.remove(1);
+            selectCasa.innerHTML = '<option value="">Squadra Casa</option>';
+            selectOspite.innerHTML = '<option value="">Squadra Ospite</option>';
             
             // Aggiungi squadre
             squadre.forEach(squadra => {
@@ -806,14 +809,14 @@
         
         // AGGIORNA CONTATORE GOL
         function aggiornaContatoreGol() {
-            golCasa = parseInt(document.getElementById('golCasa').value) || 0;
-            golOspite = parseInt(document.getElementById('golOspite').value) || 0;
+            const golCasa = parseInt(document.getElementById('golCasa').value) || 0;
+            const golOspite = parseInt(document.getElementById('golOspite').value) || 0;
             
             // Aggiorna display
             document.getElementById('golRisultatoCasa').textContent = golCasa;
             document.getElementById('golRisultatoOspite').textContent = golOspite;
             
-            // Calcola gol segnati
+            // Calcola gol segnati dagli eventi
             golSegnatiCasa = eventi.filter(e => e.tipo === 'gol' && e.squadra === 'casa').length;
             golSegnatiOspite = eventi.filter(e => e.tipo === 'gol' && e.squadra === 'ospite').length;
             
@@ -841,7 +844,7 @@
             const squadraOspite = document.getElementById('squadraOspite').value;
             
             // Pulisci select
-            while (select.options.length > 1) select.remove(1);
+            select.innerHTML = '<option value="">Giocatore...</option>';
             
             if (!squadraSelezionata) {
                 select.innerHTML = '<option value="">Seleziona squadra</option>';
@@ -857,15 +860,20 @@
             }
             
             if (!nomeSquadra) {
-                select.innerHTML = '<option value="">Seleziona squadre nel passo 1</option>';
+                select.innerHTML = '<option value="">Seleziona prima le squadre nel passo 1</option>';
                 return;
             }
             
-            // Filtra giocatori
-            const giocatoriSquadra = giocatori.filter(g => g.squadra === nomeSquadra);
+            // Filtra giocatori della squadra selezionata
+            const giocatoriSquadra = giocatori.filter(g => 
+                g.squadra && g.squadra.toLowerCase() === nomeSquadra.toLowerCase()
+            );
             
             if (giocatoriSquadra.length === 0) {
-                select.innerHTML = '<option value="">Nessun giocatore</option>';
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = `Nessun giocatore trovato per ${nomeSquadra}`;
+                select.appendChild(option);
             } else {
                 giocatoriSquadra.forEach(g => {
                     const option = document.createElement('option');
@@ -914,7 +922,7 @@
             // Reset form
             document.getElementById('eventoTipo').value = '';
             document.getElementById('eventoSquadra').value = '';
-            document.getElementById('eventoGiocatore').value = '';
+            document.getElementById('eventoGiocatore').innerHTML = '<option value="">Giocatore...</option>';
             
             mostraAlert('Evento aggiunto!', 'success');
         }
@@ -1003,9 +1011,9 @@
             const selectPortiereOspite = document.getElementById('portiereOspite');
             
             // Pulisci
-            while (selectMiglior.options.length > 1) selectMiglior.remove(1);
-            while (selectPortiereCasa.options.length > 1) selectPortiereCasa.remove(1);
-            while (selectPortiereOspite.options.length > 1) selectPortiereOspite.remove(1);
+            selectMiglior.innerHTML = '<option value="">Seleziona...</option>';
+            selectPortiereCasa.innerHTML = '<option value="">Seleziona...</option>';
+            selectPortiereOspite.innerHTML = '<option value="">Seleziona...</option>';
             
             const squadraCasa = document.getElementById('squadraCasa').value;
             const squadraOspite = document.getElementById('squadraOspite').value;
@@ -1020,7 +1028,7 @@
             
             // Portiere casa
             if (squadraCasa) {
-                giocatori.filter(g => g.squadra === squadraCasa && g.ruolo === 'Portiere')
+                giocatori.filter(g => g.squadra.toLowerCase() === squadraCasa.toLowerCase() && g.ruolo === 'Portiere')
                     .forEach(p => {
                         const option = document.createElement('option');
                         option.value = p.id;
@@ -1031,7 +1039,7 @@
             
             // Portiere ospite
             if (squadraOspite) {
-                giocatori.filter(g => g.squadra === squadraOspite && g.ruolo === 'Portiere')
+                giocatori.filter(g => g.squadra.toLowerCase() === squadraOspite.toLowerCase() && g.ruolo === 'Portiere')
                     .forEach(p => {
                         const option = document.createElement('option');
                         option.value = p.id;
@@ -1075,10 +1083,13 @@
                     // Controlla che i gol negli eventi coincidano con il risultato
                     aggiornaContatoreGol();
                     
-                    if (golCasa !== golSegnatiCasa || golOspite !== golSegnatiOspite) {
+                    const golCasaTot = parseInt(document.getElementById('golCasa').value) || 0;
+                    const golOspiteTot = parseInt(document.getElementById('golOspite').value) || 0;
+                    
+                    if (golCasaTot !== golSegnatiCasa || golOspiteTot !== golSegnatiOspite) {
                         mostraAlert(
                             `❌ Errore: i gol non coincidono!\n\n` +
-                            `Risultato: ${golCasa} - ${golOspite}\n` +
+                            `Risultato: ${golCasaTot} - ${golOspiteTot}\n` +
                             `Gol segnati: ${golSegnatiCasa} (casa) - ${golSegnatiOspite} (ospite)\n\n` +
                             `Aggiungi tutti i gol segnati negli eventi prima di procedere.`,
                             'error'
@@ -1101,6 +1112,26 @@
                             mostraAlert('Compila tutti i campi dei premi!', 'error');
                             return false;
                         }
+                    }
+                    
+                    // Controlla che i voti siano validi
+                    const votoMiglior = parseInt(document.getElementById('votoMigliorGiocatore').value);
+                    const votoCasa = parseInt(document.getElementById('votoPortiereCasa').value);
+                    const votoOspite = parseInt(document.getElementById('votoPortiereOspite').value);
+                    
+                    if (votoMiglior < 1 || votoMiglior > 10) {
+                        mostraAlert('Il voto del miglior giocatore deve essere tra 1 e 10!', 'error');
+                        return false;
+                    }
+                    
+                    if (votoCasa < 1 || votoCasa > 10) {
+                        mostraAlert('Il voto del portiere casa deve essere tra 1 e 10!', 'error');
+                        return false;
+                    }
+                    
+                    if (votoOspite < 1 || votoOspite > 10) {
+                        mostraAlert('Il voto del portiere ospite deve essere tra 1 e 10!', 'error');
+                        return false;
                     }
                     
                     return true;
@@ -1150,7 +1181,7 @@
                 };
                 
                 // Salva partita nel database
-                await database.aggiungiPartita(partita);
+                const partitaSalvata = await database.aggiungiPartita(partita);
                 
                 // Aggiorna statistiche giocatori per eventi
                 for (let evento of eventi) {
@@ -1373,18 +1404,25 @@
         
         // CAMBIA TAB
         function apriTab(tabName) {
-            // Nascondi tutti i tab
-            document.querySelectorAll('.tab-content').forEach(tab => {
+            // Aggiorna tabs
+            document.querySelectorAll('.tab').forEach(tab => {
                 tab.classList.remove('active');
             });
             
+            // Trova e attiva il tab cliccato
             document.querySelectorAll('.tab').forEach(tab => {
+                if (tab.textContent.includes(tabName.toUpperCase())) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Nascondi tutti i contenuti
+            document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
             
             // Mostra tab selezionato
             document.getElementById('tab-' + tabName).classList.add('active');
-            event.target.classList.add('active');
             
             // Se stiamo aprendo il tab gestisci, carica la lista partite
             if (tabName === 'gestisci') {

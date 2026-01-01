@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rovigoal - Finale</title>
     <style>
-        /* REUSING SAME STYLES FROM gestione-partite.html */
         * {
             margin: 0;
             padding: 0;
@@ -258,16 +257,6 @@
             <h2>📝 Configura Finale</h2>
             
             <div class="form-group">
-                <label for="finaleData">Data Finale</label>
-                <input type="date" id="finaleData" value="">
-            </div>
-            
-            <div class="form-group">
-                <label for="finaleOra">Orario</label>
-                <input type="time" id="finaleOra" value="15:00">
-            </div>
-            
-            <div class="form-group">
                 <label>Squadre Finaliste</label>
                 <div class="squadre-row">
                     <select id="finaleSquadraCasa">
@@ -356,9 +345,6 @@
                 // Se esiste finale, mostra i dati
                 if (finaleEsistente) {
                     mostraFinaleEsistente();
-                } else {
-                    // Imposta data odierna
-                    document.getElementById('finaleData').value = new Date().toISOString().split('T')[0];
                 }
                 
             } catch (error) {
@@ -400,7 +386,7 @@
             });
             
             // Portieri per miglior portiere
-            const portieri = giocatori.filter(g => g.ruolo === 'Portiere');
+            const portieri = giocatori.filter(g => g.ruolo && g.ruolo.toLowerCase().includes('portiere'));
             portieri.forEach(portiere => {
                 const option = document.createElement('option');
                 option.value = portiere.id;
@@ -465,19 +451,16 @@
                 <div style="font-weight: bold; color: #1e3c72; margin: 10px 0; font-size: 1.2em;">
                     ${vincitore}
                 </div>
-                <div style="color: #666; margin: 5px 0;">
-                    ${finaleEsistente.data || 'N/D'} ${finaleEsistente.ora || ''}
-                </div>
                 ${migliorGiocatore ? `
                     <div style="margin-top: 15px;">
                         <strong>🏆 Miglior Giocatore:</strong> ${migliorGiocatore.nome}
-                        (Voto: ${finaleEsistente.voto_miglior_giocatore}/10)
+                        ${finaleEsistente.voto_miglior_giocatore ? `(Voto: ${finaleEsistente.voto_miglior_giocatore}/10)` : ''}
                     </div>
                 ` : ''}
                 ${migliorPortiere ? `
                     <div>
                         <strong>🥅 Miglior Portiere:</strong> ${migliorPortiere.nome}
-                        (Voto: ${finaleEsistente.voto_miglior_portiere}/10)
+                        ${finaleEsistente.voto_miglior_portiere ? `(Voto: ${finaleEsistente.voto_miglior_portiere}/10)` : ''}
                     </div>
                 ` : ''}
             `;
@@ -488,8 +471,8 @@
             try {
                 // Raccogli dati
                 const finaleData = {
-                    data: document.getElementById('finaleData').value,
-                    ora: document.getElementById('finaleOra').value,
+                    data: null, // Ora non richiesto
+                    ora: null, // Ora non richiesto
                     squadra_casa: document.getElementById('finaleSquadraCasa').value,
                     squadra_ospite: document.getElementById('finaleSquadraOspite').value,
                     gol_casa: parseInt(document.getElementById('finaleGolCasa').value) || 0,
@@ -498,15 +481,10 @@
                     voto_miglior_giocatore: parseInt(document.getElementById('finaleVotoMigliorGiocatore').value) || null,
                     miglior_portiere: document.getElementById('finaleMigliorPortiere').value,
                     voto_miglior_portiere: parseInt(document.getElementById('finaleVotoMigliorPortiere').value) || null,
-                    eventi: [] // Per la finale, gli eventi sono opzionali
+                    eventi: []
                 };
                 
                 // Validazione
-                if (!finaleData.data) {
-                    mostraAlert('Inserisci la data della finale', 'error');
-                    return;
-                }
-                
                 if (!finaleData.squadra_casa || !finaleData.squadra_ospite) {
                     mostraAlert('Seleziona entrambe le squadre finaliste', 'error');
                     return;
@@ -517,8 +495,13 @@
                     return;
                 }
                 
-                if (!finaleData.miglior_giocatore || !finaleData.voto_miglior_giocatore) {
-                    mostraAlert('Seleziona il miglior giocatore con voto', 'error');
+                if (!finaleData.miglior_giocatore) {
+                    mostraAlert('Seleziona il miglior giocatore', 'error');
+                    return;
+                }
+                
+                if (!finaleData.voto_miglior_giocatore || finaleData.voto_miglior_giocatore < 1 || finaleData.voto_miglior_giocatore > 10) {
+                    mostraAlert('Inserisci un voto valido per il miglior giocatore (1-10)', 'error');
                     return;
                 }
                 

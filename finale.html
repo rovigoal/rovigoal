@@ -163,83 +163,83 @@
             }
         }
         
-        // MOSTRA FINALE
-        function mostraFinale(finale, giocatori) {
-            const container = document.getElementById('contenutoFinale');
+// MOSTRA FINALE
+function mostraFinale(finale, giocatori) {
+    const container = document.getElementById('contenutoFinale');
+    
+    if (!finale) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <h2>🏆 FINALE NON ANCORA GIOCATA</h2>
+                <p>La partita finale non è stata ancora configurata.</p>
+                <p>L'amministratore deve configurare la finale dall'area Admin.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Trova giocatori premiati
+    const migliorGiocatore = giocatori.find(g => g.id === finale.miglior_giocatore);
+    const migliorPortiere = giocatori.find(g => g.id === finale.portiere_casa); // CAMBIATO: usa portiere_casa
+    
+    // Determina vincitore
+    let vincitore = '';
+    if (finale.gol_casa > finale.gol_ospite) {
+        vincitore = finale.squadra_casa;
+    } else if (finale.gol_ospite > finale.gol_casa) {
+        vincitore = finale.squadra_ospite;
+    } else {
+        vincitore = 'PAREGGIO';
+    }
+    
+    container.innerHTML = `
+        <div class="finale-box">
+            <div class="risultato-finale">
+                ${finale.squadra_casa} ${finale.gol_casa || 0} - ${finale.gol_ospite || 0} ${finale.squadra_ospite}
+            </div>
             
-            if (!finale) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <h2>🏆 FINALE NON ANCORA GIOCATA</h2>
-                        <p>La partita finale non è stata ancora configurata.</p>
-                        <p>L'amministratore deve configurare la finale dall'area Admin.</p>
-                    </div>
-                `;
-                return;
-            }
+            <div class="vincitore">
+                ${vincitore !== 'PAREGGIO' ? `🏆 CAMPIONE: ${vincitore} 🏆` : '⚖️ FINALE PAREGGIATA'}
+            </div>
             
-            // Trova giocatori premiati
-            const migliorGiocatore = giocatori.find(g => g.id === finale.miglior_giocatore);
-            const migliorPortiere = giocatori.find(g => g.id === finale.miglior_portiere);
-            
-            // Determina vincitore
-            let vincitore = '';
-            if (finale.gol_casa > finale.gol_ospite) {
-                vincitore = finale.squadra_casa;
-            } else if (finale.gol_ospite > finale.gol_casa) {
-                vincitore = finale.squadra_ospite;
-            } else {
-                vincitore = 'PAREGGIO';
-            }
-            
-            container.innerHTML = `
-                <div class="finale-box">
-                    <div class="risultato-finale">
-                        ${finale.squadra_casa} ${finale.gol_casa || 0} - ${finale.gol_ospite || 0} ${finale.squadra_ospite}
-                    </div>
-                    
-                    <div class="vincitore">
-                        ${vincitore !== 'PAREGGIO' ? `🏆 CAMPIONE: ${vincitore} 🏆` : '⚖️ FINALE PAREGGIATA'}
-                    </div>
-                    
-                    <div class="squadre-info">
-                        <div class="squadra-card">
-                            <h3>${finale.squadra_casa}</h3>
-                            <p><strong>Gol:</strong> ${finale.gol_casa || 0}</p>
-                        </div>
-                        
-                        <div class="squadra-card">
-                            <h3>${finale.squadra_ospite}</h3>
-                            <p><strong>Gol:</strong> ${finale.gol_ospite || 0}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="premi-section">
-                        <h3>🎖️ PREMI DELLA FINALE</h3>
-                        
-                        ${migliorGiocatore ? `
-                            <div style="margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
-                                <div style="font-weight: bold; color: #1976D2;">🏆 MIGLIOR GIOCATORE</div>
-                                <div style="font-size: 1.2em; margin: 10px 0;">${migliorGiocatore.nome}</div>
-                                ${finale.voto_miglior_giocatore ? `
-                                    <div style="color: #FFD700; font-weight: bold;">Voto: ${finale.voto_miglior_giocatore}/10</div>
-                                ` : ''}
-                            </div>
-                        ` : ''}
-                        
-                        ${migliorPortiere ? `
-                            <div style="margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
-                                <div style="font-weight: bold; color: #1976D2;">🥅 MIGLIOR PORTIERE</div>
-                                <div style="font-size: 1.2em; margin: 10px 0;">${migliorPortiere.nome}</div>
-                                ${finale.voto_miglior_portiere ? `
-                                    <div style="color: #FFD700; font-weight: bold;">Voto: ${finale.voto_miglior_portiere}/10</div>
-                                ` : ''}
-                            </div>
-                        ` : ''}
-                    </div>
+            <div class="squadre-info">
+                <div class="squadra-card">
+                    <h3>${finale.squadra_casa}</h3>
+                    <p><strong>Gol:</strong> ${finale.gol_casa || 0}</p>
                 </div>
-            `;
-        }
+                
+                <div class="squadra-card">
+                    <h3>${finale.squadra_ospite}</h3>
+                    <p><strong>Gol:</strong> ${finale.gol_ospite || 0}</p>
+                </div>
+            </div>
+            
+            <div class="premi-section">
+                <h3>🎖️ PREMI DELLA FINALE</h3>
+                
+                ${migliorGiocatore ? `
+                    <div style="margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+                        <div style="font-weight: bold; color: #1976D2;">🏆 MIGLIOR GIOCATORE</div>
+                        <div style="font-size: 1.2em; margin: 10px 0;">${migliorGiocatore.nome}</div>
+                        ${finale.voto_miglior_giocatore ? `
+                            <div style="color: #FFD700; font-weight: bold;">Voto: ${finale.voto_miglior_giocatore}/10</div>
+                        ` : ''}
+                    </div>
+                ` : ''}
+                
+                ${migliorPortiere ? `
+                    <div style="margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+                        <div style="font-weight: bold; color: #1976D2;">🥅 MIGLIOR PORTIERE</div>
+                        <div style="font-size: 1.2em; margin: 10px 0;">${migliorPortiere.nome}</div>
+                        ${finale.voto_portiere_casa ? ` <!-- CAMBIATO: usa voto_portiere_casa -->
+                            <div style="color: #FFD700; font-weight: bold;">Voto: ${finale.voto_portiere_casa}/10</div>
+                        ` : ''}
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+}
         
         // ERRORE
         function mostraErrore() {
@@ -274,3 +274,4 @@
     </script>
 </body>
 </html>
+

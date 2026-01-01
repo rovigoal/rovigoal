@@ -580,24 +580,24 @@
         }
         
         function aggiornaSelectGiocatoriMarcatore() {
-            const selectGiocatori = document.querySelectorAll('.marcatore-giocatore:last-child');
-            const ultimoSelect = selectGiocatori[selectGiocatori.length - 1];
-            
-            if (!ultimoSelect) return;
-            
-            // Rimuovi tutte le opzioni tranne la prima
-            while (ultimoSelect.options.length > 1) {
-                ultimoSelect.remove(1);
-            }
-            
-            // Aggiungi tutti i giocatori
-            giocatori.forEach(giocatore => {
-                const option = document.createElement('option');
-                option.value = giocatore.id;
-                option.textContent = `${giocatore.nome} (${giocatore.squadra})`;
-                ultimoSelect.appendChild(option);
-            });
-        }
+    const selectGiocatori = document.querySelectorAll('.marcatore-giocatore:last-child');
+    const ultimoSelect = selectGiocatori[selectGiocatori.length - 1];
+    
+    if (!ultimoSelect) return;
+    
+    // Rimuovi tutte le opzioni tranne la prima
+    while (ultimoSelect.options.length > 1) {
+        ultimoSelect.remove(1);
+    }
+    
+    // Aggiungi TUTTI i giocatori (anche portieri)
+    giocatori.forEach(giocatore => {
+        const option = document.createElement('option');
+        option.value = giocatore.id;
+        option.textContent = `${giocatore.nome} (${giocatore.squadra}) - ${giocatore.ruolo || 'Giocatore'}`;
+        ultimoSelect.appendChild(option);
+    });
+}
         
         function aggiornaNomiSquadreMarcatori() {
             const squadraCasa = document.getElementById('finaleSquadraCasa').value || 'Squadra Casa';

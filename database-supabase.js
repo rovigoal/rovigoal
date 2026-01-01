@@ -1,4 +1,4 @@
-// database-supabase.js - VERSIONE FUNZIONANTE
+// database-supabase.js - VERSIONE DEFINITIVA
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
 
 const SUPABASE_URL = 'https://jgcjhawtmwfsovuegryz.supabase.co'
@@ -204,10 +204,9 @@ const DatabaseManager = {
     
     async salvaFinale(finale) {
         try {
-            // Prima controlla quali colonne esistono
-            console.log('Dati finale da salvare:', finale);
+            console.log('Salvataggio finale con dati:', finale);
             
-            // Prepara i dati da inserire SOLO con le colonne che hai nel database
+            // Prepara dati secondo la TUA struttura esatta
             const datiDaInserire = {
                 data: finale.data,
                 ora: finale.ora || null,
@@ -215,41 +214,20 @@ const DatabaseManager = {
                 squadra_ospite: finale.squadra_ospite,
                 gol_casa: finale.gol_casa || 0,
                 gol_ospite: finale.gol_ospite || 0,
-                marcatori: finale.marcatori || [], // Cerchiamo di salvare i marcatori
-                eventi: finale.eventi || []
+                eventi: finale.eventi || [],
+                marcatori: finale.marcatori || [], // COLONNA MARCATORI
+                miglior_giocatore: finale.miglior_giocatore || null,
+                voto_miglior_giocatore: finale.voto_miglior_giocatore || null,
+                portiere_casa: finale.portiere_casa || null,
+                portiere_ospite: finale.portiere_ospite || null,
+                voto_portiere_casa: finale.voto_portiere_casa || null,
+                voto_portiere_ospite: finale.voto_portiere_ospite || null
             };
-            
-            // Aggiungi solo le colonne che hai nel database (basandoci sugli errori)
-            // Se hai "miglior_giocatore" ma non "miglior_portiere"
-            if (finale.miglior_giocatore) {
-                datiDaInserire.miglior_giocatore = finale.miglior_giocatore;
-            }
-            
-            if (finale.voto_miglior_giocatore) {
-                datiDaInserire.voto_miglior_giocatore = finale.voto_miglior_giocatore;
-            }
-            
-            // Se hai "portiere_casa" e "portiere_ospite" invece di "miglior_portiere"
-            if (finale.portiere_casa) {
-                datiDaInserire.portiere_casa = finale.portiere_casa;
-            }
-            
-            if (finale.portiere_ospite) {
-                datiDaInserire.portiere_ospite = finale.portiere_ospite;
-            }
-            
-            if (finale.voto_portiere_casa) {
-                datiDaInserire.voto_portiere_casa = finale.voto_portiere_casa;
-            }
-            
-            if (finale.voto_portiere_ospite) {
-                datiDaInserire.voto_portiere_ospite = finale.voto_portiere_ospite;
-            }
             
             // Elimina finale esistente
             await supabase.from('finale').delete().neq('id', 0)
             
-            // Aggiungi nuova finale con SOLO le colonne esistenti
+            // Inserisci nuova finale
             const { data, error } = await supabase
                 .from('finale')
                 .insert([datiDaInserire])

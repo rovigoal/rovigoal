@@ -1,4 +1,4 @@
-// database-supabase.js - VERSIONE CORRETTA
+// database-supabase.js - VERSIONE DEFINITIVA CON NOMI CORRETTI
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
 
 const SUPABASE_URL = 'https://jgcjhawtmwfsovuegryz.supabase.co'
@@ -85,26 +85,7 @@ const DatabaseManager = {
                 throw error
             }
             
-            // Mappatura dei nomi delle colonne
-            if (data) {
-                return {
-                    id: data.id,
-                    created_at: data.created_at,
-                    data: data.data,
-                    ora: data.ora,
-                    squadra_casa: data.squadra_casa,
-                    squadra_ospite: data.squadra_ospit, // Mappato da squadra_ospit
-                    gol_casa: data.gol_casa,
-                    gol_ospite: data.gol_ospite,
-                    miglior_giocatore: data.miglior_glocat, // Mappato da miglior_glocat
-                    voto_miglior_giocatore: data.voto_miglior_g, // Mappato da voto_miglior_g
-                    miglior_portiere: data.portiere_casa, // Mappato da portiere_casa
-                    voto_miglior_portiere: data.voto_portiere_e, // Mappato da voto_portiere_e
-                    eventi: data.eventi
-                }
-            }
-            
-            return null
+            return data || null
             
         } catch (error) {
             console.error('Errore getFinale:', error)
@@ -226,20 +207,22 @@ const DatabaseManager = {
             // Elimina finale esistente
             await supabase.from('finale').delete().neq('id', 0)
             
-            // INSERIMENTO CON I NOMI DELLE COLONNE CORRETTI PER SUPA BASE
+            // INSERIMENTO CON I NOMI DELLE COLONNE ESATTI
             const { data, error } = await supabase
                 .from('finale')
                 .insert([{
-                    data: finale.data || null, // Ora data e ora possono essere null
-                    ora: finale.ora || null,
+                    data: null, // Non serve più
+                    ora: null,  // Non serve più
                     squadra_casa: finale.squadra_casa,
-                    squadra_ospit: finale.squadra_ospite, // Mappato a squadra_ospit
+                    squadra_ospite: finale.squadra_ospite,
                     gol_casa: finale.gol_casa || 0,
                     gol_ospite: finale.gol_ospite || 0,
-                    miglior_glocat: finale.miglior_giocatore || null, // Mappato a miglior_glocat
-                    voto_miglior_g: finale.voto_miglior_giocatore || null, // Mappato a voto_miglior_g
-                    portiere_casa: finale.miglior_portiere || null, // Mappato a portiere_casa
-                    voto_portiere_e: finale.voto_miglior_portiere || null, // Mappato a voto_portiere_e
+                    miglior_giocatore: finale.miglior_giocatore || null,
+                    voto_miglior_giocatore: finale.voto_miglior_giocatore || null,
+                    portiere_casa: finale.miglior_portiere || null, // Usiamo portiere_casa per il miglior portiere
+                    portiere_ospite: null, // Lasciamo vuoto
+                    voto_portiere_casa: finale.voto_miglior_portiere || null, // Usiamo voto_portiere_casa per il voto del miglior portiere
+                    voto_portiere_ospite: null, // Lasciamo vuoto
                     eventi: finale.eventi || []
                 }])
                 .select()

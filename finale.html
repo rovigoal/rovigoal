@@ -144,11 +144,7 @@
             font-weight: bold;
             color: #1e3c72;
             display: block;
-        }
-        
-        .marcatore-dettagli {
-            font-size: 0.9em;
-            color: #666;
+            font-size: 1.1em;
         }
         
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -229,7 +225,7 @@
                 vincitore = 'PAREGGIO';
             }
             
-            // Costruisci HTML marcatori
+            // Costruisci HTML marcatori (SOLO NOME)
             let marcatoriHTML = '';
             if (finale.marcatori && finale.marcatori.length > 0) {
                 marcatoriHTML = `
@@ -241,7 +237,6 @@
                     marcatoriHTML += `
                         <div class="marcatore-item">
                             <span class="marcatore-nome">${marcatore.nome}</span>
-                            <span class="marcatore-dettagli">Squadra: ${marcatore.squadra} | Minuto: ${marcatore.minuto}</span>
                         </div>
                     `;
                 });

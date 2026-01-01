@@ -113,7 +113,7 @@
             border: 3px solid #2196F3;
         }
         
-        .premi-section, .marcatori-section {
+        .premi-section, .marcatori-section, .portieri-section {
             background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
             padding: 20px;
             border-radius: 10px;
@@ -246,6 +246,7 @@
             grid-template-columns: 2fr 1fr 1fr;
             gap: 10px;
             align-items: center;
+            margin-bottom: 10px;
         }
         
         .btn-add {
@@ -361,7 +362,7 @@
                 <h3 style="margin: 0;">Pareggio 0-0</h3>
             </div>
             
-            <!-- SEZIONE MARCATORI (NUOVA) -->
+            <!-- SEZIONE MARCATORI -->
             <div class="marcatori-section">
                 <h3>⚽ Marcatori della Finale</h3>
                 
@@ -373,57 +374,60 @@
                     </select>
                 </div>
                 
-                <button type="button" class="btn-add" onclick="aggiungiMarcatore()" style="margin-top: 10px;">
+                <button type="button" class="btn-add" onclick="aggiungiMarcatore()">
                     ➕ Aggiungi Marcatore
                 </button>
                 
                 <div id="listaMarcatori" style="margin-top: 20px;">
-                    <!-- Qui appariranno i marcatori -->
+                    <p style="color: #666; font-style: italic; text-align: center;">Nessun marcatore aggiunto</p>
                 </div>
             </div>
             
-            <!-- SEZIONE PREMI -->
+            <!-- SEZIONE PREMI GIOCATORI -->
             <div class="premi-section">
-    <h3>⭐ Premi della Finale</h3>
-    
-    <div class="form-group">
-        <label for="finaleMigliorGiocatore">🏆 Miglior Giocatore</label>
-        <select id="finaleMigliorGiocatore">
-            <option value="">Seleziona...</option>
-        </select>
-    </div>
-    
-    <div class="form-group">
-        <label for="finaleVotoMigliorGiocatore">Voto (1-10)</label>
-        <input type="number" id="finaleVotoMigliorGiocatore" min="1" max="10" value="9">
-    </div>
-    
-    <!-- RIMUOVI LA SEZIONE MIGLIOR PORTIERE se non esiste nel DB -->
-    <!-- Se hai portiere_casa e portiere_ospite invece, aggiungi: -->
-    <div class="form-group">
-        <label for="portiereCasa">🥅 Portiere Casa</label>
-        <select id="portiereCasa">
-            <option value="">Seleziona portiere...</option>
-        </select>
-    </div>
-    
-    <div class="form-group">
-        <label for="votoPortiereCasa">Voto Portiere Casa (1-10)</label>
-        <input type="number" id="votoPortiereCasa" min="1" max="10" value="7">
-    </div>
-    
-    <div class="form-group">
-        <label for="portiereOspite">🥅 Portiere Ospite</label>
-        <select id="portiereOspite">
-            <option value="">Seleziona portiere...</option>
-        </select>
-    </div>
-    
-    <div class="form-group">
-        <label for="votoPortiereOspite">Voto Portiere Ospite (1-10)</label>
-        <input type="number" id="votoPortiereOspite" min="1" max="10" value="7">
-    </div>
-</div>
+                <h3>⭐ Miglior Giocatore</h3>
+                
+                <div class="form-group">
+                    <label for="finaleMigliorGiocatore">🏆 Miglior Giocatore</label>
+                    <select id="finaleMigliorGiocatore">
+                        <option value="">Seleziona...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="finaleVotoMigliorGiocatore">Voto (1-10)</label>
+                    <input type="number" id="finaleVotoMigliorGiocatore" min="1" max="10" value="9">
+                </div>
+            </div>
+            
+            <!-- SEZIONE PORTIERI -->
+            <div class="portieri-section">
+                <h3>🥅 Portieri</h3>
+                
+                <div class="form-group">
+                    <label for="portiereCasa">Portiere Casa</label>
+                    <select id="portiereCasa">
+                        <option value="">Seleziona portiere...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="votoPortiereCasa">Voto Portiere Casa (1-10)</label>
+                    <input type="number" id="votoPortiereCasa" min="1" max="10" value="7">
+                </div>
+                
+                <div class="form-group">
+                    <label for="portiereOspite">Portiere Ospite</label>
+                    <select id="portiereOspite">
+                        <option value="">Seleziona portiere...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="votoPortiereOspite">Voto Portiere Ospite (1-10)</label>
+                    <input type="number" id="votoPortiereOspite" min="1" max="10" value="7">
+                </div>
+            </div>
             
             <button class="btn btn-success" onclick="salvaFinale()">
                 ✅ SALVA PARTITA FINALE
@@ -441,7 +445,7 @@
         let squadre = [];
         let giocatori = [];
         let finaleEsistente = null;
-        let marcatori = []; // Array per i marcatori
+        let marcatori = [];
         
         // INIZIALIZZAZIONE
         document.addEventListener('DOMContentLoaded', async function() {
@@ -479,15 +483,16 @@
             }
         });
         
-        // AGGIORNA SELECT SQUADRE
+        // AGGIORNA SELECT SQUADRE E GIOCATORI
         function aggiornaSelectSquadre() {
             const selectCasa = document.getElementById('finaleSquadraCasa');
             const selectOspite = document.getElementById('finaleSquadraOspite');
             const selectMigliorGioc = document.getElementById('finaleMigliorGiocatore');
-            const selectMigliorPort = document.getElementById('finaleMigliorPortiere');
+            const selectPortiereCasa = document.getElementById('portiereCasa');
+            const selectPortiereOspite = document.getElementById('portiereOspite');
             
             // Pulisci
-            [selectCasa, selectOspite, selectMigliorGioc, selectMigliorPort].forEach(select => {
+            [selectCasa, selectOspite, selectMigliorGioc, selectPortiereCasa, selectPortiereOspite].forEach(select => {
                 while (select.options.length > 1) select.remove(1);
             });
             
@@ -511,13 +516,14 @@
                 selectMigliorGioc.appendChild(option);
             });
             
-            // Portieri per miglior portiere
+            // Portieri
             const portieri = giocatori.filter(g => g.ruolo === 'Portiere');
             portieri.forEach(portiere => {
                 const option = document.createElement('option');
                 option.value = portiere.id;
                 option.textContent = `${portiere.nome} (${portiere.squadra})`;
-                selectMigliorPort.appendChild(option);
+                selectPortiereCasa.appendChild(option.cloneNode(true));
+                selectPortiereOspite.appendChild(option.cloneNode(true));
             });
         }
         
@@ -623,7 +629,8 @@
             
             // Trova nomi giocatori
             const migliorGiocatore = giocatori.find(g => g.id === finaleEsistente.miglior_giocatore);
-            const migliorPortiere = giocatori.find(g => g.id === finaleEsistente.miglior_portiere);
+            const portiereCasa = giocatori.find(g => g.id === finaleEsistente.portiere_casa);
+            const portiereOspite = giocatori.find(g => g.id === finaleEsistente.portiere_ospite);
             
             // Determina vincitore
             let vincitore = '';
@@ -635,6 +642,7 @@
                 vincitore = '⚖️ PAREGGIO';
             }
             
+            // HTML marcatori
             let marcatoriHTML = '';
             if (finaleEsistente.marcatori && finaleEsistente.marcatori.length > 0) {
                 marcatoriHTML = `
@@ -671,10 +679,16 @@
                         (Voto: ${finaleEsistente.voto_miglior_giocatore}/10)
                     </div>
                 ` : ''}
-                ${migliorPortiere ? `
+                ${portiereCasa ? `
                     <div>
-                        <strong>🥅 Miglior Portiere:</strong> ${migliorPortiere.nome}
-                        (Voto: ${finaleEsistente.voto_miglior_portiere}/10)
+                        <strong>🥅 Portiere Casa:</strong> ${portiereCasa.nome}
+                        (Voto: ${finaleEsistente.voto_portiere_casa}/10)
+                    </div>
+                ` : ''}
+                ${portiereOspite ? `
+                    <div>
+                        <strong>🥅 Portiere Ospite:</strong> ${portiereOspite.nome}
+                        (Voto: ${finaleEsistente.voto_portiere_ospite}/10)
                     </div>
                 ` : ''}
             `;
@@ -683,7 +697,7 @@
         // SALVA FINALE
         async function salvaFinale() {
             try {
-                // Raccogli dati
+                // Raccogli dati secondo la TUA struttura
                 const finaleData = {
                     data: document.getElementById('finaleData').value,
                     ora: document.getElementById('finaleOra').value,
@@ -693,9 +707,11 @@
                     gol_ospite: parseInt(document.getElementById('finaleGolOspite').value) || 0,
                     miglior_giocatore: document.getElementById('finaleMigliorGiocatore').value,
                     voto_miglior_giocatore: parseInt(document.getElementById('finaleVotoMigliorGiocatore').value) || null,
-                    miglior_portiere: document.getElementById('finaleMigliorPortiere').value,
-                    voto_miglior_portiere: parseInt(document.getElementById('finaleVotoMigliorPortiere').value) || null,
-                    marcatori: marcatori, // <-- AGGIUNTO
+                    portiere_casa: document.getElementById('portiereCasa').value,
+                    voto_portiere_casa: parseInt(document.getElementById('votoPortiereCasa').value) || null,
+                    portiere_ospite: document.getElementById('portiereOspite').value,
+                    voto_portiere_ospite: parseInt(document.getElementById('votoPortiereOspite').value) || null,
+                    marcatori: marcatori, // ARRAY DI MARCATORI
                     eventi: [] // Eventi della partita
                 };
                 

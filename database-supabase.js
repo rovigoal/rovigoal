@@ -1,4 +1,4 @@
-// database-supabase.js - VERSIONE CON MARCATORI
+// database-supabase.js - VERSIONE FUNZIONANTE
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
 
 const SUPABASE_URL = 'https://jgcjhawtmwfsovuegryz.supabase.co'
@@ -207,23 +207,21 @@ const DatabaseManager = {
             // Elimina finale esistente
             await supabase.from('finale').delete().neq('id', 0)
             
-            // INSERIMENTO CON MARCATORI
+            // Aggiungi nuova finale
             const { data, error } = await supabase
                 .from('finale')
                 .insert([{
-                    data: null,
-                    ora: null,
+                    data: finale.data,
+                    ora: finale.ora || null,
                     squadra_casa: finale.squadra_casa,
                     squadra_ospite: finale.squadra_ospite,
                     gol_casa: finale.gol_casa || 0,
                     gol_ospite: finale.gol_ospite || 0,
                     miglior_giocatore: finale.miglior_giocatore || null,
                     voto_miglior_giocatore: finale.voto_miglior_giocatore || null,
-                    portiere_casa: finale.miglior_portiere || null,
-                    portiere_ospite: null,
-                    voto_portiere_casa: finale.voto_miglior_portiere || null,
-                    voto_portiere_ospite: null,
-                    marcatori: finale.marcatori || [], // NUOVO: aggiungi i marcatori
+                    miglior_portiere: finale.miglior_portiere || null,
+                    voto_miglior_portiere: finale.voto_miglior_portiere || null,
+                    marcatori: finale.marcatori || [], // <-- AGGIUNTO
                     eventi: finale.eventi || []
                 }])
                 .select()
@@ -250,37 +248,6 @@ const DatabaseManager = {
             
         } catch (error) {
             console.error('Errore eliminaFinale:', error)
-            throw error
-        }
-    },
-    
-    // NUOVO: Test connessione
-    async testConnessione() {
-        try {
-            const { error } = await supabase
-                .from('finale')
-                .select('id')
-                .limit(1)
-            
-            return !error
-        } catch (error) {
-            console.error('Errore test connessione:', error)
-            return false
-        }
-    },
-    
-    // NUOVO: Elimina tutto
-    async eliminaTutto() {
-        try {
-            // Elimina in ordine corretto (per vincoli foreign key se ci sono)
-            await supabase.from('finale').delete().neq('id', 0)
-            await supabase.from('partite').delete().neq('id', 0)
-            await supabase.from('giocatori').delete().neq('id', 0)
-            await supabase.from('squadre').delete().neq('id', 0)
-            
-            return true
-        } catch (error) {
-            console.error('Errore eliminaTutto:', error)
             throw error
         }
     }

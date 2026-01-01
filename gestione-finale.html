@@ -355,6 +355,7 @@
             <!-- SEZIONE MARCATORI -->
             <div class="marcatori-section">
                 <h3>⚽ MARCATORI</h3>
+                <p style="color: #666; font-size: 0.9em; margin-bottom: 10px;">Puoi selezionare qualsiasi giocatore, anche portieri!</p>
                 
                 <div id="marcatoriContainer">
                     <!-- I marcatori saranno aggiunti qui dinamicamente -->
@@ -462,20 +463,20 @@
                 selectOspite.appendChild(option.cloneNode(true));
             });
             
-            // Giocatori per miglior giocatore
+            // Giocatori per miglior giocatore (TUTTI i giocatori)
             giocatori.forEach(giocatore => {
                 const option = document.createElement('option');
                 option.value = giocatore.id;
-                option.textContent = `${giocatore.nome} (${giocatore.squadra})`;
+                option.textContent = `${giocatore.nome} (${giocatore.squadra}) - ${giocatore.ruolo || 'Giocatore'}`;
                 selectMigliorGioc.appendChild(option);
             });
             
-            // Portieri per miglior portiere
+            // Portieri per miglior portiere (solo portieri)
             const portieri = giocatori.filter(g => g.ruolo && g.ruolo.toLowerCase().includes('portiere'));
             portieri.forEach(portiere => {
                 const option = document.createElement('option');
                 option.value = portiere.id;
-                option.textContent = `${portiere.nome} (${portiere.squadra})`;
+                option.textContent = `${portiere.nome} (${portiere.squadra}) - ${portiere.ruolo}`;
                 selectMigliorPort.appendChild(option);
             });
         }
@@ -529,6 +530,32 @@
                 vincitore = '⚖️ PAREGGIO';
             }
             
+            // Trova nomi dei marcatori
+            let marcatoriHTML = '';
+            if (finaleEsistente.marcatori && finaleEsistente.marcatori.length > 0) {
+                const marcatoriConNomi = finaleEsistente.marcatori.map(marcatore => {
+                    const giocatore = giocatori.find(g => g.id == marcatore.giocatore_id);
+                    return {
+                        ...marcatore,
+                        giocatore_nome: giocatore ? giocatore.nome : 'Sconosciuto',
+                        giocatore_ruolo: giocatore ? giocatore.ruolo : ''
+                    };
+                }).sort((a, b) => a.minuto - b.minuto);
+                
+                marcatoriHTML = `
+                    <div style="margin-top: 15px; text-align: left;">
+                        <strong>⚽ Marcatori:</strong>
+                        ${marcatoriConNomi.map(m => `
+                            <div style="margin: 5px 0 5px 15px; font-size: 0.9em;">
+                                ${m.minuto}' - ${m.giocatore_nome} 
+                                ${m.giocatore_ruolo ? `(${m.giocatore_ruolo})` : ''}
+                                (${m.squadra === 'casa' ? finaleEsistente.squadra_casa : finaleEsistente.squadra_ospite})
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
             finaleInfo.innerHTML = `
                 <div class="risultato-grande">
                     ${finaleEsistente.squadra_casa} ${finaleEsistente.gol_casa} - ${finaleEsistente.gol_ospite} ${finaleEsistente.squadra_ospite}
@@ -548,6 +575,7 @@
                         ${finaleEsistente.voto_portiere_casa ? `(Voto: ${finaleEsistente.voto_portiere_casa}/10)` : ''}
                     </div>
                 ` : ''}
+                ${marcatoriHTML}
             `;
         }
         
@@ -580,24 +608,24 @@
         }
         
         function aggiornaSelectGiocatoriMarcatore() {
-    const selectGiocatori = document.querySelectorAll('.marcatore-giocatore:last-child');
-    const ultimoSelect = selectGiocatori[selectGiocatori.length - 1];
-    
-    if (!ultimoSelect) return;
-    
-    // Rimuovi tutte le opzioni tranne la prima
-    while (ultimoSelect.options.length > 1) {
-        ultimoSelect.remove(1);
-    }
-    
-    // Aggiungi TUTTI i giocatori (anche portieri)
-    giocatori.forEach(giocatore => {
-        const option = document.createElement('option');
-        option.value = giocatore.id;
-        option.textContent = `${giocatore.nome} (${giocatore.squadra}) - ${giocatore.ruolo || 'Giocatore'}`;
-        ultimoSelect.appendChild(option);
-    });
-}
+            const selectGiocatori = document.querySelectorAll('.marcatore-giocatore:last-child');
+            const ultimoSelect = selectGiocatori[selectGiocatori.length - 1];
+            
+            if (!ultimoSelect) return;
+            
+            // Rimuovi tutte le opzioni tranne la prima
+            while (ultimoSelect.options.length > 1) {
+                ultimoSelect.remove(1);
+            }
+            
+            // Aggiungi TUTTI i giocatori (anche portieri)
+            giocatori.forEach(giocatore => {
+                const option = document.createElement('option');
+                option.value = giocatore.id;
+                option.textContent = `${giocatore.nome} (${giocatore.squadra}) - ${giocatore.ruolo || 'Giocatore'}`;
+                ultimoSelect.appendChild(option);
+            });
+        }
         
         function aggiornaNomiSquadreMarcatori() {
             const squadraCasa = document.getElementById('finaleSquadraCasa').value || 'Squadra Casa';
@@ -621,9 +649,10 @@
                     const giocatore = giocatori.find(g => g.id == giocatoreId);
                     if (giocatore) {
                         marcatori.push({
-                            giocatore_id: giocatoreId,
+                            giocatore_id: parseInt(giocatoreId),
                             giocatore_nome: giocatore.nome,
-                            squadra: squadra, // 'casa' o 'ospite'
+                            giocatore_ruolo: giocatore.ruolo || 'Giocatore',
+                            squadra: squadra,
                             minuto: parseInt(minuto),
                             squadra_nome: squadra === 'casa' ? 
                                 document.getElementById('finaleSquadraCasa').value : 
@@ -651,7 +680,7 @@
                     voto_miglior_giocatore: parseInt(document.getElementById('finaleVotoMigliorGiocatore').value) || null,
                     miglior_portiere: document.getElementById('finaleMigliorPortiere').value,
                     voto_miglior_portiere: parseInt(document.getElementById('finaleVotoMigliorPortiere').value) || null,
-                    marcatori: raccogliMarcatori(), // Aggiungi i marcatori
+                    marcatori: raccogliMarcatori(),
                     eventi: []
                 };
                 

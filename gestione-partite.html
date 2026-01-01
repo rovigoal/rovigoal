@@ -1311,40 +1311,47 @@
             container.innerHTML = html;
         }
         
-        // ELIMINA PARTITA
-        async function eliminaPartita(partitaId, nomePartita) {
-            if (!confirm(`Sei sicuro di voler eliminare la partita "${nomePartita}"?\n\nQuesta operazione non può essere annullata!`)) {
-                return;
-            }
-            
-            try {
-                aggiornaStatoConnessione('caricamento');
-                
-                // Prima recupera i dati della partita per aggiornare le statistiche
-                const partita = partite.find(p => p.id === partitaId);
-                if (partita) {
-                    // Troviamo la partita nel database per aggiornare le statistiche
-                    // Per ora eliminiamo solo la partita, in una versione più avanzata
-                    // dovresti aggiornare anche statistiche giocatori e squadre
-                }
-                
-                // Elimina la partita
-                // NOTA: database.eliminaPartita non esiste nel tuo database-supabase.js
-                // Dovresti aggiungere questa funzione
-                
-                mostraAlert('⚠️ Funzione eliminaPartita non implementata nel database. Controlla il file database-supabase.js', 'warning');
-                
-                // Per ora, aggiorniamo solo la lista
-                await caricaDatiIniziali();
-                
-                aggiornaStatoConnessione('ok');
-                
-            } catch (error) {
-                console.error('Errore eliminazione partita:', error);
-                mostraAlert('Errore nell\'eliminazione della partita: ' + error.message, 'error');
-                aggiornaStatoConnessione('ko');
-            }
+       // ELIMINA PARTITA - VERSIONE CORRETTA
+async function eliminaPartita(partitaId, nomePartita) {
+    if (!confirm(`⚠️ SEI SICURO DI VOLER ELIMINARE QUESTA PARTITA?\n\n"${nomePartita}"\n\nQuesta operazione:\n• Cancella la partita\n• NON aggiorna le statistiche dei giocatori\n• NON aggiorna la classifica delle squadre\n\nL'operazione è irreversibile!`)) {
+        return;
+    }
+    
+    try {
+        aggiornaStatoConnessione('caricamento');
+        
+        // Prima recupera i dati della partita
+        const partita = partite.find(p => p.id === partitaId);
+        if (!partita) {
+            throw new Error('Partita non trovata');
         }
+        
+        // NOTA: Per una versione completa, qui dovremmo:
+        // 1. Trovare tutti i giocatori coinvolti
+        // 2. Sottrarre i gol/ammonizioni/espulsioni
+        // 3. Sottrarre i premi assegnati
+        // 4. Aggiornare la classifica delle squadre
+        // Ma per semplicità, per ora eliminiamo solo la partita
+        
+        // Elimina la partita dal database
+        await database.eliminaPartita(partitaId);
+        
+        // Rimuovi la partita dalla lista locale
+        partite = partite.filter(p => p.id !== partitaId);
+        
+        // Aggiorna la visualizzazione
+        caricaListaPartite();
+        
+        mostraAlert(`✅ Partita "${nomePartita}" eliminata con successo!`, 'success');
+        
+        aggiornaStatoConnessione('ok');
+        
+    } catch (error) {
+        console.error('Errore eliminazione partita:', error);
+        mostraAlert(`❌ Errore nell'eliminazione della partita: ${error.message}`, 'error');
+        aggiornaStatoConnessione('ko');
+    }
+}
         
         // RESET FORM
         function resetForm() {

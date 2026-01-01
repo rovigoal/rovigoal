@@ -113,19 +113,11 @@
             border: 3px solid #2196F3;
         }
         
-        .premi-section {
+        .premi-section, .marcatori-section {
             background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
             padding: 20px;
             border-radius: 10px;
             border: 2px solid #ffc107;
-            margin-top: 20px;
-        }
-        
-        .marcatori-section {
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            padding: 20px;
-            border-radius: 10px;
-            border: 2px solid #4CAF50;
             margin-top: 20px;
         }
         
@@ -163,12 +155,6 @@
         .btn-secondary {
             background: #6c757d;
             color: white;
-        }
-        
-        .btn-small {
-            padding: 8px 15px;
-            width: auto;
-            font-size: 0.9em;
         }
         
         .btn:hover {
@@ -214,47 +200,66 @@
             margin: 15px 0;
         }
         
+        /* STILI MARCATORI */
         .marcatore-item {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 10px;
             background: white;
-            padding: 10px;
+            padding: 10px 15px;
             border-radius: 8px;
-            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            border: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
-        .marcatore-select {
-            flex: 2;
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
+        .marcatore-info {
+            display: flex;
+            flex-direction: column;
         }
         
-        .marcatore-squadra-select {
-            flex: 1;
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
+        .marcatore-nome {
+            font-weight: bold;
+            color: #1e3c72;
         }
         
-        .marcatore-minuto-input {
-            width: 80px;
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            text-align: center;
+        .marcatore-dettagli {
+            font-size: 0.9em;
+            color: #666;
         }
         
-        .btn-rimuovi {
+        .btn-remove {
             background: #dc143c;
             color: white;
             border: none;
             border-radius: 5px;
-            padding: 5px 10px;
+            width: 30px;
+            height: 30px;
             cursor: pointer;
-            font-size: 0.9em;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .marcatori-input-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .btn-add {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
         
         /* MOBILE */
@@ -287,15 +292,9 @@
                 display: none;
             }
             
-            .marcatore-item {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .marcatore-select,
-            .marcatore-squadra-select,
-            .marcatore-minuto-input {
-                width: 100%;
+            .marcatori-input-row {
+                grid-template-columns: 1fr;
+                gap: 5px;
             }
         }
     </style>
@@ -325,6 +324,16 @@
             <h2>📝 Configura Finale</h2>
             
             <div class="form-group">
+                <label for="finaleData">Data Finale</label>
+                <input type="date" id="finaleData" value="">
+            </div>
+            
+            <div class="form-group">
+                <label for="finaleOra">Orario</label>
+                <input type="time" id="finaleOra" value="15:00">
+            </div>
+            
+            <div class="form-group">
                 <label>Squadre Finaliste</label>
                 <div class="squadre-row">
                     <select id="finaleSquadraCasa">
@@ -352,18 +361,25 @@
                 <h3 style="margin: 0;">Pareggio 0-0</h3>
             </div>
             
-            <!-- SEZIONE MARCATORI -->
+            <!-- SEZIONE MARCATORI (NUOVA) -->
             <div class="marcatori-section">
-                <h3>⚽ MARCATORI</h3>
-                <p style="color: #666; font-size: 0.9em; margin-bottom: 10px;">Puoi selezionare qualsiasi giocatore, anche portieri!</p>
+                <h3>⚽ Marcatori della Finale</h3>
                 
-                <div id="marcatoriContainer">
-                    <!-- I marcatori saranno aggiunti qui dinamicamente -->
+                <div class="marcatori-input-row">
+                    <input type="text" id="nomeMarcatore" placeholder="Nome marcatore" class="form-control">
+                    <input type="number" id="minutoMarcatore" placeholder="Min." min="1" max="120">
+                    <select id="squadraMarcatore">
+                        <option value="">Squadra</option>
+                    </select>
                 </div>
                 
-                <button type="button" class="btn btn-success btn-small" onclick="aggiungiMarcatore()" style="margin-top: 10px;">
-                    ➕ AGGIUNGI MARCATORE
+                <button type="button" class="btn-add" onclick="aggiungiMarcatore()" style="margin-top: 10px;">
+                    ➕ Aggiungi Marcatore
                 </button>
+                
+                <div id="listaMarcatori" style="margin-top: 20px;">
+                    <!-- Qui appariranno i marcatori -->
+                </div>
             </div>
             
             <!-- SEZIONE PREMI -->
@@ -411,6 +427,7 @@
         let squadre = [];
         let giocatori = [];
         let finaleEsistente = null;
+        let marcatori = []; // Array per i marcatori
         
         // INIZIALIZZAZIONE
         document.addEventListener('DOMContentLoaded', async function() {
@@ -425,13 +442,22 @@
                 // Aggiorna select
                 aggiornaSelectSquadre();
                 
+                // Popola squadraMarcatore
+                const selectSquadraMarc = document.getElementById('squadraMarcatore');
+                squadre.forEach(squadra => {
+                    const option = document.createElement('option');
+                    option.value = squadra.nome;
+                    option.textContent = squadra.nome;
+                    selectSquadraMarc.appendChild(option);
+                });
+                
                 // Se esiste finale, mostra i dati
                 if (finaleEsistente) {
                     mostraFinaleEsistente();
+                } else {
+                    // Imposta data odierna
+                    document.getElementById('finaleData').value = new Date().toISOString().split('T')[0];
                 }
-                
-                // Aggiungi un marcatore iniziale
-                aggiungiMarcatore();
                 
             } catch (error) {
                 console.error('Errore caricamento finale:', error);
@@ -463,22 +489,82 @@
                 selectOspite.appendChild(option.cloneNode(true));
             });
             
-            // Giocatori per miglior giocatore (TUTTI i giocatori)
+            // Giocatori per miglior giocatore
             giocatori.forEach(giocatore => {
                 const option = document.createElement('option');
                 option.value = giocatore.id;
-                option.textContent = `${giocatore.nome} (${giocatore.squadra}) - ${giocatore.ruolo || 'Giocatore'}`;
+                option.textContent = `${giocatore.nome} (${giocatore.squadra})`;
                 selectMigliorGioc.appendChild(option);
             });
             
-            // Portieri per miglior portiere (solo portieri)
-            const portieri = giocatori.filter(g => g.ruolo && g.ruolo.toLowerCase().includes('portiere'));
+            // Portieri per miglior portiere
+            const portieri = giocatori.filter(g => g.ruolo === 'Portiere');
             portieri.forEach(portiere => {
                 const option = document.createElement('option');
                 option.value = portiere.id;
-                option.textContent = `${portiere.nome} (${portiere.squadra}) - ${portiere.ruolo}`;
+                option.textContent = `${portiere.nome} (${portiere.squadra})`;
                 selectMigliorPort.appendChild(option);
             });
+        }
+        
+        // AGGIUNGI MARCATORE
+        function aggiungiMarcatore() {
+            const nome = document.getElementById('nomeMarcatore').value.trim();
+            const minuto = document.getElementById('minutoMarcatore').value;
+            const squadra = document.getElementById('squadraMarcatore').value;
+            
+            if (!nome || !squadra) {
+                mostraAlert('Inserisci nome e squadra del marcatore', 'error');
+                return;
+            }
+            
+            // Aggiungi all'array
+            marcatori.push({
+                nome: nome,
+                minuto: minuto || 'N/D',
+                squadra: squadra
+            });
+            
+            // Aggiorna visualizzazione
+            aggiornaListaMarcatori();
+            
+            // Pulisci campi
+            document.getElementById('nomeMarcatore').value = '';
+            document.getElementById('minutoMarcatore').value = '';
+            document.getElementById('squadraMarcatore').value = '';
+        }
+        
+        // RIMUOVI MARCATORE
+        function rimuoviMarcatore(index) {
+            marcatori.splice(index, 1);
+            aggiornaListaMarcatori();
+        }
+        
+        // AGGIORNA LISTA MARCATORI
+        function aggiornaListaMarcatori() {
+            const container = document.getElementById('listaMarcatori');
+            
+            if (marcatori.length === 0) {
+                container.innerHTML = '<p style="color: #666; font-style: italic; text-align: center;">Nessun marcatore aggiunto</p>';
+                return;
+            }
+            
+            let html = '<div style="max-height: 300px; overflow-y: auto;">';
+            
+            marcatori.forEach((marcatore, index) => {
+                html += `
+                    <div class="marcatore-item">
+                        <div class="marcatore-info">
+                            <span class="marcatore-nome">${marcatore.nome}</span>
+                            <span class="marcatore-dettagli">Squadra: ${marcatore.squadra} | Minuto: ${marcatore.minuto}</span>
+                        </div>
+                        <button class="btn-remove" onclick="rimuoviMarcatore(${index})">×</button>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
         }
         
         // AGGIORNA VINCITORE FINALE
@@ -516,9 +602,14 @@
             form.style.display = 'none';
             container.style.display = 'block';
             
+            // Carica marcatori dalla finale esistente
+            if (finaleEsistente.marcatori) {
+                marcatori = finaleEsistente.marcatori;
+            }
+            
             // Trova nomi giocatori
             const migliorGiocatore = giocatori.find(g => g.id === finaleEsistente.miglior_giocatore);
-            const migliorPortiere = giocatori.find(g => g.id === finaleEsistente.portiere_casa);
+            const migliorPortiere = giocatori.find(g => g.id === finaleEsistente.miglior_portiere);
             
             // Determina vincitore
             let vincitore = '';
@@ -530,30 +621,23 @@
                 vincitore = '⚖️ PAREGGIO';
             }
             
-            // Trova nomi dei marcatori
             let marcatoriHTML = '';
             if (finaleEsistente.marcatori && finaleEsistente.marcatori.length > 0) {
-                const marcatoriConNomi = finaleEsistente.marcatori.map(marcatore => {
-                    const giocatore = giocatori.find(g => g.id == marcatore.giocatore_id);
-                    return {
-                        ...marcatore,
-                        giocatore_nome: giocatore ? giocatore.nome : 'Sconosciuto',
-                        giocatore_ruolo: giocatore ? giocatore.ruolo : ''
-                    };
-                }).sort((a, b) => a.minuto - b.minuto);
-                
                 marcatoriHTML = `
                     <div style="margin-top: 15px; text-align: left;">
-                        <strong>⚽ Marcatori:</strong>
-                        ${marcatoriConNomi.map(m => `
-                            <div style="margin: 5px 0 5px 15px; font-size: 0.9em;">
-                                ${m.minuto}' - ${m.giocatore_nome} 
-                                ${m.giocatore_ruolo ? `(${m.giocatore_ruolo})` : ''}
-                                (${m.squadra === 'casa' ? finaleEsistente.squadra_casa : finaleEsistente.squadra_ospite})
-                            </div>
-                        `).join('')}
-                    </div>
+                        <strong>⚽ MARCATORI:</strong>
+                        <div style="margin-top: 10px;">
                 `;
+                
+                finaleEsistente.marcatori.forEach(marcatore => {
+                    marcatoriHTML += `
+                        <div style="margin-bottom: 5px; padding: 8px; background: #f8f9fa; border-radius: 5px;">
+                            <strong>${marcatore.nome}</strong> (${marcatore.squadra}) - Minuto ${marcatore.minuto}
+                        </div>
+                    `;
+                });
+                
+                marcatoriHTML += '</div></div>';
             }
             
             finaleInfo.innerHTML = `
@@ -563,106 +647,23 @@
                 <div style="font-weight: bold; color: #1e3c72; margin: 10px 0; font-size: 1.2em;">
                     ${vincitore}
                 </div>
+                <div style="color: #666; margin: 5px 0;">
+                    ${finaleEsistente.data || 'N/D'} ${finaleEsistente.ora || ''}
+                </div>
+                ${marcatoriHTML}
                 ${migliorGiocatore ? `
                     <div style="margin-top: 15px;">
                         <strong>🏆 Miglior Giocatore:</strong> ${migliorGiocatore.nome}
-                        ${finaleEsistente.voto_miglior_giocatore ? `(Voto: ${finaleEsistente.voto_miglior_giocatore}/10)` : ''}
+                        (Voto: ${finaleEsistente.voto_miglior_giocatore}/10)
                     </div>
                 ` : ''}
                 ${migliorPortiere ? `
                     <div>
                         <strong>🥅 Miglior Portiere:</strong> ${migliorPortiere.nome}
-                        ${finaleEsistente.voto_portiere_casa ? `(Voto: ${finaleEsistente.voto_portiere_casa}/10)` : ''}
+                        (Voto: ${finaleEsistente.voto_miglior_portiere}/10)
                     </div>
                 ` : ''}
-                ${marcatoriHTML}
             `;
-        }
-        
-        // FUNZIONI PER MARCATORI
-        function aggiungiMarcatore() {
-            const container = document.getElementById('marcatoriContainer');
-            const squadraCasa = document.getElementById('finaleSquadraCasa').value || 'Squadra Casa';
-            const squadraOspite = document.getElementById('finaleSquadraOspite').value || 'Squadra Ospite';
-            
-            const nuovoMarcatore = document.createElement('div');
-            nuovoMarcatore.className = 'marcatore-item';
-            nuovoMarcatore.innerHTML = `
-                <select class="marcatore-giocatore marcatore-select">
-                    <option value="">Seleziona giocatore...</option>
-                </select>
-                <select class="marcatore-squadra marcatore-squadra-select">
-                    <option value="casa">${squadraCasa}</option>
-                    <option value="ospite">${squadraOspite}</option>
-                </select>
-                <input type="number" class="marcatore-minuto marcatore-minuto-input" placeholder="Min." min="1" max="120">
-                <button type="button" class="btn-rimuovi" onclick="rimuoviMarcatore(this)">✕</button>
-            `;
-            
-            container.appendChild(nuovoMarcatore);
-            aggiornaSelectGiocatoriMarcatore();
-        }
-        
-        function rimuoviMarcatore(button) {
-            button.parentElement.remove();
-        }
-        
-        function aggiornaSelectGiocatoriMarcatore() {
-            const selectGiocatori = document.querySelectorAll('.marcatore-giocatore:last-child');
-            const ultimoSelect = selectGiocatori[selectGiocatori.length - 1];
-            
-            if (!ultimoSelect) return;
-            
-            // Rimuovi tutte le opzioni tranne la prima
-            while (ultimoSelect.options.length > 1) {
-                ultimoSelect.remove(1);
-            }
-            
-            // Aggiungi TUTTI i giocatori (anche portieri)
-            giocatori.forEach(giocatore => {
-                const option = document.createElement('option');
-                option.value = giocatore.id;
-                option.textContent = `${giocatore.nome} (${giocatore.squadra}) - ${giocatore.ruolo || 'Giocatore'}`;
-                ultimoSelect.appendChild(option);
-            });
-        }
-        
-        function aggiornaNomiSquadreMarcatori() {
-            const squadraCasa = document.getElementById('finaleSquadraCasa').value || 'Squadra Casa';
-            const squadraOspite = document.getElementById('finaleSquadraOspite').value || 'Squadra Ospite';
-            
-            document.querySelectorAll('.marcatore-squadra').forEach(select => {
-                select.options[0].text = squadraCasa;
-                select.options[1].text = squadraOspite;
-            });
-        }
-        
-        function raccogliMarcatori() {
-            const marcatori = [];
-            
-            document.querySelectorAll('.marcatore-item').forEach(item => {
-                const giocatoreId = item.querySelector('.marcatore-giocatore').value;
-                const squadra = item.querySelector('.marcatore-squadra').value;
-                const minuto = item.querySelector('.marcatore-minuto').value;
-                
-                if (giocatoreId && minuto) {
-                    const giocatore = giocatori.find(g => g.id == giocatoreId);
-                    if (giocatore) {
-                        marcatori.push({
-                            giocatore_id: parseInt(giocatoreId),
-                            giocatore_nome: giocatore.nome,
-                            giocatore_ruolo: giocatore.ruolo || 'Giocatore',
-                            squadra: squadra,
-                            minuto: parseInt(minuto),
-                            squadra_nome: squadra === 'casa' ? 
-                                document.getElementById('finaleSquadraCasa').value : 
-                                document.getElementById('finaleSquadraOspite').value
-                        });
-                    }
-                }
-            });
-            
-            return marcatori;
         }
         
         // SALVA FINALE
@@ -670,8 +671,8 @@
             try {
                 // Raccogli dati
                 const finaleData = {
-                    data: null,
-                    ora: null,
+                    data: document.getElementById('finaleData').value,
+                    ora: document.getElementById('finaleOra').value,
                     squadra_casa: document.getElementById('finaleSquadraCasa').value,
                     squadra_ospite: document.getElementById('finaleSquadraOspite').value,
                     gol_casa: parseInt(document.getElementById('finaleGolCasa').value) || 0,
@@ -680,11 +681,16 @@
                     voto_miglior_giocatore: parseInt(document.getElementById('finaleVotoMigliorGiocatore').value) || null,
                     miglior_portiere: document.getElementById('finaleMigliorPortiere').value,
                     voto_miglior_portiere: parseInt(document.getElementById('finaleVotoMigliorPortiere').value) || null,
-                    marcatori: raccogliMarcatori(),
-                    eventi: []
+                    marcatori: marcatori, // <-- AGGIUNTO
+                    eventi: [] // Eventi della partita
                 };
                 
                 // Validazione
+                if (!finaleData.data) {
+                    mostraAlert('Inserisci la data della finale', 'error');
+                    return;
+                }
+                
                 if (!finaleData.squadra_casa || !finaleData.squadra_ospite) {
                     mostraAlert('Seleziona entrambe le squadre finaliste', 'error');
                     return;
@@ -695,21 +701,8 @@
                     return;
                 }
                 
-                if (!finaleData.miglior_giocatore) {
-                    mostraAlert('Seleziona il miglior giocatore', 'error');
-                    return;
-                }
-                
-                if (!finaleData.voto_miglior_giocatore || finaleData.voto_miglior_giocatore < 1 || finaleData.voto_miglior_giocatore > 10) {
-                    mostraAlert('Inserisci un voto valido per il miglior giocatore (1-10)', 'error');
-                    return;
-                }
-                
-                // Validazione marcatori
-                const marcatori = finaleData.marcatori;
-                const golTotali = finaleData.gol_casa + finaleData.gol_ospite;
-                if (marcatori.length !== golTotali) {
-                    mostraAlert(`Il numero di marcatori (${marcatori.length}) non corrisponde al numero totale di gol (${golTotali})`, 'error');
+                if (!finaleData.miglior_giocatore || !finaleData.voto_miglior_giocatore) {
+                    mostraAlert('Seleziona il miglior giocatore con voto', 'error');
                     return;
                 }
                 
@@ -774,22 +767,11 @@
         
         // ESPORTA FUNZIONI
         window.aggiornaVincitoreFinale = aggiornaVincitoreFinale;
+        window.aggiungiMarcatore = aggiungiMarcatore;
+        window.rimuoviMarcatore = rimuoviMarcatore;
         window.salvaFinale = salvaFinale;
         window.eliminaFinale = eliminaFinale;
         window.tornaIndietro = tornaIndietro;
-        window.aggiungiMarcatore = aggiungiMarcatore;
-        window.rimuoviMarcatore = rimuoviMarcatore;
-        
-        // Aggiorna nomi squadre nei marcatori quando cambiano le squadre
-        document.getElementById('finaleSquadraCasa').addEventListener('change', function() {
-            aggiornaVincitoreFinale();
-            aggiornaNomiSquadreMarcatori();
-        });
-        
-        document.getElementById('finaleSquadraOspite').addEventListener('change', function() {
-            aggiornaVincitoreFinale();
-            aggiornaNomiSquadreMarcatori();
-        });
         
     </script>
 </body>

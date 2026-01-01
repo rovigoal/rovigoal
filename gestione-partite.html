@@ -829,39 +829,92 @@
             });
         }
         
-        // AGGIORNA GIOCATORI PER EVENTI
-        function aggiornaGiocatoriEvento() {
-            const selectGiocatore = document.getElementById('eventoGiocatore');
-            const squadraSelezionata = document.getElementById('eventoSquadra').value;
-            const squadraCasa = document.getElementById('squadraCasa').value;
-            const squadraOspite = document.getElementById('squadraOspite').value;
-            
-            // Pulisci opzioni
-            while (selectGiocatore.options.length > 1) selectGiocatore.remove(1);
-            
-            let giocatoriFiltrati = [];
-            
-            if (squadraSelezionata === 'casa' && squadraCasa) {
-                giocatoriFiltrati = giocatori.filter(g => g.squadra === squadraCasa);
-            } else if (squadraSelezionata === 'ospite' && squadraOspite) {
-                giocatoriFiltrati = giocatori.filter(g => g.squadra === squadraOspite);
-            }
-            
-            // Aggiungi giocatori
-            if (giocatoriFiltrati.length === 0) {
-                const option = document.createElement('option');
-                option.value = '';
-                option.textContent = 'Seleziona prima una squadra';
-                selectGiocatore.appendChild(option);
-            } else {
-                giocatoriFiltrati.forEach(giocatore => {
-                    const option = document.createElement('option');
-                    option.value = giocatore.id;
-                    option.textContent = `${giocatore.nome} ${giocatore.numero ? `(#${giocatore.numero})` : ''}`;
-                    selectGiocatore.appendChild(option);
-                });
-            }
+        // AGGIORNA GIOCATORI PER EVENTI - VERSIONE CORRETTA
+function aggiornaGiocatoriEvento() {
+    const selectGiocatore = document.getElementById('eventoGiocatore');
+    const squadraSelezionata = document.getElementById('eventoSquadra').value;
+    const squadraCasa = document.getElementById('squadraCasa').value;
+    const squadraOspite = document.getElementById('squadraOspite').value;
+    
+    console.log('DEBUG aggiornaGiocatoriEvento:', {
+        squadraSelezionata,
+        squadraCasa,
+        squadraOspite,
+        totaleGiocatori: giocatori.length
+    });
+    
+    // Salva valore attuale
+    const valoreAttuale = selectGiocatore.value;
+    
+    // Pulisci opzioni (mantieni solo la prima)
+    while (selectGiocatore.options.length > 1) {
+        selectGiocatore.remove(1);
+    }
+    
+    // Se nessuna squadra selezionata
+    if (!squadraSelezionata) {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = '→ Seleziona prima "Casa" o "Ospite"';
+        selectGiocatore.appendChild(option);
+        return;
+    }
+    
+    // Determina nome squadra reale
+    let nomeSquadraReale = '';
+    if (squadraSelezionata === 'casa') {
+        nomeSquadraReale = squadraCasa;
+    } else if (squadraSelezionata === 'ospite') {
+        nomeSquadraReale = squadraOspite;
+    }
+    
+    console.log('DEBUG: Cercando giocatori per squadra:', nomeSquadraReale);
+    
+    // Se non c'è squadra selezionata nelle squadre principali
+    if (!nomeSquadraReale) {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = '→ Seleziona prima le squadre nel Step 1';
+        selectGiocatore.appendChild(option);
+        return;
+    }
+    
+    // Filtra giocatori della squadra corretta
+    const giocatoriFiltrati = giocatori.filter(g => {
+        const appartiene = g.squadra === nomeSquadraReale;
+        console.log(`DEBUG: Giocatore ${g.nome} (${g.squadra}) appartiene a ${nomeSquadraReale}? ${appartiene}`);
+        return appartiene;
+    });
+    
+    console.log('DEBUG: Giocatori trovati:', giocatoriFiltrati.length);
+    
+    // Aggiungi giocatori
+    if (giocatoriFiltrati.length === 0) {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = `Nessun giocatore in ${nomeSquadraReale}`;
+        selectGiocatore.appendChild(option);
+    } else {
+        // Aggiungi opzione vuota
+        const optionVuota = document.createElement('option');
+        optionVuota.value = '';
+        optionVuota.textContent = 'Seleziona giocatore...';
+        selectGiocatore.appendChild(optionVuota);
+        
+        // Aggiungi giocatori
+        giocatoriFiltrati.forEach(giocatore => {
+            const option = document.createElement('option');
+            option.value = giocatore.id;
+            option.textContent = `${giocatore.nome} ${giocatore.numero ? `(#${giocatore.numero})` : ''}`;
+            selectGiocatore.appendChild(option);
+        });
+        
+        // Ripristina valore selezionato se possibile
+        if (valoreAttuale && giocatoriFiltrati.some(g => g.id === valoreAttuale)) {
+            selectGiocatore.value = valoreAttuale;
         }
+    }
+}
         
         // AGGIORNA GIOCATORI PER SELECT (premi)
         function aggiornaGiocatoriSelect() {

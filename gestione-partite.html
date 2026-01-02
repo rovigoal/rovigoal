@@ -823,7 +823,7 @@
             }
         }
         
-        // ============ TAB 1: CREAZIONE PARTITE (COME NEL VECCHIO FILE) ============
+        // ============ TAB 1: CREAZIONE PARTITE ============
         
         // POPOLA SELECT SQUADRE
         function popolaSelectSquadre() {
@@ -1102,12 +1102,14 @@
             const squadraCasa = document.getElementById('squadraCasa').value;
             const squadraOspite = document.getElementById('squadraOspite').value;
             
-            // Miglior giocatore (tutti i giocatori)
+            // Miglior giocatore (tutti i giocatori tranne portieri)
             giocatori.forEach(g => {
-                const option = document.createElement('option');
-                option.value = g.id;
-                option.textContent = g.nome + ' (' + g.squadra + ')';
-                selectMiglior.appendChild(option);
+                if (!g.ruolo || g.ruolo.toLowerCase() !== 'portiere') {
+                    const option = document.createElement('option');
+                    option.value = g.id;
+                    option.textContent = g.nome + ' (' + g.squadra + ')';
+                    selectMiglior.appendChild(option);
+                }
             });
             
             // Portiere casa
@@ -1183,32 +1185,48 @@
                     }
                 }
                 
-                // 4. Aggiorna premi miglior giocatore
+                // 4. AGGIORNA PUNTEGGIO MIGLIOR GIOCATORE (SOLO PER GIOCATORI DI CAMPO)
                 if (partita.miglior_giocatore) {
                     const mg = giocatori.find(g => g.id == partita.miglior_giocatore);
                     if (mg) {
-                        await database.aggiornaGiocatore(mg.id, {
-                            premi_miglior_giocatore: (mg.premi_miglior_giocatore || 0) + 1
-                        });
+                        const isPortiere = mg.ruolo && mg.ruolo.toLowerCase() === 'portiere';
+                        
+                        if (!isPortiere) {
+                            // Giocatore di campo
+                            const nuovoPunteggio = (mg.punteggio_totale || 0) + partita.voto_miglior_giocatore;
+                            await database.aggiornaGiocatore(mg.id, {
+                                premi_miglior_giocatore: (mg.premi_miglior_giocatore || 0) + 1,
+                                punteggio_totale: nuovoPunteggio
+                            });
+                            console.log(`✅ Aggiornato miglior giocatore (campo): ${mg.nome}, punteggio: ${nuovoPunteggio}`);
+                        } else {
+                            console.log(`⚠️ Il miglior giocatore selezionato è un portiere (${mg.nome}), non aggiorno premi_miglior_giocatore`);
+                        }
                     }
                 }
                 
-                // 5. Aggiorna premi portieri
+                // 5. AGGIORNA PUNTEGGIO PORTIERI
                 if (partita.portiere_casa) {
                     const pc = giocatori.find(g => g.id == partita.portiere_casa);
-                    if (pc) {
+                    if (pc && pc.ruolo && pc.ruolo.toLowerCase() === 'portiere') {
+                        const nuovoPunteggio = (pc.punteggio_totale || 0) + partita.voto_portiere_casa;
                         await database.aggiornaGiocatore(pc.id, {
-                            premi_miglior_portiere: (pc.premi_miglior_portiere || 0) + 1
+                            premi_miglior_portiere: (pc.premi_miglior_portiere || 0) + 1,
+                            punteggio_totale: nuovoPunteggio
                         });
+                        console.log(`✅ Aggiornato portiere casa: ${pc.nome}, punteggio: ${nuovoPunteggio}`);
                     }
                 }
                 
                 if (partita.portiere_ospite) {
                     const po = giocatori.find(g => g.id == partita.portiere_ospite);
-                    if (po) {
+                    if (po && po.ruolo && po.ruolo.toLowerCase() === 'portiere') {
+                        const nuovoPunteggio = (po.punteggio_totale || 0) + partita.voto_portiere_ospite;
                         await database.aggiornaGiocatore(po.id, {
-                            premi_miglior_portiere: (po.premi_miglior_portiere || 0) + 1
+                            premi_miglior_portiere: (po.premi_miglior_portiere || 0) + 1,
+                            punteggio_totale: nuovoPunteggio
                         });
+                        console.log(`✅ Aggiornato portiere ospite: ${po.nome}, punteggio: ${nuovoPunteggio}`);
                     }
                 }
                 
@@ -1235,6 +1253,9 @@
                 // Aggiorna lista partite per la tab elimina
                 partite = await database.getPartite();
                 
+                // Ricarica i giocatori per aggiornare i dati locali
+                giocatori = await database.getGiocatori();
+                
                 aggiornaStatoConnessione('ok');
                 
             } catch (error) {
@@ -1244,7 +1265,7 @@
             }
         }
         
-        // ============ FUNZIONE PER AGGIORNARE STATISTICHE SQUADRE (QUANDO SI CREA PARTITA) ============
+        // ============ FUNZIONE PER AGGIORNARE STATISTICHE SQUADRE ============
         async function aggiornaStatisticheSquadrePerNuovaPartita(partita) {
             try {
                 console.log('Aggiornamento statistiche per nuova partita:', partita);
@@ -1510,30 +1531,38 @@
                 }
             }
             
-            // Aggiorna premi miglior giocatore/portiere - RIMUOVENDO
+            // Aggiorna premi e punteggi - RIMUOVENDO
             if (partita.miglior_giocatore) {
                 const mg = giocatori.find(g => g.id == partita.miglior_giocatore);
                 if (mg) {
-                    await database.aggiornaGiocatore(mg.id, {
-                        premi_miglior_giocatore: Math.max(0, (mg.premi_miglior_giocatore || 0) - 1)
-                    });
+                    const isPortiere = mg.ruolo && mg.ruolo.toLowerCase() === 'portiere';
+                    
+                    if (!isPortiere) {
+                        // Era un giocatore di campo
+                        await database.aggiornaGiocatore(mg.id, {
+                            premi_miglior_giocatore: Math.max(0, (mg.premi_miglior_giocatore || 0) - 1),
+                            punteggio_totale: Math.max(0, (mg.punteggio_totale || 0) - (partita.voto_miglior_giocatore || 0))
+                        });
+                    }
                 }
             }
             
             if (partita.portiere_casa) {
                 const pc = giocatori.find(g => g.id == partita.portiere_casa);
-                if (pc) {
+                if (pc && pc.ruolo && pc.ruolo.toLowerCase() === 'portiere') {
                     await database.aggiornaGiocatore(pc.id, {
-                        premi_miglior_portiere: Math.max(0, (pc.premi_miglior_portiere || 0) - 1)
+                        premi_miglior_portiere: Math.max(0, (pc.premi_miglior_portiere || 0) - 1),
+                        punteggio_totale: Math.max(0, (pc.punteggio_totale || 0) - (partita.voto_portiere_casa || 0))
                     });
                 }
             }
             
             if (partita.portiere_ospite) {
                 const po = giocatori.find(g => g.id == partita.portiere_ospite);
-                if (po) {
+                if (po && po.ruolo && po.ruolo.toLowerCase() === 'portiere') {
                     await database.aggiornaGiocatore(po.id, {
-                        premi_miglior_portiere: Math.max(0, (po.premi_miglior_portiere || 0) - 1)
+                        premi_miglior_portiere: Math.max(0, (po.premi_miglior_portiere || 0) - 1),
+                        punteggio_totale: Math.max(0, (po.punteggio_totale || 0) - (partita.voto_portiere_ospite || 0))
                     });
                 }
             }
@@ -1544,6 +1573,9 @@
                 if (s.id === squadraOspite.id) return { ...s, ...nuoviValoriOspite };
                 return s;
             });
+            
+            // Ricarica i giocatori per aggiornare i dati locali
+            giocatori = await database.getGiocatori();
         }
         
         // ============ FUNZIONI COMUNI ============

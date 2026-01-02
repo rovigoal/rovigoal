@@ -517,7 +517,7 @@
         <div id="portieri" class="tab-content">
             <h2>🥅 CLASSIFICA PORTIERI</h2>
             <div class="avviso">
-                <strong>Nota:</strong> Questa classifica tiene conto dei voti assegnati come "Miglior Portiere" durante le partite
+                <strong>Nota:</strong> Questa classifica mostra i portieri con i voti ricevuti nelle partite
             </div>
             <table>
                 <thead>
@@ -525,14 +525,12 @@
                         <th width="60">#</th>
                         <th>Portiere</th>
                         <th>Squadra</th>
-                        <th width="100">Punteggio</th>
-                        <th width="100">Premi</th>
-                        <th width="100">Media Voto</th>
-                        <th width="100">Partite</th>
+                        <th width="120">Punteggio</th>
+                        <th width="120">Media Voto</th>
                     </tr>
                 </thead>
                 <tbody id="tabellaPortieri">
-                    <tr><td colspan="7" class="empty-state">Caricamento portieri...</td></tr>
+                    <tr><td colspan="5" class="empty-state">Caricamento portieri...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -541,7 +539,7 @@
         <div id="punteggi" class="tab-content">
             <h2>⭐ CLASSIFICA MIGLIORI GIOCATORI</h2>
             <div class="avviso">
-                <strong>Nota:</strong> Questa classifica mostra SOLO i giocatori che hanno ricevuto voti come "Miglior Giocatore"
+                <strong>Nota:</strong> Questa classifica mostra SOLO i giocatori di campo che hanno ricevuto voti come "Miglior Giocatore"
             </div>
             <table>
                 <thead>
@@ -625,14 +623,8 @@
             aggiornaStatoConnessione('caricamento');
             
             try {
-                // Prima controlla se ci sono dati in cache
-                await caricaDaCache();
-                
-                // Poi carica dati freschi da Supabase
+                // Carica dati iniziali
                 await caricaDatiIniziali();
-                
-                // Setup listener in tempo reale
-                setupRealtimeListeners();
                 
                 aggiornaStatoConnessione('ok');
                 
@@ -645,32 +637,6 @@
                 mostraErrore('Errore nel caricamento delle statistiche. Riprova più tardi.');
             }
         });
-        
-        // CARICA DATI DA CACHE
-        async function caricaDaCache() {
-            try {
-                const cacheSquadre = sessionStorage.getItem('cache_squadre');
-                const cacheGiocatori = sessionStorage.getItem('cache_giocatori');
-                const cachePartite = sessionStorage.getItem('cache_partite');
-                
-                if (cacheSquadre && cacheGiocatori && cachePartite) {
-                    datiTorneo.squadre = JSON.parse(cacheSquadre);
-                    datiTorneo.giocatori = JSON.parse(cacheGiocatori);
-                    datiTorneo.partite = JSON.parse(cachePartite);
-                    
-                    console.log('Dati caricati dalla cache:', {
-                        squadre: datiTorneo.squadre.length,
-                        giocatori: datiTorneo.giocatori.length,
-                        partite: datiTorneo.partite.length
-                    });
-                    
-                    return true;
-                }
-            } catch (error) {
-                console.warn('Errore caricamento cache:', error);
-            }
-            return false;
-        }
         
         // CARICA DATI INIZIALI DA SUPABASE
         async function caricaDatiIniziali() {
@@ -690,16 +656,11 @@
                 ultimoAggiornamento = new Date();
                 aggiornaInfoAggiornamento();
                 
-                console.log('Dati Supabase caricati:', {
+                console.log('Dati caricati:', {
                     squadre: datiTorneo.squadre.length,
                     giocatori: datiTorneo.giocatori.length,
                     partite: datiTorneo.partite.length
                 });
-                
-                // Aggiorna cache
-                sessionStorage.setItem('cache_squadre', JSON.stringify(datiTorneo.squadre));
-                sessionStorage.setItem('cache_giocatori', JSON.stringify(datiTorneo.giocatori));
-                sessionStorage.setItem('cache_partite', JSON.stringify(datiTorneo.partite));
                 
                 // Aggiorna filtro squadre
                 aggiornaFiltroSquadre();
@@ -708,40 +669,6 @@
                 console.error('Errore nel caricamento iniziale:', error);
                 throw error;
             }
-        }
-        
-        // SETUP LISTENER TEMPO REALE
-        function setupRealtimeListeners() {
-            // Ascolta aggiornamenti dal database Supabase
-            window.onDatabaseUpdate = function(type, data) {
-                console.log(`Aggiornamento statistiche: ${type}`);
-                
-                // Aggiorna i dati locali
-                if (type === 'squadre') {
-                    datiTorneo.squadre = data || [];
-                    sessionStorage.setItem('cache_squadre', JSON.stringify(data));
-                    aggiornaFiltroSquadre();
-                } else if (type === 'giocatori') {
-                    datiTorneo.giocatori = data || [];
-                    sessionStorage.setItem('cache_giocatori', JSON.stringify(data));
-                } else if (type === 'partite') {
-                    datiTorneo.partite = data || [];
-                    sessionStorage.setItem('cache_partite', JSON.stringify(data));
-                }
-                
-                ultimoAggiornamento = new Date();
-                contatoreAggiornamenti++;
-                
-                // Aggiorna l'interfaccia
-                aggiornaInfoAggiornamento();
-                aggiornaStatoConnessione('ok');
-                
-                // Ricarica il tab attivo
-                caricaStatistiche(tabAttivo);
-                
-                // Mostra notifica
-                mostraNotificaAggiornamento(type);
-            };
         }
         
         // FUNZIONE PER CAMBIARE TAB
@@ -817,7 +744,7 @@
         function caricaTabellaCannoniere() {
             const tbody = document.getElementById('tabellaCannoniere');
             
-            // Filtra giocatori con gol
+            // Filtra giocatori con gol (TUTTI, anche portieri)
             const cannonieri = datiTorneo.giocatori
                 .filter(g => (g.gol || 0) > 0)
                 .sort((a, b) => (b.gol || 0) - (a.gol || 0));
@@ -943,41 +870,47 @@
             tbody.innerHTML = html;
         }
         
-        // TABELLA PORTIERI
+        // TABELLA PORTIERI (SOLO 4 COLONNE)
         function caricaTabellaPortieri() {
             const tbody = document.getElementById('tabellaPortieri');
             
-            // Filtra SOLO portieri con voti
-            const portieriConVoti = datiTorneo.giocatori.filter(g => 
+            // Filtra SOLO portieri con punteggio totale > 0
+            const portieri = datiTorneo.giocatori.filter(g => 
                 g.ruolo && g.ruolo.toLowerCase() === 'portiere' && 
-                g.punteggio_totale && g.punteggio_totale > 0 && 
-                g.premi_miglior_portiere > 0
+                g.punteggio_totale && g.punteggio_totale > 0
             );
             
-            if (portieriConVoti.length === 0) {
+            if (portieri.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="7" class="empty-state">
-                            Nessun portiere ha ancora ricevuto voti come "Miglior Portiere"
+                        <td colspan="5" class="empty-state">
+                            Nessun portiere ha ancora ricevuto voti
                         </td>
                     </tr>
                 `;
                 return;
             }
             
-            // Ordina per punteggio
-            portieriConVoti.sort((a, b) => b.punteggio_totale - a.punteggio_totale);
+            // Ordina per punteggio (più alto)
+            portieri.sort((a, b) => b.punteggio_totale - a.punteggio_totale);
             
             let html = '';
-            portieriConVoti.forEach((portiere, index) => {
+            portieri.forEach((portiere, index) => {
                 let medaglia = '';
                 if (index === 0) medaglia = '<span class="medaglie medaglia-oro">🥇</span>';
                 else if (index === 1) medaglia = '<span class="medaglie medaglia-argento">🥈</span>';
                 else if (index === 2) medaglia = '<span class="medaglie medaglia-bronzo">🥉</span>';
                 
-                const premi = portiere.premi_miglior_portiere || 0;
-                const mediaVoto = premi > 0 ? (portiere.punteggio_totale / premi).toFixed(2) : '0.00';
-                const partiteGiocate = calcolaPartiteGiocate(portiere);
+                // Calcola media voto
+                const premiPortiere = portiere.premi_miglior_portiere || 0;
+                const mediaVoto = premiPortiere > 0 ? (portiere.punteggio_totale / premiPortiere).toFixed(2) : '0.00';
+                
+                // Determina classe colore per media voto
+                let classeVoto = '';
+                const mediaNum = parseFloat(mediaVoto);
+                if (mediaNum >= 7) classeVoto = 'voto-alto';
+                else if (mediaNum >= 5) classeVoto = 'voto-medio';
+                else classeVoto = 'voto-basso';
                 
                 html += `
                     <tr class="stat-portiere">
@@ -987,13 +920,9 @@
                         <td class="voto-cell voto-alto">
                             <strong>${portiere.punteggio_totale}</strong>
                         </td>
-                        <td>
-                            <strong>${premi}</strong> 🏅
-                        </td>
-                        <td class="voto-alto">
+                        <td class="${classeVoto}">
                             <strong>${mediaVoto}/10</strong>
                         </td>
-                        <td>${partiteGiocate}</td>
                     </tr>
                 `;
             });
@@ -1001,15 +930,15 @@
             tbody.innerHTML = html;
         }
         
-        // TABELLA PUNTEGGI
+        // TABELLA PUNTEGGI (SOLO GIOCATORI DI CAMPO)
         function caricaTabellaPunteggi() {
             const tbody = document.getElementById('tabellaPunteggi');
             
-            // Filtra SOLO giocatori di campo con voti
+            // Filtra SOLO giocatori di campo con premi_miglior_giocatore > 0
             const giocatoriConVoti = datiTorneo.giocatori.filter(g => 
                 g.punteggio_totale && g.punteggio_totale > 0 && 
                 g.premi_miglior_giocatore > 0 &&
-                g.ruolo === 'Giocatore'
+                (!g.ruolo || g.ruolo.toLowerCase() !== 'portiere')
             );
             
             if (giocatoriConVoti.length === 0) {
@@ -1047,7 +976,7 @@
                         <td class="posizione">${index + 1}${medaglia}</td>
                         <td class="giocatore">${giocatore.nome}</td>
                         <td class="squadra">${giocatore.squadra || 'N/A'}</td>
-                        <td>Giocatore</td>
+                        <td>${giocatore.ruolo || 'Giocatore'}</td>
                         <td class="voto-cell ${classeVoto}">
                             <span class="punteggio-totale">${giocatore.punteggio_totale}</span>
                         </td>
@@ -1246,7 +1175,7 @@
                     
                 case 'ok':
                     statusElement.className = 'connessione-status connessione-ok';
-                    statusElement.innerHTML = '✓ Connesso in tempo reale';
+                    statusElement.innerHTML = '✓ Connesso';
                     break;
                     
                 case 'ko':
@@ -1263,23 +1192,6 @@
                 elemento.style.color = '#4CAF50';
                 elemento.style.fontWeight = 'bold';
             }
-        }
-        
-        function mostraNotificaAggiornamento(tipo) {
-            const notifica = document.getElementById('notificaAggiornamento');
-            
-            const messaggi = {
-                'squadre': 'Squadre aggiornate!',
-                'giocatori': 'Giocatori aggiornati!',
-                'partite': 'Partite aggiornate!'
-            };
-            
-            notifica.textContent = `🔄 ${messaggi[tipo] || 'Statistiche aggiornate!'}`;
-            notifica.style.display = 'block';
-            
-            setTimeout(() => {
-                notifica.style.display = 'none';
-            }, 3000);
         }
         
         function mostraErrore(messaggio) {

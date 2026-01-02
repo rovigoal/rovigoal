@@ -1139,7 +1139,7 @@
             }
         }
         
-        // ============ SALVA PARTITA (FUNZIONE CORRETTA) ============
+        // ============ SALVA PARTITA (VERSIONE COMPLETA E FUNZIONANTE) ============
         async function salvaPartita() {
             if (!validaStep(4)) return;
             
@@ -1167,10 +1167,10 @@
                 // 1. Salva partita nel database
                 const partitaSalvata = await database.aggiungiPartita(partita);
                 
-                // 2. AGGIORNA STATISTICHE SQUADRE (PUNTI, GOL, ETC.)
+                // 2. AGGIORNA STATISTICHE SQUADRE
                 await aggiornaStatisticheSquadrePerNuovaPartita(partita);
                 
-                // 3. Aggiorna statistiche giocatori (gol, ammonizioni, espulsioni)
+                // 3. AGGIORNA STATISTICHE GIOCATORI (GOL, AMMONIZIONI, ESPULSIONI)
                 for (let evento of eventi) {
                     const giocatore = giocatori.find(g => g.id == evento.giocatoreId);
                     if (giocatore) {
@@ -1185,23 +1185,15 @@
                     }
                 }
                 
-                // 4. AGGIORNA PUNTEGGIO MIGLIOR GIOCATORE (SOLO PER GIOCATORI DI CAMPO)
+                // 4. AGGIORNA PUNTEGGIO MIGLIOR GIOCATORE (SOLO GIOCATORI DI CAMPO)
                 if (partita.miglior_giocatore) {
                     const mg = giocatori.find(g => g.id == partita.miglior_giocatore);
-                    if (mg) {
-                        const isPortiere = mg.ruolo && mg.ruolo.toLowerCase() === 'portiere';
-                        
-                        if (!isPortiere) {
-                            // Giocatore di campo
-                            const nuovoPunteggio = (mg.punteggio_totale || 0) + partita.voto_miglior_giocatore;
-                            await database.aggiornaGiocatore(mg.id, {
-                                premi_miglior_giocatore: (mg.premi_miglior_giocatore || 0) + 1,
-                                punteggio_totale: nuovoPunteggio
-                            });
-                            console.log(`✅ Aggiornato miglior giocatore (campo): ${mg.nome}, punteggio: ${nuovoPunteggio}`);
-                        } else {
-                            console.log(`⚠️ Il miglior giocatore selezionato è un portiere (${mg.nome}), non aggiorno premi_miglior_giocatore`);
-                        }
+                    if (mg && (!mg.ruolo || mg.ruolo.toLowerCase() !== 'portiere')) {
+                        const nuovoPunteggio = (mg.punteggio_totale || 0) + partita.voto_miglior_giocatore;
+                        await database.aggiornaGiocatore(mg.id, {
+                            premi_miglior_giocatore: (mg.premi_miglior_giocatore || 0) + 1,
+                            punteggio_totale: nuovoPunteggio
+                        });
                     }
                 }
                 
@@ -1214,7 +1206,6 @@
                             premi_miglior_portiere: (pc.premi_miglior_portiere || 0) + 1,
                             punteggio_totale: nuovoPunteggio
                         });
-                        console.log(`✅ Aggiornato portiere casa: ${pc.nome}, punteggio: ${nuovoPunteggio}`);
                     }
                 }
                 
@@ -1226,11 +1217,15 @@
                             premi_miglior_portiere: (po.premi_miglior_portiere || 0) + 1,
                             punteggio_totale: nuovoPunteggio
                         });
-                        console.log(`✅ Aggiornato portiere ospite: ${po.nome}, punteggio: ${nuovoPunteggio}`);
                     }
                 }
                 
-                mostraAlert(`✅ Partita ${partita.squadra_casa} ${partita.gol_casa}-${partita.gol_ospite} ${partita.squadra_ospite} salvata!`, 'success');
+                // 6. RICARICA TUTTI I DATI DAL DATABASE
+                giocatori = await database.getGiocatori();
+                squadre = await database.getSquadre();
+                partite = await database.getPartite();
+                
+                mostraAlert(`✅ Partita ${partita.squadra_casa} ${partita.gol_casa}-${partita.gol_ospite} ${partita.squadra_ospite} salvata! Statistiche aggiornate.`, 'success');
                 
                 // Reset form
                 eventi = [];
@@ -1249,13 +1244,6 @@
                 
                 aggiornaListaEventi();
                 cambiaStep(1);
-                
-                // Aggiorna lista partite per la tab elimina
-                partite = await database.getPartite();
-                
-                // Ricarica i giocatori per aggiornare i dati locali
-                giocatori = await database.getGiocatori();
-                
                 aggiornaStatoConnessione('ok');
                 
             } catch (error) {
@@ -1268,8 +1256,6 @@
         // ============ FUNZIONE PER AGGIORNARE STATISTICHE SQUADRE ============
         async function aggiornaStatisticheSquadrePerNuovaPartita(partita) {
             try {
-                console.log('Aggiornamento statistiche per nuova partita:', partita);
-                
                 const squadraCasa = squadre.find(s => s.nome === partita.squadra_casa);
                 const squadraOspite = squadre.find(s => s.nome === partita.squadra_ospite);
                 
@@ -1312,9 +1298,6 @@
                     nuoviValoriOspite.pareggi = (squadraOspite.pareggi || 0) + 1;
                     nuoviValoriOspite.punti = (squadraOspite.punti || 0) + 1;
                 }
-                
-                console.log('Nuovi valori casa:', nuoviValoriCasa);
-                console.log('Nuovi valori ospite:', nuoviValoriOspite);
                 
                 // Aggiorna nel database
                 await database.aggiornaSquadra(squadraCasa.id, nuoviValoriCasa);

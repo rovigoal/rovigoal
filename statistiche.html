@@ -323,32 +323,6 @@
             to { transform: rotate(360deg); }
         }
         
-        /* NOTIFICA AGGIORNAMENTO */
-        .notifica-aggiornamento {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            z-index: 9999;
-            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2s forwards;
-            font-weight: bold;
-            display: none;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; transform: translateX(100%); }
-        }
-        
         /* INFO DATA AGGIORNAMENTO */
         .info-aggiornamento {
             text-align: center;
@@ -421,11 +395,6 @@
     </style>
 </head>
 <body>
-    <!-- NOTIFICA AGGIORNAMENTO -->
-    <div id="notificaAggiornamento" class="notifica-aggiornamento">
-        🔄 Statistiche aggiornate in tempo reale!
-    </div>
-    
     <div class="header">
         <h1>📊 STATISTICHE ROVIGOAL</h1>
         <p>Statistiche dettagliate giocatori e squadre</p>
@@ -615,7 +584,6 @@
         
         let partiteAperte = new Set();
         let ultimoAggiornamento = null;
-        let contatoreAggiornamenti = 0;
         let tabAttivo = 'cannoniere';
         
         // INIZIALIZZAZIONE
@@ -656,7 +624,7 @@
                 ultimoAggiornamento = new Date();
                 aggiornaInfoAggiornamento();
                 
-                console.log('Dati caricati:', {
+                console.log('Dati caricati per statistiche:', {
                     squadre: datiTorneo.squadre.length,
                     giocatori: datiTorneo.giocatori.length,
                     partite: datiTorneo.partite.length
@@ -1223,20 +1191,6 @@
         if (localStorage.getItem('rovigoal_entrato') !== 'true') {
             window.location.href = 'index.html';
         }
-        
-        // CONTROLLO PERIODICO CONNESSIONE
-        setInterval(async () => {
-            try {
-                const test = await database.getSquadre();
-                if (Array.isArray(test)) {
-                    aggiornaStatoConnessione('ok');
-                } else {
-                    aggiornaStatoConnessione('ko');
-                }
-            } catch (error) {
-                aggiornaStatoConnessione('ko');
-            }
-        }, 30000);
         
         // ESPORTA FUNZIONI
         window.apriTab = apriTab;

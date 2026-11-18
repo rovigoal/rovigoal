@@ -3,144 +3,49 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ROVIGOL – Menu principale</title>
-  <meta name="description" content="ROVIGOL – Torneo di calcio a 5 e green volley." />
-
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 32px 20px 90px;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-      text-align: center;
-      color: #ffffff;
-      background: linear-gradient(135deg, #0b6b3a 0%, #16a34a 55%, #65c466 100%);
-      background-attachment: fixed;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.16), transparent 45%),
-        radial-gradient(circle at 85% 80%, rgba(255, 255, 255, 0.12), transparent 45%);
-      pointer-events: none;
-    }
-
-    .contenitore {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    h1 {
-      font-size: clamp(2rem, 7vw, 3rem);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      text-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
-    }
-
-    .sottotitolo {
-      margin-top: 10px;
-      margin-bottom: 32px;
-      font-size: clamp(0.95rem, 3.2vw, 1.15rem);
-      color: rgba(255, 255, 255, 0.9);
-    }
-
-    /* griglia con quadrati di dimensione fissa */
-    .griglia {
-      display: grid;
-      grid-template-columns: repeat(2, 150px);
-      gap: 20px;
-      justify-content: center;
-    }
-
-    .quadrato {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 150px;
-      height: 150px;
-      padding: 10px;
-      text-decoration: none;
-      color: #ffffff;
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      line-height: 1.2;
-      background: rgba(0, 0, 0, 0.22);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 18px;
-      backdrop-filter: blur(6px);
-      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
-      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-    }
-
-    .quadrato:hover {
-      background: rgba(255, 255, 255, 0.16);
-      transform: translateY(-5px);
-      box-shadow: 0 20px 38px rgba(0, 0, 0, 0.3);
-    }
-
-    .quadrato:active { transform: translateY(0); }
-
-    .quadrato:focus-visible {
-      outline: 3px solid #ffffff;
-      outline-offset: 4px;
-    }
-
-    .btn-indietro {
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      z-index: 10;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 18px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      text-decoration: none;
-      color: #0b6b3a;
-      background: #ffffff;
-      border-radius: 999px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
-      transition: transform 0.18s ease, background 0.18s ease;
-    }
-
-    .btn-indietro:hover { background: #f2f7f2; transform: translateY(-2px); }
-
-    .btn-indietro:focus-visible { outline: 3px solid #ffffff; outline-offset: 4px; }
-
-    @media (max-width: 420px) {
-      .griglia { grid-template-columns: repeat(2, 130px); gap: 14px; }
-      .quadrato { width: 130px; height: 130px; font-size: 0.85rem; }
-    }
-  </style>
+  <title>ROVIGOL — Menu</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <main class="contenitore">
-    <h1>Rovigol</h1>
-    <p class="sottotitolo">Torneo di calcio a 5 e green volley</p>
+  <div class="page content-page">
+    <div class="container">
+      <header class="topbar">
+        <a href="index.html" class="logo">Rovigol</a>
+        <span class="topbar-badge">Menu</span>
+      </header>
 
-    <nav class="griglia">
-      <a class="quadrato" href="iscrizione-torneo.html">Iscrizione<br />torneo</a>
-      <a class="quadrato" href="iscrizione-cena.html">Iscrizione<br />cena</a>
-      <a class="quadrato" href="menu.html">Menù</a>
-      <a class="quadrato" href="regolamenti.html">Regolamenti</a>
-    </nav>
-  </main>
+      <div class="content-header">
+        <span class="eyebrow">Menu principale</span>
+        <h1 class="display">Cosa vuoi <span class="accent">fare?</span></h1>
+      </div>
 
-  <a class="btn-indietro" href="index.html">← Indietro</a>
+      <nav class="cards grid-2">
+        <a href="iscrizione-torneo.html" class="card">
+          <span class="card-icon">⚽</span>
+          <div class="card-title">Iscrizione torneo</div>
+          <div class="card-desc">Calcio a 5 e green volley</div>
+        </a>
+        <a href="iscrizione-cena.html" class="card">
+          <span class="card-icon">🍝</span>
+          <div class="card-title">Iscrizione cena</div>
+          <div class="card-desc">Prenota il tuo posto a tavola</div>
+        </a>
+        <a href="menu.html" class="card">
+          <span class="card-icon">📋</span>
+          <div class="card-title">Menù</div>
+          <div class="card-desc">Scopri cosa si mangia</div>
+        </a>
+        <a href="regolamenti.html" class="card">
+          <span class="card-icon">📖</span>
+          <div class="card-title">Regolamenti</div>
+          <div class="card-desc">Le regole del torneo</div>
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-btn">← Indietro</a>
 
 </body>
 </html>

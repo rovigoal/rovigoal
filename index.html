@@ -1,36 +1,111 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rovigoal - Home</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Arial', sans-serif; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; }
-        .container { text-align: center; padding: 20px; background-color: rgba(255, 255, 255, 0.1); border-radius: 20px; backdrop-filter: blur(10px); box-shadow: 0 15px 35px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); }
-        h1 { color: white; margin-bottom: 30px; font-size: 3em; text-shadow: 3px 3px 6px rgba(0,0,0,0.5); }
-        .logo { font-size: 4em; margin-bottom: 20px; color: #FFD700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-        .entra-btn { padding: 20px 60px; font-size: 1.8em; background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%); color: white; border: none; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(0,0,0,0.3); font-weight: bold; letter-spacing: 1px; }
-        .entra-btn:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 15px 30px rgba(0,0,0,0.4); }
-        .sottotitolo { color: rgba(255,255,255,0.8); margin-top: 20px; font-size: 1.2em; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ROVIGOL – Torneo di Calcio a 5 e Green Volley</title>
+  <meta name="description" content="ROVIGOL – Torneo di calcio a 5 e green volley." />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      text-align: center;
+      color: #ffffff;
+      background: linear-gradient(135deg, #0b6b3a 0%, #16a34a 55%, #65c466 100%);
+      background-attachment: fixed;
+    }
+
+    /* alone decorativo di sfondo */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.16), transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(255, 255, 255, 0.12), transparent 45%);
+      pointer-events: none;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 720px;
+      background: rgba(0, 0, 0, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 24px;
+      padding: 48px 28px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+    }
+
+    h1 {
+      font-size: clamp(2.4rem, 10vw, 4.5rem);
+      letter-spacing: 0.06em;
+      line-height: 1;
+      text-transform: uppercase;
+      text-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    .sottotitolo {
+      margin-top: 18px;
+      font-size: clamp(1rem, 3.6vw, 1.4rem);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .btn-entra {
+      display: inline-block;
+      margin-top: 40px;
+      padding: 18px 52px;
+      font-size: clamp(1rem, 3.4vw, 1.2rem);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: #0b6b3a;
+      background: #ffffff;
+      border-radius: 999px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .btn-entra:hover {
+      background: #f2f7f2;
+      transform: translateY(-3px);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.32);
+    }
+
+    .btn-entra:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
+    }
+
+    .btn-entra:focus-visible {
+      outline: 3px solid #ffffff;
+      outline-offset: 4px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">⚽</div>
-        <h1>ROVIGOAL</h1>
-        <button class="entra-btn" onclick="entra()">ENTRA NEL SITO</button>
-        <p class="sottotitolo">Il calcio a Rovigo e dintorni</p>
-    </div>
 
-    <script>
-        function entra() {
-            localStorage.setItem('rovigoal_entrato', 'true');
-            window.location.href = 'main.html';
-        }
-        if(localStorage.getItem('rovigoal_entrato') === 'true') {
-            window.location.href = 'main.html';
-        }
-    </script>
+  <main class="card">
+    <h1>Rovigol</h1>
+    <p class="sottotitolo">Torneo di calcio a 5 e green volley</p>
+    <a class="btn-entra" href="home.html">Entra nel sito</a>
+  </main>
+
 </body>
 </html>

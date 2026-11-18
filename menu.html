@@ -3,119 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ROVIGOL – Menù</title>
-  <meta name="description" content="ROVIGOL – Menù della cena." />
-
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 32px 20px 90px;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-      text-align: center;
-      color: #ffffff;
-      background: linear-gradient(135deg, #0b6b3a 0%, #16a34a 55%, #65c466 100%);
-      background-attachment: fixed;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.16), transparent 45%),
-        radial-gradient(circle at 85% 80%, rgba(255, 255, 255, 0.12), transparent 45%);
-      pointer-events: none;
-    }
-
-    .contenitore {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 640px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    h1 {
-      font-size: clamp(1.9rem, 6.5vw, 2.8rem);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      text-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
-    }
-
-    .sottotitolo {
-      margin-top: 10px;
-      margin-bottom: 28px;
-      font-size: clamp(0.95rem, 3.2vw, 1.15rem);
-      color: rgba(255, 255, 255, 0.9);
-    }
-
-    .descrizione {
-      width: 100%;
-      padding: 24px 22px;
-      background: rgba(0, 0, 0, 0.22);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 18px;
-      backdrop-filter: blur(6px);
-      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
-      font-size: clamp(0.95rem, 3vw, 1.05rem);
-      line-height: 1.6;
-      text-align: left;
-      color: rgba(255, 255, 255, 0.95);
-    }
-
-    .descrizione strong {
-      display: block;
-      margin-bottom: 10px;
-      font-size: 1.05em;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      color: #ffffff;
-    }
-
-    .btn-indietro {
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      z-index: 10;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 18px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      text-decoration: none;
-      color: #0b6b3a;
-      background: #ffffff;
-      border-radius: 999px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
-      transition: transform 0.18s ease, background 0.18s ease;
-    }
-
-    .btn-indietro:hover { background: #f2f7f2; transform: translateY(-2px); }
-
-    .btn-indietro:focus-visible { outline: 3px solid #ffffff; outline-offset: 4px; }
-  </style>
+  <title>ROVIGOL — Menù</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <main class="contenitore">
-    <h1>Menù</h1>
-    <p class="sottotitolo">Il menù della cena ROVIGOL</p>
+  <div class="page content-page">
+    <div class="container">
+      <header class="topbar">
+        <a href="index.html" class="logo">Rovigol</a>
+        <span class="topbar-badge">Menù</span>
+      </header>
 
-    <section class="descrizione">
-      <strong>Pasta con il tonno</strong>
-      Piatto unico della serata: pasta con il tonno.
-    </section>
-  </main>
+      <div class="content-header">
+        <span class="eyebrow">Menù della cena</span>
+        <h1 class="display">Cosa si <span class="accent">mangia</span></h1>
+      </div>
 
-  <a class="btn-indietro" href="home.html">← Indietro</a>
+      <div class="panel">
+        <div class="menu-item">
+          <div>
+            <div class="menu-item-name">Pasta con il tonno</div>
+            <div class="menu-item-desc">Piatto unico della serata</div>
+          </div>
+          <span class="menu-item-emoji">🍝</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <a href="home.html" class="back-btn">← Indietro</a>
 
 </body>
 </html>

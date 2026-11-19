@@ -70,7 +70,7 @@ body::after {
   padding: 0 24px;
 }
 
-/* Topbar */
+/* ---------- Topbar ---------- */
 .topbar {
   padding: 24px 0;
   display: flex;
@@ -107,7 +107,7 @@ body::after {
   font-weight: 600;
 }
 
-/* Eyebrow */
+/* ---------- Eyebrow ---------- */
 .eyebrow {
   display: inline-block;
   font-size: 0.72rem;
@@ -124,7 +124,7 @@ body::after {
   color: var(--accent);
 }
 
-/* Display title */
+/* ---------- Display title ---------- */
 .display {
   font-family: 'Anton', sans-serif;
   font-size: clamp(2.4rem, 7vw, 5rem);
@@ -136,7 +136,7 @@ body::after {
 
 .display .accent { color: var(--accent); }
 
-/* Buttons */
+/* ---------- Buttons ---------- */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -166,7 +166,7 @@ body::after {
   box-shadow: 0 12px 32px rgba(199, 247, 62, 0.45);
 }
 
-/* Back button */
+/* ---------- Back button ---------- */
 .back-btn {
   position: fixed;
   right: 20px;
@@ -196,7 +196,7 @@ body::after {
   color: var(--accent);
 }
 
-/* Cards */
+/* ---------- Cards ---------- */
 .cards {
   display: grid;
   gap: 16px;
@@ -268,7 +268,7 @@ body::after {
   color: var(--muted);
 }
 
-/* Panels */
+/* ---------- Panels ---------- */
 .panel {
   padding: 28px;
   background: var(--surface);
@@ -285,7 +285,7 @@ body::after {
 
 .panel-body p + p { margin-top: 12px; }
 
-/* WIP badge */
+/* ---------- WIP badge ---------- */
 .wip-badge {
   display: inline-flex;
   align-items: center;
@@ -304,7 +304,7 @@ body::after {
 
 .wip-badge::before { content: '⚙'; }
 
-/* Hero */
+/* ---------- Hero ---------- */
 .hero {
   min-height: 100vh;
   display: flex;
@@ -410,7 +410,7 @@ body::after {
   50% { transform: translateY(4px); }
 }
 
-/* Menu item */
+/* ---------- Menu item ---------- */
 .menu-item {
   display: flex;
   justify-content: space-between;
@@ -441,7 +441,7 @@ body::after {
   flex-shrink: 0;
 }
 
-/* PayPal button */
+/* ---------- PayPal button ---------- */
 .paypal-btn {
   display: inline-flex;
   align-items: center;
@@ -459,7 +459,6 @@ body::after {
   border-radius: 12px;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
-  margin-top: 8px;
 }
 
 .paypal-btn:hover {
@@ -471,7 +470,7 @@ body::after {
 .paypal-btn .pp-pal { color: #009cde; }
 .paypal-btn .pp-icon { font-size: 1.3rem; }
 
-/* Content page */
+/* ---------- Content page ---------- */
 .content-page { padding-bottom: 100px; }
 
 .content-header {
@@ -480,7 +479,118 @@ body::after {
 
 .content-header .display { margin-bottom: 0; }
 
-/* Responsive */
+/* ---------- Steps iscrizione ---------- */
+.steps {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 24px;
+}
+
+.step {
+  display: flex;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.step:last-child { border-bottom: none; }
+
+.step-num {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(199, 247, 62, 0.1);
+  border: 1px solid rgba(199, 247, 62, 0.35);
+  color: var(--accent);
+  font-family: 'Anton', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.step-content { flex: 1; padding-top: 4px; }
+
+.step-title {
+  font-family: 'Anton', sans-serif;
+  font-size: 1.15rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 4px;
+  line-height: 1.15;
+}
+
+.step-desc {
+  font-size: 0.92rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.step-desc a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(199, 247, 62, 0.4);
+  transition: border-color 0.15s ease;
+}
+
+.step-desc a:hover { border-bottom-color: var(--accent); }
+
+/* ---------- Nota importante ---------- */
+.note {
+  display: flex;
+  gap: 14px;
+  padding: 18px 20px;
+  background: rgba(199, 247, 62, 0.06);
+  border: 1px solid rgba(199, 247, 62, 0.3);
+  border-radius: 12px;
+  margin: 8px 0 32px;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--text);
+}
+
+.note-icon { font-size: 1.4rem; flex-shrink: 0; }
+
+.note strong { color: var(--accent); }
+
+/* ---------- Gruppo azioni ---------- */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 26px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.btn-secondary .icon { font-size: 1.15rem; }
+
+/* ---------- Responsive ---------- */
 @media (max-width: 640px) {
   .back-btn {
     padding: 10px 16px;
@@ -492,4 +602,9 @@ body::after {
   .card { padding: 22px; }
   .topbar { padding: 18px 0; }
   .content-header { padding: 24px 0 16px; }
+}
+
+@media (max-width: 520px) {
+  .actions { flex-direction: column; }
+  .btn-secondary, .paypal-btn { width: 100%; justify-content: center; }
 }

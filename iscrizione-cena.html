@@ -20,23 +20,83 @@
         <h1 class="display">Iscrizione <span class="accent">cena</span></h1>
       </div>
 
+      <!-- Intro + prezzo -->
       <div class="panel">
-        <span class="wip-badge">Work in progress</span>
         <div class="panel-body">
           <p>
-            Aggiungere descrizione: spiegare come iscriversi alla cena, indicare
-            scadenze, quota di partecipazione e tutte le informazioni utili.
+            La cena del ROVIGOL è il momento per stare tutti insieme a tavola dopo la giornata di
+            torneo. Niente moduli, niente mail: per prenotare il tuo posto basta pagare la quota
+            tramite PayPal, ci pensiamo noi al resto.
+          </p>
+        </div>
+
+        <div style="margin-top:24px; padding-top:20px; border-top:1px dashed var(--border);">
+          <div style="color:var(--muted); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.14em; margin-bottom:10px;">
+            Quota cena
+          </div>
+          <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;">
+            <span style="font-family:'Anton', sans-serif; font-size:3.2rem; color:var(--accent); line-height:1;">€ 1000</span>
+            <span style="color:var(--muted); font-size:0.9rem; text-transform:uppercase; letter-spacing:0.14em; font-weight:600;">a testa</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Come pagare -->
+      <div class="panel">
+        <div class="step-title" style="margin-bottom:14px;">Come prenotare</div>
+        <div class="panel-body">
+          <p>
+            Clicca il pulsante <strong>PayPal — Paga la quota</strong> qui sotto e paga la tua quota.
+            Nella <strong>descrizione del pagamento</strong> scrivi il tuo <strong>nome e cognome</strong>
+            seguito da <strong>x</strong> e dal numero di persone per cui stai pagando.
+          </p>
+        </div>
+
+        <div class="note" style="margin-top:20px;">
+          <span class="note-icon">✍️</span>
+          <div>
+            <strong>Esempi:</strong><br>
+            Mario Rossi <strong>x1</strong> → una quota (€ 1000)<br>
+            Mario Rossi <strong>x2</strong> → due quote (€ 2000)<br>
+            Mario Rossi <strong>x3</strong> → tre quote (€ 3000)<br>
+            …e così via.
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <p>
+            La quota si moltiplica in automatico in base al numero che scrivi: se paghi per più
+            persone basta indicarlo con <strong>x2</strong>, <strong>x3</strong>, ecc.
           </p>
         </div>
       </div>
 
-      <a class="paypal-btn"
-         href="https://www.paypal.com/paypalme/IL-TUO-LINK"
-         target="_blank"
-         rel="noopener noreferrer">
-        <span class="pp-icon">💳</span>
-        <span><span class="pp-pay">Pay</span><span class="pp-pal">Pal</span> — Paga ora</span>
-      </a>
+      <!-- Braccialetto -->
+      <div class="panel">
+        <div class="step-title" style="margin-bottom:14px;">Braccialetto</div>
+        <div class="panel-body">
+          <p>
+            Il giorno stesso dell’evento passa dallo staff: ti consegneranno un braccialetto in base
+            al numero di quote che hai pagato. Conservalo bene, è il tuo lasciapassare per la cena.
+          </p>
+        </div>
+      </div>
+
+      <!-- Pulsante PayPal -->
+      <div class="action-box">
+        <a class="paypal-btn"
+           href="https://www.paypal.com/paypalme/IL-TUO-LINK"
+           target="_blank"
+           rel="noopener noreferrer">
+          <span class="pp-icon">💳</span>
+          <span><span class="pp-pay">Pay</span><span class="pp-pal">Pal</span> — Paga la quota</span>
+        </a>
+      </div>
+
+      <!-- Chiusura -->
+      <p style="text-align:center; margin:36px 0 8px; color:var(--muted); font-size:0.92rem; line-height:1.7;">
+        Grazie a tutti, buona cena e buon divertimento! 🍝
+      </p>
     </div>
   </div>
 

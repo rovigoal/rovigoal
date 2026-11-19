@@ -11,6 +11,7 @@
   --accent: #c7f73e;
   --accent-2: #a8d62e;
   --gold: #f0b800;
+  --red: #ff4757;
   --radius: 14px;
 }
 
@@ -532,10 +533,21 @@ body::after {
   color: var(--accent);
   text-decoration: none;
   border-bottom: 1px dashed rgba(199, 247, 62, 0.4);
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, color 0.15s ease;
 }
 
 .step-desc a:hover { border-bottom-color: var(--accent); }
+
+/* email in rosso */
+.step-desc a.email-link {
+  color: var(--red);
+  border-bottom-color: rgba(255, 71, 87, 0.45);
+}
+
+.step-desc a.email-link:hover {
+  color: #ff6b7a;
+  border-bottom-color: #ff6b7a;
+}
 
 /* ---------- Nota importante ---------- */
 .note {
@@ -555,7 +567,7 @@ body::after {
 
 .note strong { color: var(--accent); }
 
-/* ---------- Gruppo azioni ---------- */
+/* ---------- Gruppo azioni (fuori dal box) ---------- */
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -590,6 +602,44 @@ body::after {
 
 .btn-secondary .icon { font-size: 1.15rem; }
 
+/* ---------- Box giallo fluo con i 3 pulsanti ---------- */
+.action-box {
+  background: var(--accent);
+  border-radius: var(--radius);
+  padding: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: stretch;
+  justify-content: center;
+  margin-top: 8px;
+  box-shadow: 0 16px 40px rgba(199, 247, 62, 0.25);
+}
+
+.action-box .paypal-btn {
+  background: #ffffff;
+  margin: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.action-box .paypal-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.action-box .btn-secondary {
+  background: var(--bg);
+  border-color: var(--bg);
+  color: var(--text);
+}
+
+.action-box .btn-secondary:hover {
+  background: #000;
+  border-color: #000;
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 640px) {
   .back-btn {
@@ -606,5 +656,9 @@ body::after {
 
 @media (max-width: 520px) {
   .actions { flex-direction: column; }
-  .btn-secondary, .paypal-btn { width: 100%; justify-content: center; }
+  .actions .btn-secondary,
+  .actions .paypal-btn { width: 100%; justify-content: center; }
+  .action-box { flex-direction: column; padding: 18px; }
+  .action-box .btn-secondary,
+  .action-box .paypal-btn { width: 100%; justify-content: center; }
 }

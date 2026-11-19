@@ -26,7 +26,6 @@
 
   // --- Esplosione circolare ---
   function burst(x, y) {
-    // anello che si espande
     particles.push({
       ring: true,
       x: x,
@@ -38,7 +37,6 @@
       color: colors[Math.floor(Math.random() * colors.length)]
     });
 
-    // particelle radiali
     const count = 22 + Math.floor(Math.random() * 10);
     for (let i = 0; i < count; i++) {
       const angle = (i / count) * Math.PI * 2 + Math.random() * 0.15;
@@ -117,10 +115,8 @@
     const x = e.clientX;
     const y = e.clientY;
 
-    // effetto sempre
     burst(x, y);
 
-    // gestione link interni: aspetta 300ms prima di navigare
     const link = e.target.closest('a');
     if (!link) return;
 
@@ -139,6 +135,26 @@
       setTimeout(function () {
         window.location.href = href;
       }, 300);
+    }
+  });
+
+  // --- Fix: reset quando si torna indietro col tasto del browser ---
+  window.addEventListener('pageshow', function (event) {
+    // event.persisted = true se la pagina viene dal bfcache (tasto back di Chrome)
+    navigating = false;
+    particles = [];
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+      animationId = null;
+    }
+    ctx.clearRect(0, 0, canvas.width / DPR, canvas.height / DPR);
+  });
+
+  // --- Fix: ferma l'animazione quando si lascia la pagina ---
+  window.addEventListener('pagehide', function () {
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+      animationId = null;
     }
   });
 })();
